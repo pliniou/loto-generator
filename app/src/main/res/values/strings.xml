@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">Loto Generator</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Início</string>
+    <string name="nav_generator">Gerador</string>
+    <string name="nav_games">Jogos</string>
+    <string name="nav_checker">Conferidor</string>
+    <string name="nav_about">Sobre</string>
+
+    <!-- States -->
+    <string name="state_loading">Carregando…</string>
+    <string name="state_error">Não foi possível atualizar agora.</string>
+    <string name="state_offline">Sem conexão. Exibindo dados salvos.</string>
+    <string name="state_syncing">Atualizando resultados…</string>
+    <string name="state_empty_games">Você ainda não salvou nenhum jogo.</string>
+    <string name="state_stale_data">Dados de %s</string>
+
+    <!-- Actions -->
+    <string name="action_clear">Limpar seleção</string>
+    <string name="action_check">Conferir jogo</string>
+    <plurals name="action_generate">
+        <item quantity="one">Gerar %d jogo</item>
+        <item quantity="other">Gerar %d jogos</item>
+    </plurals>
+    <string name="action_save">Salvar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_apply">Aplicar</string>
+    <string name="action_delete">Excluir</string>
+    <string name="action_retry">Tentar novamente</string>
+    <string name="action_sync">Atualizar resultados</string>
+    <string name="action_remove">Remover</string>
+    <string name="action_fix_team">Fixar time</string>
+    <string name="action_redo">Refazer</string>
+    <string name="action_back">Voltar</string>
+    <string name="action_increase">Aumentar</string>
+    <string name="action_select">Selecionar</string>
+    <string name="action_generate_now">Gerar agora</string>
+    <string name="action_pin">Fixar jogo</string>
+    <string name="action_unpin">Desafixar jogo</string>
+
+    <!-- Generator -->
+    <string name="generator_title">Gerador de Jogos</string>
+    <string name="generator_select_lottery">Selecione a modalidade</string>
+    <string name="generator_quantity">Quantidade de jogos</string>
+    <string name="generator_filters">Filtros</string>
+    <string name="config_filters">Configurar filtros</string>
+    <string name="generator_presets_title">Presets</string>
+    <string name="generator_filters_active">Filtros ativos</string>
+    <string name="generator_fine_tuning">Ajuste fino</string>
+    <string name="filter_parity_range">Paridade: %1$d%% a %2$d%%</string>
+    <string name="filter_repeats_limit">Máx. repetidas do anterior: %1$d</string>
+    <string name="preset_name_label">Nome do preset</string>
+    <string name="save_preset">Salvar preset</string>
+    <string name="user_presets">Presets do usuário</string>
+    <string name="action_close">Fechar</string>
+    <string name="report_details">Detalhes do relatório</string>
+    <string name="report_attempts">Tentativas: %1$d</string>
+    <string name="report_rejected_by_filter">Rejeições por filtro</string>
+    <string name="example_label">Exemplo:</string>
+    <string name="generation_partial_warning">Geração parcial: foram gerados %1$d de %2$d jogos</string>
+    <string name="generator_total_cost">Custo total: %s</string>
+    <string name="apply_preset">Aplicar preset: %1$s</string>
+    <string name="timemania_team_optional">Time do Coração (opcional)</string>
+    <string name="timemania_random_team_saved">Aleatório (sortear ao salvar)</string>
+    <string name="error_invalid_values">Valores inválidos</string>
+    <string name="error_invalid_parity_range">Paridade deve estar entre 0.0 e 1.0 e min &lt;= max</string>
+    <string name="error_invalid_repeats">Máx. repetições inválido</string>
+    <string name="filter_all">Todos</string>
+    <plurals name="snackbar_games_saved">
+        <item quantity="one">%d jogo salvo com sucesso!</item>
+        <item quantity="other">%d jogos salvos com sucesso!</item>
+    </plurals>
+
+
+    <!-- Checker -->
+    <string name="checker_title">Conferidor</string>
+    <string name="checker_select_numbers">Selecione os números</string>
+    <string name="checker_select_team">Selecionar time…</string>
+    <string name="checker_against">Conferir contra: Conc. %1$d (%2$s)</string>
+    <string name="checker_prize_details">Detalhes do prêmio</string>
+    <string name="checker_past_prizes">Premiações já ocorridas</string>
+    <plurals name="checker_hits">
+        <item quantity="one">%d acerto</item>
+        <item quantity="other">%d acertos</item>
+    </plurals>
+    <string name="checker_dupla_mode_first">1º Sorteio</string>
+    <string name="checker_dupla_mode_second">2º Sorteio</string>
+    <string name="checker_dupla_mode_best">Melhor dos dois</string>
+    <string name="checker_prize_badge">PREMIADO!</string>
+
+    <!-- Games -->
+    <string name="games_title">Meus Jogos</string>
+    <string name="games_saved">Salvos</string>
+    <string name="games_generated">Gerados</string>
+    <string name="games_fixed">Fixado</string>
+    <string name="games_analyze">Analisar</string>
+    <plurals name="games_count">
+        <item quantity="one">%d jogo</item>
+        <item quantity="other">%d jogos</item>
+    </plurals>
+    <plurals name="games_generated_count">
+        <item quantity="one">Jogo Gerado</item>
+        <item quantity="other">Jogos Gerados (%d)</item>
+    </plurals>
+
+    <!-- Home -->
+    <string name="home_title">Início</string>
+    <string name="home_last_contest">Último sorteio</string>
+    <string name="home_next_contest">Próximo concurso</string>
+    <string name="home_estimated_prize">Prêmio estimado</string>
+    <string name="home_contest_number">Concurso %d</string>
+    <string name="home_greeting">Olá, Apostador!</string>
+    <string name="home_schedule_title">Calendário de sorteios</string>
+
+    <!-- About -->
+    <string name="about_title">Sobre</string>
+    <string name="about_disclaimer">Este aplicativo é uma ferramenta de apoio para jogadores de loterias. Os resultados exibidos são obtidos da CAIXA e podem apresentar atrasos. Não nos responsabilizamos por eventuais divergências. Jogue com responsabilidade.</string>
+    <string name="about_version">Versão %s</string>
+    <string name="about_lottery_info_title">Informações das loterias</string>
+    <string name="about_min_bet">Aposta mínima</string>
+    <string name="about_win_chance">Chance de ganhar</string>
+    <string name="about_numbers">Dezenas</string>
+    <string name="about_no_pool">Esta modalidade não permite Bolão Oficial.</string>
+    <string name="about_pool_rules">Regras do bolão</string>
+    <string name="about_pool_min_price">Preço mín.</string>
+    <string name="about_pool_min_share">Cota mín.</string>
+    <string name="about_pool_shares">Cotas</string>
+
+    <!-- Lottery Names -->
+    <string name="lottery_lotofacil">Lotofácil</string>
+    <string name="lottery_mega_sena">Mega-Sena</string>
+    <string name="lottery_quina">Quina</string>
+    <string name="lottery_lotomania">Lotomania</string>
+    <string name="lottery_dupla_sena">Dupla Sena</string>
+    <string name="lottery_timemania">Timemania</string>
+    <string name="lottery_super_sete">Super Sete</string>
+
+    <!-- Timemania -->
+    <string name="timemania_team_heart">Time do Coração</string>
+    <string name="timemania_random_team">Sortear time</string>
+    <string name="timemania_team_hit">Time acertado!</string>
+    <string name="timemania_team_miss">Errou o time</string>
+    <string name="team_display">Time: %s</string>
+    <string name="team_select_title">Selecione o time</string>
+    <string name="team_search_placeholder">Buscar time…</string>
+    <string name="team_code">UF %1$s - Cód. %2$d</string>
+
+    <!-- Super Sete -->
+    <string name="super_sete_column">Coluna %d</string>
+    <string name="super_sete_select_number">Selecione um número por coluna</string>
+
+    <!-- Common -->
+    <string name="contest">Concurso</string>
+    <string name="date">Data</string>
+    <string name="numbers">Números</string>
+    <string name="ok">OK</string>
+    <string name="contest_short">Conc. %d</string>
+    <string name="second_draw">2º sorteio</string>
+    <string name="state_no_data">Sem dados</string>
+    <string name="content_app_logo">Logo do aplicativo</string>
+    <!-- Onboarding -->
+    <string name="onboard_title_1">Bem-vindo ao Cebolão</string>
+    <string name="onboard_desc_1">Sua ferramenta completa para analisar, gerar e conferir loterias da CAIXA.</string>
+    <string name="onboard_title_2">Gerador Inteligente</string>
+    <string name="onboard_desc_2">Crie jogos com filtros estatísticos, como múltiplos de 3, pares/ímpares e moldura.</string>
+    <string name="onboard_title_3">Conferidor Automático</string>
+    <string name="onboard_desc_3">Confira seus jogos salvos contra os últimos resultados oficiais rapidamente.</string>
+    <string name="onboard_title_4">Funciona Offline</string>
+    <string name="onboard_desc_4">Acesse seus jogos e últimos resultados mesmo sem internet. Sincroniza em segundo plano.</string>
+    <string name="onboard_next">Próximo</string>
+    <string name="onboard_start">Começar</string>
+    <string name="onboard_skip">Pular</string>
+
+    <!-- Filtros de geração -->
+    <string name="filter_parity_label">Paridade</string>
+    <string name="filter_multiples_label">Múltiplos de 3</string>
+    <string name="filter_repeated_label">Repetidas do anterior</string>
+    <string name="filter_moldura_label">Moldura e miolo</string>
+    <string name="filter_primes_label">Números primos</string>
+    <string name="filter_parity_desc">Equilíbrio entre pares e ímpares</string>
+    <string name="filter_multiples_desc">Evita seleção apenas de múltiplos de 3 ou nenhuma vez</string>
+    <string name="filter_repeated_desc">Limita repetições do último concurso</string>
+    <string name="filter_moldura_desc">Garante mistura entre moldura e miolo (Lotofácil)</string>
+    <string name="filter_primes_desc">Assegura presença de ao menos um primo</string>
+    <!-- Dialogs -->
+    <string name="dialog_delete_title">Excluir jogo?</string>
+    <string name="dialog_delete_message">Tem certeza que deseja excluir este jogo? Esta ação não pode ser desfeita.</string>
+    <string name="dialog_clear_title">Limpar gerados?</string>
+    <string name="dialog_clear_message">Deseja descartar todos os jogos gerados não salvos?</string>
+
+    <!-- Statistics & Insights -->
+    <string name="checker_analysis_title">Análise de Histórico</string>
+    <string name="checker_analysis_empty">Nenhuma premiação encontrada em concursos anteriores.</string>
+    <string name="checker_analysis_subtitle">Premiações em concursos passados:</string>
+    <string name="insight_sum">Soma: %d</string>
+    <string name="insight_repeats">%d Repetidas</string>
+    <string name="action_analyze">Analisar</string>
+</resources>

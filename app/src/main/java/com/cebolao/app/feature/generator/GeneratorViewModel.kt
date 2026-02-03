@@ -1,0 +1,260 @@
+package com.cebolao.app.feature.generator
+
+import android.util.Log
+import androidx.compose.runtime.Immutable
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.cebolao.app.util.toUserMessage
+import com.cebolao.domain.model.Contest
+import com.cebolao.domain.model.FilterConfig
+import com.cebolao.domain.model.Game
+import com.cebolao.domain.model.GenerationConfig
+import com.cebolao.domain.model.GenerationFilter
+import com.cebolao.domain.model.GenerationReport
+import com.cebolao.domain.model.LotteryProfile
+import com.cebolao.domain.model.LotteryType
+import com.cebolao.domain.model.UserFilterPreset
+import com.cebolao.domain.repository.LotteryRepository
+import com.cebolao.domain.repository.ProfileRepository
+import com.cebolao.domain.repository.UserPresetRepository
+import com.cebolao.domain.result.AppResult
+import com.cebolao.domain.rules.FilterPresets
+import com.cebolao.domain.usecase.GenerateGamesUseCase
+import com.cebolao.app.di.DefaultDispatcher
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+
+@Immutable
+data class GeneratorUiState(
+    val selectedType: LotteryType = LotteryType.LOTOFACIL,
+    val quantity: Int = 1,
+    val profile: LotteryProfile? = null,
+    val generatedGames: List<Game> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val lastSavedCount: Int = 0,
+    val selectedTeam: Int? = null,
+    val activeFilters: List<GenerationFilter> = emptyList(),
+    val filterConfigs: Map<GenerationFilter, FilterConfig> = emptyMap(),
+    val showFilterConfigDialog: Boolean = false,
+    val showReportDialog: Boolean = false,
+    val generationReport: GenerationReport? = null,
+    val userPresets: List<UserFilterPreset> = emptyList(),
+    val lastContest: Contest? = null,
+)
+
+@HiltViewModel
+class GeneratorViewModel
+    @Inject
+    constructor(
+        private val profileRepository: ProfileRepository,
+        private val lotteryRepository: LotteryRepository,
+        private val userPresetRepository: UserPresetRepository,
+        private val generateGamesUseCase: GenerateGamesUseCase,
+        @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    ) : ViewModel() {
+        private val _uiState = MutableStateFlow(GeneratorUiState())
+        val uiState: StateFlow<GeneratorUiState> = _uiState.asStateFlow()
+        private var latestContestJob: Job? = null
+
+        init {
+            // Carrega perfil inicial
+            loadProfile(LotteryType.LOTOFACIL)
+
+            // Observa presets do usuário e atualiza UI
+            viewModelScope.launch {
+                userPresetRepository.observePresets().collect { presets ->
+                    _uiState.value = _uiState.value.copy(userPresets = presets)
+                }
+            }
+        }
+
+        fun onTypeSelected(type: LotteryType) {
+            loadProfile(type)
+        }
+
+        fun onQuantityChanged(quantity: Int) {
+            _uiState.value = _uiState.value.copy(quantity = quantity)
+        }
+
+        fun onTeamSelected(teamId: Int?) {
+            _uiState.value = _uiState.value.copy(selectedTeam = teamId)
+        }
+
+        fun onGenerate() {
+            val currentState = _uiState.value
+            val profile = currentState.profile ?: return
+
+            viewModelScope.launch {
+                _uiState.value = currentState.copy(isLoading = true, errorMessage = null)
+                try {
+                    // Configuração da geração
+                    val config =
+                        GenerationConfig(
+                            quantity = currentState.quantity,
+                            filters = currentState.activeFilters,
+                            filterConfigs = currentState.filterConfigs,
+                            fixedTeam = currentState.selectedTeam,
+                        )
+
+                    val result =
+                        withContext(defaultDispatcher) {
+                            // Simula um delay "mecânico" para a animação de sorteio ser percebida
+                            delay(800)
+
+                            // Usa último concurso já observado; faz fallback pontual se ainda não veio nada
+                            val lastContest = _uiState.value.lastContest ?: lotteryRepository.getLastContest(profile.type)
+                            generateGamesUseCase(profile, config, lastContest = lastContest)
+                        }
+
+                    val games = result.games
+
+                    // Se parcial, registrar e expor via estado da UI
+                    if (result.report.partial) {
+                        Log.w(
+                            "GeneratorVM",
+                            "Geração parcial: ${result.report.generated}/${config.quantity} após ${result.report.attempts} tentativas",
+                        )
+                    }
+
+                    _uiState.value =
+                        currentState.copy(
+                            generatedGames = games,
+                            isLoading = false,
+                            lastSavedCount = 0,
+                            generationReport = result.report,
+                            errorMessage = null,
+                        )
+                } catch (e: Exception) {
+                    Log.e("GeneratorVM", "Erro ao gerar jogos", e)
+                    _uiState.value = currentState.copy(isLoading = false, errorMessage = e.message ?: "Erro ao gerar jogos")
+                }
+            }
+        }
+
+        fun onSaveAll() {
+            val currentState = _uiState.value
+            if (currentState.generatedGames.isEmpty()) return
+
+            viewModelScope.launch {
+                _uiState.value = currentState.copy(isLoading = true)
+                when (val result = lotteryRepository.saveGames(currentState.generatedGames)) {
+                    is AppResult.Success -> {
+                        _uiState.value =
+                            currentState.copy(
+                                generatedGames = emptyList(),
+                                lastSavedCount = currentState.generatedGames.size,
+                                isLoading = false,
+                                errorMessage = null,
+                            )
+                    }
+                    is AppResult.Failure -> {
+                        Log.e("GeneratorVM", "Erro ao salvar jogos", result.cause)
+                        _uiState.value = currentState.copy(isLoading = false, errorMessage = result.error.toUserMessage())
+                    }
+                }
+            }
+        }
+
+        fun onClearGenerated() {
+            _uiState.value = _uiState.value.copy(generatedGames = emptyList(), lastSavedCount = 0, generationReport = null)
+        }
+
+        fun onFilterToggled(filter: GenerationFilter) {
+            val current = _uiState.value
+            val newFilters = if (current.activeFilters.contains(filter)) current.activeFilters - filter else current.activeFilters + filter
+            _uiState.value = current.copy(activeFilters = newFilters)
+        }
+
+        fun onOpenFilterConfig() {
+            _uiState.value = _uiState.value.copy(showFilterConfigDialog = true)
+        }
+
+        fun onCloseFilterConfig() {
+            _uiState.value = _uiState.value.copy(showFilterConfigDialog = false)
+        }
+
+        fun onUpdateFilterConfig(
+            filter: GenerationFilter,
+            cfg: FilterConfig,
+        ) {
+            val current = _uiState.value
+            val newMap = current.filterConfigs.toMutableMap()
+            newMap[filter] = cfg
+            _uiState.value = current.copy(filterConfigs = newMap)
+        }
+
+        fun onApplyPresetForProfile() {
+            val current = _uiState.value
+            val profile = current.profile ?: return
+            val preset = FilterPresets.presetForProfile(profile) ?: return
+            _uiState.value =
+                current.copy(
+                    activeFilters = preset.filters,
+                    filterConfigs = preset.configs,
+                )
+        }
+
+        fun onOpenReportDetails() {
+            _uiState.value = _uiState.value.copy(showReportDialog = true)
+        }
+
+        fun onCloseReportDetails() {
+            _uiState.value = _uiState.value.copy(showReportDialog = false)
+        }
+
+        fun onSaveUserPreset(name: String) {
+            val current = _uiState.value
+            val preset =
+                UserFilterPreset(
+                    name = name,
+                    filters = current.activeFilters,
+                    filterConfigs = current.filterConfigs,
+                )
+            viewModelScope.launch {
+                when (val result = userPresetRepository.savePreset(preset)) {
+                    is AppResult.Success -> _uiState.value = _uiState.value.copy(errorMessage = null)
+                    is AppResult.Failure -> _uiState.value = _uiState.value.copy(errorMessage = result.error.toUserMessage())
+                }
+            }
+        }
+
+        private fun loadProfile(type: LotteryType) {
+            latestContestJob?.cancel()
+
+            viewModelScope.launch {
+                val profile = profileRepository.getProfile(type)
+                val filteredFilters = _uiState.value.activeFilters.filter { it.isApplicable(profile) }
+                val filteredConfigs = _uiState.value.filterConfigs.filterKeys { it.isApplicable(profile) }
+                val lastContest = lotteryRepository.getLastContest(type) // Snapshot inicial
+
+                _uiState.value =
+                    _uiState.value.copy(
+                        selectedType = type,
+                        profile = profile,
+                        generatedGames = emptyList(),
+                        lastSavedCount = 0,
+                        selectedTeam = null,
+                        activeFilters = filteredFilters,
+                        filterConfigs = filteredConfigs,
+                        lastContest = lastContest,
+                    )
+            }
+
+            // Mantém lastContest reativo aos updates do Room (sync/worker)
+            latestContestJob =
+                viewModelScope.launch {
+                    lotteryRepository.observeLatestContest(type).collect { contest ->
+                        _uiState.value = _uiState.value.copy(lastContest = contest)
+                    }
+                }
+        }
+    }

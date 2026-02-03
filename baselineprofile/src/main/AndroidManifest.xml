@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.cebolao.baselineprofile">
+
+    <!--
+    Baseline Profile Generator Module
+    This module is used only for generating baseline profiles and macrobenchmarks.
+    It runs as a separate test module against the main app.
+    -->
+
+    <application
+        android:debuggable="false">
+
+        <!-- Required for macrobenchmark tests -->
+        <profileable
+            android:shell="true" />
+
+    </application>
+
+</manifest>
