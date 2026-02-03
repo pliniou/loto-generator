@@ -1,5 +1,7 @@
 package com.cebolao.app.feature.generator.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.cebolao.R
 import com.cebolao.app.component.SmallLotteryBall
 import com.cebolao.app.feature.generator.GeneratorUiState
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.app.util.GenerationFilterUiMapper
@@ -79,13 +83,18 @@ fun GeneratorConfigSection(
     ) {
         items(items = LotteryType.entries, key = { it.name }) { type ->
             val isSelected = type == uiState.selectedType
+            val chipColor by animateColorAsState(
+                targetValue = LotteryColors.getColor(type),
+                animationSpec = tween(durationMillis = 300),
+                label = "chip-color-$type"
+            )
             FilterChip(
                 selected = isSelected,
                 onClick = { onTypeSelected(type) },
                 label = { Text(stringResource(LotteryUiMapper.getNameRes(type))) },
                 colors =
                     FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = LotteryColors.getColor(type),
+                        selectedContainerColor = chipColor,
                         selectedLabelColor = LotteryColors.getOnColor(type),
                     ),
                 border =
@@ -95,7 +104,7 @@ fun GeneratorConfigSection(
                         FilterChipDefaults.filterChipBorder(
                             enabled = true,
                             selected = false,
-                            borderColor = LotteryColors.getColor(type).copy(alpha = 0.5f),
+                            borderColor = chipColor.copy(alpha = AlphaLevels.BORDER_MEDIUM),
                         )
                     },
             )
@@ -108,9 +117,9 @@ fun GeneratorConfigSection(
         shape = MaterialTheme.shapes.large,
         colors =
             CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
             ),
-        border = BorderStroke(1.dp, lotteryColor.copy(alpha = 0.2f)),
+        border = BorderStroke(1.dp, lotteryColor.copy(alpha = AlphaLevels.BORDER_LOW)),
     ) {
         Column(modifier = Modifier.padding(spacing.lg)) {
             // Quantidade
@@ -169,7 +178,7 @@ fun GeneratorConfigSection(
             val costFormatted = com.cebolao.app.util.FormatUtils.formatCurrency(totalCost.toLong())
 
             Surface(
-                color = lotteryColor.copy(alpha = 0.1f),
+                color = lotteryColor.copy(alpha = AlphaLevels.CARD_FAINT),
                 shape = MaterialTheme.shapes.small,
             ) {
                 Text(
@@ -182,7 +191,10 @@ fun GeneratorConfigSection(
             }
 
             Spacer(modifier = Modifier.height(spacing.lg))
-            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+            HorizontalDivider(
+                thickness = 0.5.dp,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT)
+            )
             Spacer(modifier = Modifier.height(spacing.md))
 
             // Filtros configuráveis
@@ -281,8 +293,11 @@ fun TimemaniaTeamCard(
                     .semantics { role = Role.Button }
                     .clickable { onShowTeamDialog() },
             shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-            border = BorderStroke(1.dp, lotteryColor.copy(alpha = 0.2f)),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
+                ),
+            border = BorderStroke(1.dp, lotteryColor.copy(alpha = AlphaLevels.BORDER_LOW)),
         ) {
             Row(
                 modifier = Modifier.padding(spacing.lg),
@@ -377,19 +392,17 @@ fun GeneratedGameItem(
     val lotteryColor = LotteryColors.getColor(game.lotteryType)
 
     // Calculate insights on the fly (lightweight)
-    val insight =
-        remember(game, lastContest) {
-            com.cebolao.domain.util.StatisticsUtil.analyzeGame(game.numbers, lastContest, emptyList())
-        }
+    val insight = remember(game, lastContest) { com.cebolao.domain.util.StatisticsUtil.analyzeGame(game.numbers, lastContest, emptyList()) }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, lotteryColor.copy(alpha = 0.15f)),
+        border = BorderStroke(1.dp, lotteryColor.copy(alpha = AlphaLevels.BORDER_FAINT)),
     ) {
         Column(modifier = Modifier.padding(spacing.lg)) {
             // Se tiver time (Timemania), mostra cabeçalho ou badge
@@ -424,7 +437,10 @@ fun GeneratedGameItem(
             }
 
             Spacer(modifier = Modifier.height(spacing.md))
-            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(
+                thickness = 0.5.dp,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT)
+            )
             Spacer(modifier = Modifier.height(spacing.md))
 
             // Insights Row com badges coloridas
@@ -437,17 +453,17 @@ fun GeneratedGameItem(
                 ) {
                     InsightBadge(
                         label = stringResource(R.string.insight_sum, insight.sum),
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                     InsightBadge(
                         label = "${insight.evenCount}P / ${insight.oddCount}I",
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     )
                     InsightBadge(
                         label = "Média: ${insight.average}",
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.4f),
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     )
                 }
@@ -460,17 +476,17 @@ fun GeneratedGameItem(
                 ) {
                     InsightBadge(
                         label = "Seq: ${insight.longestSequence}",
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_HIGH),
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     InsightBadge(
                         label = "Múlt3: ${insight.multiplesOf3}",
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_HIGH),
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     InsightBadge(
                         label = "Primos: ${insight.primeCount}",
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_HIGH),
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -484,7 +500,7 @@ fun GeneratedGameItem(
                     ) {
                         InsightBadge(
                             label = stringResource(R.string.insight_repeats, insight.repeatsFromLast),
-                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
+                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                             contentColor = MaterialTheme.colorScheme.onErrorContainer,
                         )
                     }

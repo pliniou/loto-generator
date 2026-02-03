@@ -1,24 +1,32 @@
 package com.cebolao.app.component
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.domain.model.LotteryType
 
 /**
  * Bolinha colorida com número.
+ * Otimizada com animações suaves e sombras elegantes.
  */
 @Composable
 fun LotteryBall(
@@ -30,13 +38,28 @@ fun LotteryBall(
 ) {
     val backgroundColor = LotteryColors.getColor(lotteryType)
     val contentColor = LotteryColors.getOnColor(lotteryType)
+    
+    // Animação de sombra suave
+    val elevation by animateDpAsState(
+        targetValue = 2.dp,
+        animationSpec = tween(durationMillis = 300),
+        label = "ball-elevation"
+    )
+    
+    // Animação de cor de fundo
+    val animatedBackgroundColor by animateColorAsState(
+        targetValue = backgroundColor,
+        animationSpec = tween(durationMillis = 300),
+        label = "ball-background-color"
+    )
 
     Box(
         modifier =
             modifier
                 .size(size)
                 .clip(CircleShape)
-                .background(backgroundColor),
+                .shadow(elevation, CircleShape, spotColor = backgroundColor.copy(alpha = AlphaLevels.GHOST))
+                .background(animatedBackgroundColor),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -45,13 +68,14 @@ fun LotteryBall(
             style = style,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.Center), // Ensure centering
+            modifier = Modifier.align(Alignment.Center),
         )
     }
 }
 
 /**
  * Versão simplificada pequena para listas densas.
+ * Otimizada para performance com tamanho reduzido.
  */
 @Composable
 fun SmallLotteryBall(
@@ -66,6 +90,5 @@ fun SmallLotteryBall(
             androidx.compose.material3.MaterialTheme.typography.labelSmall.copy(
                 fontSize = 10.sp,
             ),
-        // 10sp explicitly if needed or just labelSmall (11sp)
     )
 }

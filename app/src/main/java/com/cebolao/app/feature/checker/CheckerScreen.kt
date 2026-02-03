@@ -65,6 +65,7 @@ import com.cebolao.app.feature.checker.components.CheckerTypeSelector
 import com.cebolao.app.feature.checker.components.HistoryHitsList
 import com.cebolao.app.feature.checker.components.HistorySummaryRow
 import com.cebolao.app.feature.checker.components.NumberStatsSection
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
@@ -158,7 +159,7 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.medium,
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
                             ),
                         ) {
                             Row(
@@ -181,7 +182,7 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
                                     Text(
                                         text = uiState.lastContest?.drawDate ?: "",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                                     )
                                 }
                             }
@@ -215,20 +216,21 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
                     item {
                         Card(
                             modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .semantics { role = Role.Button }
-                                .clickable { showTeamDialog = true },
+                                Modifier
+                                    .fillMaxWidth()
+                                    .semantics { role = Role.Button }
+                                    .clickable { showTeamDialog = true },
                             shape = MaterialTheme.shapes.medium,
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
                             ),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, lotteryColor.copy(alpha = 0.2f)),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, lotteryColor.copy(alpha = AlphaLevels.BORDER_LOW)),
                         ) {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(spacing.lg),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(spacing.lg),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
@@ -258,9 +260,10 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
                             viewModel.onCheck()
                             viewModel.onAnalyzeHistory()
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
                         enabled = isSelectionValid && uiState.lastContest != null && !uiState.isAnalyzing,
                         shape = MaterialTheme.shapes.medium,
                         colors = ButtonDefaults.buttonColors(
@@ -354,9 +357,9 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
             ) {
                 Box(
                     modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.7f)),
+                        Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = AlphaLevels.OVERLAY_DARK)),
                     contentAlignment = Alignment.Center,
                 ) {
                     ScannerAnimation(color = lotteryColor)
@@ -373,10 +376,10 @@ fun ScannerAnimation(color: Color) {
         initialValue = -100f,
         targetValue = 100f,
         animationSpec =
-        infiniteRepeatable(
-            animation = tween(1500),
-            repeatMode = RepeatMode.Reverse,
-        ),
+            infiniteRepeatable(
+                animation = tween(1500),
+                repeatMode = RepeatMode.Reverse,
+            ),
         label = "offset",
     )
 
@@ -385,23 +388,23 @@ fun ScannerAnimation(color: Color) {
             // Scanner Frame
             Box(
                 modifier =
-                Modifier
-                    .fillMaxSize()
-                    .border(2.dp, color.copy(alpha = 0.3f), MaterialTheme.shapes.medium),
+                    Modifier
+                        .fillMaxSize()
+                        .border(2.dp, color.copy(alpha = AlphaLevels.BORDER_LOW), MaterialTheme.shapes.medium),
             )
 
             // Scanning Line
             Box(
                 modifier =
-                Modifier
-                    .fillMaxWidth(0.9f)
-                    .height(2.dp)
-                    .offset(y = offsetY.dp)
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(Color.Transparent, color, Color.Transparent),
+                    Modifier
+                        .fillMaxWidth(0.9f)
+                        .height(2.dp)
+                        .offset(y = offsetY.dp)
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(Color.Transparent, color, Color.Transparent),
+                            ),
                         ),
-                    ),
             )
         }
         Spacer(modifier = Modifier.height(24.dp))

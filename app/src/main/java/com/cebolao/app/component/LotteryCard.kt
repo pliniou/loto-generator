@@ -1,5 +1,8 @@
 package com.cebolao.app.component
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,12 +17,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.cebolao.R
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.app.util.LotteryUiMapper
@@ -35,6 +40,19 @@ fun LotteryCard(
 ) {
     val spacing = LocalSpacing.current
     val lotteryColor = LotteryColors.getColor(lotteryType)
+    
+    // Animações de elevação e cor
+    val elevation by animateDpAsState(
+        targetValue = 2.dp,
+        animationSpec = tween(durationMillis = 300),
+        label = "card-elevation"
+    )
+    
+    val borderColor by animateColorAsState(
+        targetValue = lotteryColor.copy(alpha = AlphaLevels.BORDER_MEDIUM),
+        animationSpec = tween(durationMillis = 300),
+        label = "card-border-color"
+    )
 
     Card(
         onClick = onClick,
@@ -44,18 +62,18 @@ fun LotteryCard(
                 .padding(horizontal = spacing.lg, vertical = spacing.sm),
         colors =
             CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_MEDIUM),
             ),
         elevation =
             CardDefaults.cardElevation(
-                defaultElevation = 2.dp,
+                defaultElevation = elevation,
                 pressedElevation = 4.dp,
                 hoveredElevation = 3.dp,
             ),
         border =
             BorderStroke(
                 width = 1.dp,
-                color = lotteryColor.copy(alpha = 0.3f),
+                color = borderColor,
             ),
         shape = MaterialTheme.shapes.large,
     ) {
@@ -83,7 +101,7 @@ fun LotteryCard(
                         Text(
                             text = stringResource(R.string.contest_short, contest.id),
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_MEDIUM),
                             fontWeight = FontWeight.SemiBold,
                         )
                         if (contest.accumulated) {
@@ -112,7 +130,7 @@ fun LotteryCard(
                 Text(
                     text = contest.drawDate,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                 )
 
                 Spacer(modifier = Modifier.height(spacing.md))
@@ -120,7 +138,7 @@ fun LotteryCard(
                 // Visual Separator
                 HorizontalDivider(
                     thickness = 1.dp,
-                    color = lotteryColor.copy(alpha = 0.2f),
+                    color = lotteryColor.copy(alpha = AlphaLevels.BORDER_FAINT),
                 )
 
                 Spacer(modifier = Modifier.height(spacing.md))
@@ -148,7 +166,7 @@ fun LotteryCard(
                     // Visual Separator
                     HorizontalDivider(
                         thickness = 1.dp,
-                        color = lotteryColor.copy(alpha = 0.2f),
+                        color = lotteryColor.copy(alpha = AlphaLevels.BORDER_FAINT),
                     )
 
                     Spacer(modifier = Modifier.height(spacing.md))
@@ -188,7 +206,7 @@ fun LotteryCard(
                     // Visual Separator
                     HorizontalDivider(
                         thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
                     )
 
                     Spacer(modifier = Modifier.height(spacing.md))
@@ -223,7 +241,7 @@ fun LotteryCard(
                                 Text(
                                     text = contest.nextContestDate,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                                 )
                             }
                         }

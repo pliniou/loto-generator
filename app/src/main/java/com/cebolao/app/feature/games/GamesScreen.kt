@@ -1,5 +1,7 @@
 package com.cebolao.app.feature.games
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.R
 import com.cebolao.app.feature.games.components.SavedGameItem
 import com.cebolao.app.feature.generator.components.GameDetailsDialog
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
@@ -123,6 +126,11 @@ fun GamesScreen(
                     }
                     items(LotteryType.entries) { type ->
                         val isSelected = type == uiState.filterType
+                        val chipColor by animateColorAsState(
+                            targetValue = LotteryColors.getColor(type),
+                            animationSpec = tween(durationMillis = 300),
+                            label = "chip-color-$type"
+                        )
                         FilterChip(
                             selected = isSelected,
                             onClick = {
@@ -135,7 +143,7 @@ fun GamesScreen(
                             label = { Text(stringResource(LotteryUiMapper.getNameRes(type))) },
                             colors =
                                 FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = LotteryColors.getColor(type),
+                                    selectedContainerColor = chipColor,
                                     selectedLabelColor = LotteryColors.getOnColor(type),
                                 ),
                             border =
@@ -145,7 +153,7 @@ fun GamesScreen(
                                     FilterChipDefaults.filterChipBorder(
                                         enabled = true,
                                         selected = false,
-                                        borderColor = LotteryColors.getColor(type).copy(alpha = 0.5f),
+                                        borderColor = chipColor.copy(alpha = AlphaLevels.BORDER_MEDIUM),
                                     )
                                 },
                         )
@@ -165,7 +173,7 @@ fun GamesScreen(
                             Surface(
                                 modifier = Modifier.size(80.dp),
                                 shape = androidx.compose.foundation.shape.CircleShape,
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
                                     Icon(
@@ -202,12 +210,12 @@ fun GamesScreen(
                         verticalArrangement = Arrangement.spacedBy(spacing.md),
                     ) {
                         items(uiState.games, key = { it.id }) { game ->
-                                SavedGameItem(
-                                    game = game,
-                                    onDelete = { gameToDelete = game },
-                                    onTogglePin = { viewModel.onTogglePin(game) },
-                                    onClick = { selectedGameForDetails = game },
-                                )
+                            SavedGameItem(
+                                game = game,
+                                onDelete = { gameToDelete = game },
+                                onTogglePin = { viewModel.onTogglePin(game) },
+                                onClick = { selectedGameForDetails = game },
+                            )
                         }
                     }
                 }

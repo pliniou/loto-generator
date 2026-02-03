@@ -1,5 +1,7 @@
 package com.cebolao.app.feature.home
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.R
 import com.cebolao.app.component.LotteryCard
 import com.cebolao.app.component.WelcomeBanner
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
@@ -72,11 +75,17 @@ fun HomeScreen(
             )
 
             if (uiState.isSyncing) {
+                val progressColor by animateColorAsState(
+                    targetValue = MaterialTheme.colorScheme.primary,
+                    animationSpec = tween(durationMillis = 300),
+                    label = "progress-color"
+                )
                 LinearProgressIndicator(
                     modifier =
                         Modifier
                             .fillMaxWidth()
                             .align(Alignment.TopCenter),
+                    color = progressColor,
                 )
             }
 
@@ -96,7 +105,7 @@ fun HomeScreen(
                         shape = MaterialTheme.shapes.large,
                         colors =
                             CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
+                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = AlphaLevels.CARD_LOW),
                             ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     ) {
@@ -134,7 +143,7 @@ fun HomeScreen(
                                             Text(
                                                 text = "Próximo: Conc. ${contest.id + 1}",
                                                 style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                                             )
                                         }
 
@@ -157,7 +166,7 @@ fun HomeScreen(
                                                 Text(
                                                     text = "Prêmio est.",
                                                     style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                                                 )
                                             }
                                         }
@@ -167,7 +176,7 @@ fun HomeScreen(
                                         HorizontalDivider(
                                             modifier = Modifier.padding(vertical = spacing.xs),
                                             thickness = 0.5.dp,
-                                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
                                         )
                                     }
                                 }
@@ -193,6 +202,7 @@ fun HomeScreen(
                     Modifier
                         .align(Alignment.BottomEnd)
                         .padding(bottom = spacing.xl, end = spacing.lg),
+                containerColor = MaterialTheme.colorScheme.primary,
             ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,

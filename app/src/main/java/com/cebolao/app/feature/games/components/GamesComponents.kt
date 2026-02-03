@@ -1,5 +1,7 @@
 package com.cebolao.app.feature.games.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cebolao.R
 import com.cebolao.app.component.SmallLotteryBall
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.app.util.LotteryUiMapper
@@ -53,19 +57,14 @@ fun SavedGameItem(
     val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR"))
 
     // Calculate insights
-    val insight =
-        remember(game) {
-            com.cebolao.domain.util.StatisticsUtil.analyzeGame(game.numbers, null, emptyList())
-        }
+    val insight = remember(game) { com.cebolao.domain.util.StatisticsUtil.analyzeGame(game.numbers, null, emptyList()) }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, lotteryColor.copy(alpha = 0.15f)),
+        border = BorderStroke(1.dp, lotteryColor.copy(alpha = AlphaLevels.BORDER_FAINT)),
     ) {
         Column(modifier = Modifier.padding(spacing.lg)) {
             // Cabeçalho
@@ -97,7 +96,7 @@ fun SavedGameItem(
                                 if (game.isPinned) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW)
                                 },
                             modifier = Modifier.size(20.dp),
                         )
@@ -118,7 +117,7 @@ fun SavedGameItem(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(R.string.action_remove),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                     )
                 }
             }
@@ -149,7 +148,7 @@ fun SavedGameItem(
             }
 
             Spacer(modifier = Modifier.height(spacing.md))
-            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
             Spacer(modifier = Modifier.height(spacing.md))
 
             // Rodapé com Insights e Data
@@ -161,15 +160,15 @@ fun SavedGameItem(
                 ) {
                     SavedInsightBadge(
                         label = stringResource(R.string.insight_sum, insight.sum),
-                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                     )
                     SavedInsightBadge(
                         label = "${insight.evenCount}P / ${insight.oddCount}I",
-                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
+                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                     )
                     SavedInsightBadge(
                         label = "Média: ${insight.average}",
-                        color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.4f),
+                        color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                     )
                 }
 
@@ -180,22 +179,22 @@ fun SavedGameItem(
                 ) {
                     SavedInsightBadge(
                         label = "Seq: ${insight.longestSequence}",
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_HIGH),
                     )
                     SavedInsightBadge(
                         label = "Múlt3: ${insight.multiplesOf3}",
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_HIGH),
                     )
                     SavedInsightBadge(
                         label = "Primos: ${insight.primeCount}",
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_HIGH),
                     )
                 }
 
                 Text(
                     text = dateFormat.format(Date(game.createdAt)),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                     textAlign = TextAlign.End,
                     modifier = Modifier.fillMaxWidth(),
                 )

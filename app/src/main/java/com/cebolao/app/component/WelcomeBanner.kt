@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cebolao.R
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.app.util.LotteryUiMapper
@@ -81,12 +82,19 @@ fun WelcomeBanner(modifier: Modifier = Modifier) {
                 ),
         )
 
+    // Animação de elevação suave
+    val elevation by animateDpAsState(
+        targetValue = 4.dp,
+        animationSpec = tween(durationMillis = 300),
+        label = "banner-elevation"
+    )
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge,
         elevation =
             CardDefaults.cardElevation(
-                defaultElevation = 4.dp,
+                defaultElevation = elevation,
                 pressedElevation = 6.dp,
             ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -111,7 +119,7 @@ fun WelcomeBanner(modifier: Modifier = Modifier) {
                 Text(
                     text = dateString,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.9f),
+                    color = Color.White.copy(alpha = AlphaLevels.TEXT_HIGH),
                     modifier = Modifier.padding(top = spacing.xs),
                 )
 
@@ -165,15 +173,15 @@ private fun EnhancedDayScheduleCard(
     val backgroundColor =
         when {
             isExpanded -> Color.White
-            isToday -> Color.White.copy(alpha = 0.25f)
-            else -> Color.White.copy(alpha = 0.12f)
+            isToday -> Color.White.copy(alpha = AlphaLevels.GLASS_LOW)
+            else -> Color.White.copy(alpha = AlphaLevels.MINIMAL)
         }
 
     val textColor =
         when {
             isExpanded -> MaterialTheme.colorScheme.primary
             isToday -> Color.White
-            else -> Color.White.copy(alpha = 0.85f)
+            else -> Color.White.copy(alpha = AlphaLevels.TEXT_MEDIUM)
         }
 
     val elevation by animateDpAsState(
@@ -255,7 +263,7 @@ private fun EnhancedDayScheduleCard(
                             Text(
                                 text = "+${day.lotteries.size - 4}",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = textColor.copy(alpha = 0.7f),
+                                color = textColor.copy(alpha = AlphaLevels.TEXT_MEDIUM),
                                 fontSize = MaterialTheme.typography.labelSmall.fontSize * 0.8f,
                                 modifier = Modifier.padding(top = 2.dp),
                             )

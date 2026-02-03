@@ -1,5 +1,7 @@
 package com.cebolao.app.feature.checker.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,9 +32,11 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import com.cebolao.R
 import com.cebolao.app.feature.checker.CheckerUiState
 import com.cebolao.app.feature.checker.HistoryHit
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.app.util.LotteryUiMapper
@@ -65,13 +70,18 @@ fun CheckerTypeSelector(
     ) {
         items(items = LotteryType.entries, key = { it.name }) { type ->
             val isSelected = type == selectedType
+            val chipColor by animateColorAsState(
+                targetValue = LotteryColors.getColor(type),
+                animationSpec = tween(durationMillis = 300),
+                label = "checker-chip-$type"
+            )
             FilterChip(
                 selected = isSelected,
                 onClick = { onTypeSelected(type) },
                 label = { Text(stringResource(LotteryUiMapper.getNameRes(type))) },
                 colors =
                     FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = LotteryColors.getColor(type),
+                        selectedContainerColor = chipColor,
                         selectedLabelColor = LotteryColors.getOnColor(type),
                     ),
                 border =
@@ -81,7 +91,7 @@ fun CheckerTypeSelector(
                         FilterChipDefaults.filterChipBorder(
                             enabled = true,
                             selected = false,
-                            borderColor = LotteryColors.getColor(type).copy(alpha = 0.5f),
+                            borderColor = chipColor.copy(alpha = AlphaLevels.BORDER_MEDIUM),
                         )
                     },
             )
@@ -99,19 +109,43 @@ fun CheckerDuplaModeSelector(
         modifier = Modifier.padding(bottom = spacing.sm),
         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
     ) {
-        val modes =
-            listOf(
-                DuplaMode.FIRST to R.string.checker_dupla_mode_first,
-                DuplaMode.SECOND to R.string.checker_dupla_mode_second,
-                DuplaMode.BEST to R.string.checker_dupla_mode_best,
+        DuplaMode.entries.forEach { mode ->
+            val isSelected = mode == selectedMode
+            val modeColor by animateColorAsState(
+                targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                animationSpec = tween(durationMillis = 300),
+                label = "dupla-mode-$mode"
             )
-
-        modes.forEach { (mode, labelRes) ->
-            FilterChip(
-                selected = selectedMode == mode,
-                onClick = { onModeSelected(mode) },
-                label = { Text(stringResource(labelRes)) },
+            val textColor by animateColorAsState(
+                targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                animationSpec = tween(durationMillis = 300),
+                label = "dupla-mode-text-$mode"
             )
+            Surface(
+                modifier = Modifier.weight(1f),
+                color = modeColor,
+                shape = MaterialTheme.shapes.medium,
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    if (isSelected) modeColor else MaterialTheme.colorScheme.outline.copy(alpha = AlphaLevels.BORDER_FAINT)
+                ),
+            ) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { onModeSelected(mode) },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = stringResource(mode.nameRes),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = textColor,
+                        modifier = Modifier.padding(vertical = spacing.xs),
+                    )
+                }
+            }
         }
     }
 }

@@ -69,6 +69,7 @@ import com.cebolao.app.feature.generator.components.GeneratorFilterConfigDialog
 import com.cebolao.app.feature.generator.components.GeneratorReportDetailsDialog
 import com.cebolao.app.feature.generator.components.GeneratorResultsSection
 import com.cebolao.app.feature.generator.components.TimemaniaTeamCard
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
@@ -218,7 +219,11 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                 // 4. Resultados
                 if (uiState.generatedGames.isNotEmpty()) {
                     item {
-                        HorizontalDivider(modifier = Modifier.padding(vertical = spacing.sm), thickness = 0.5.dp)
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = spacing.sm),
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
+                        )
                         GeneratorResultsSection(
                             uiState = uiState,
                             onOpenReportDetails = { viewModel.onOpenReportDetails() },
@@ -246,7 +251,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.7f)),
+                            .background(Color.Black.copy(alpha = AlphaLevels.OVERLAY_DARK)),
                     contentAlignment = Alignment.Center,
                 ) {
                     DrawingAnimation(color = LotteryColors.getColor(uiState.selectedType))
@@ -262,7 +267,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
             ) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.surface,
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = AlphaLevels.GLASS_HIGH),
                     tonalElevation = 8.dp,
                     shadowElevation = 12.dp,
                 ) {
@@ -278,7 +283,11 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                             onClick = { showClearConfirmation = true },
                             modifier = Modifier.weight(1f).height(56.dp),
                             shape = MaterialTheme.shapes.medium,
-                            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+                            border =
+                                androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.outline.copy(alpha = AlphaLevels.BORDER_MEDIUM),
+                                ),
                         ) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                             Spacer(modifier = Modifier.width(spacing.sm))
@@ -324,8 +333,8 @@ fun DrawingAnimation(color: Color) {
         label = "scale",
     )
     val opacity by infiniteTransition.animateFloat(
-        initialValue = 0.4f,
-        targetValue = 1f,
+        initialValue = AlphaLevels.MEDIUM_LOW,
+        targetValue = AlphaLevels.FULL,
         animationSpec =
             infiniteRepeatable(
                 animation = tween(600),
@@ -345,7 +354,7 @@ fun DrawingAnimation(color: Color) {
                     Modifier
                         .size(80.dp)
                         .scale(scale)
-                        .background(color.copy(alpha = 0.2f), CircleShape),
+                        .background(color.copy(alpha = AlphaLevels.MINIMAL), CircleShape),
             )
             // Core Ball
             Surface(

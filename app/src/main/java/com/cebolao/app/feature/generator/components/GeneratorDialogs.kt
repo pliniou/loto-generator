@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.cebolao.R
 import com.cebolao.app.feature.generator.GeneratorUiState
+import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.util.GenerationFilterUiMapper
 import com.cebolao.domain.model.FilterConfig
@@ -59,9 +60,7 @@ fun GeneratorFilterConfigDialog(
     }
 
     val currentRepeatCfg = uiState.filterConfigs[GenerationFilter.REPEATED_FROM_PREVIOUS] ?: FilterConfig()
-    var maxRepeats by remember {
-        mutableFloatStateOf(currentRepeatCfg.maxRepeatsFromPrevious?.toFloat() ?: 4f)
-    }
+    var maxRepeats by remember { mutableFloatStateOf(currentRepeatCfg.maxRepeatsFromPrevious?.toFloat() ?: 4f) }
 
     AlertDialog(
         onDismissRequest = onClose,
@@ -120,7 +119,7 @@ fun GeneratorFilterConfigDialog(
                     }
                 }
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = AlphaLevels.BORDER_FAINT))
 
                 // --- Seção: Ativação de Filtros ---
                 Text(
@@ -158,13 +157,13 @@ fun GeneratorFilterConfigDialog(
                             Text(
                                 text = stringResource(GenerationFilterUiMapper.getDescriptionRes(filter)),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                             )
                         }
                     }
                 }
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = AlphaLevels.BORDER_FAINT))
 
                 // --- Seção: Ajuste Fino (Sliders) ---
                 Text(
@@ -235,7 +234,7 @@ fun GeneratorReportDetailsDialog(
                     fontWeight = FontWeight.Bold,
                 )
 
-                HorizontalDivider()
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
 
                 Text(text = stringResource(R.string.report_rejected_by_filter), style = MaterialTheme.typography.titleSmall)
 
@@ -329,9 +328,7 @@ fun GameDetailsDialog(
                     color = MaterialTheme.colorScheme.primary,
                 )
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     game.numbers.sorted().take(7).forEach { number ->
                         com.cebolao.app.component.SmallLotteryBall(
                             number = number,
@@ -340,9 +337,7 @@ fun GameDetailsDialog(
                     }
                 }
                 if (game.numbers.size > 7) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         game.numbers.sorted().drop(7).forEach { number ->
                             com.cebolao.app.component.SmallLotteryBall(
                                 number = number,
@@ -352,7 +347,7 @@ fun GameDetailsDialog(
                     }
                 }
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
 
                 // Basic Stats Section
                 Text(
@@ -363,15 +358,16 @@ fun GameDetailsDialog(
                 )
 
                 StatsGrid(
-                    items = listOf(
-                        "Soma" to "${insight.sum}",
-                        "Média" to String.format("%.1f", insight.average),
-                        "Pares" to "${insight.evenCount}",
-                        "Ímpares" to "${insight.oddCount}",
-                    ),
+                    items =
+                        listOf(
+                            "Soma" to "${insight.sum}",
+                            "Média" to String.format("%.1f", insight.average),
+                            "Pares" to "${insight.evenCount}",
+                            "Ímpares" to "${insight.oddCount}",
+                        ),
                 )
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
 
                 // Advanced Stats Section
                 Text(
@@ -382,15 +378,16 @@ fun GameDetailsDialog(
                 )
 
                 StatsGrid(
-                    items = listOf(
-                        "Primos" to "${insight.primeCount}",
-                        "Múlt. 3" to "${insight.multiplesOf3}",
-                        "Sequência" to "${insight.longestSequence}",
-                        "Repetidos" to "${insight.repeatsFromLast}",
-                    ),
+                    items =
+                        listOf(
+                            "Primos" to "${insight.primeCount}",
+                            "Múlt. 3" to "${insight.multiplesOf3}",
+                            "Sequência" to "${insight.longestSequence}",
+                            "Repetidos" to "${insight.repeatsFromLast}",
+                        ),
                 )
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
 
                 // Decade Distribution
                 Text(
@@ -407,6 +404,7 @@ fun GameDetailsDialog(
                         val endNum = startNum + 9
                         val fraction = count.toFloat() / maxDecadeCount.toFloat()
 
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
@@ -419,9 +417,10 @@ fun GameDetailsDialog(
                             )
                             androidx.compose.material3.LinearProgressIndicator(
                                 progress = { fraction },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(8.dp),
+                                modifier =
+                                    Modifier
+                                        .weight(1f)
+                                        .height(8.dp),
                                 strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
                                 color = lotteryColor,
                                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -438,7 +437,7 @@ fun GameDetailsDialog(
 
                 // Team info for Timemania
                 if (game.teamNumber != null) {
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
                     Text(
                         text = "Time do Coração",
                         style = MaterialTheme.typography.titleSmall,
@@ -455,7 +454,7 @@ fun GameDetailsDialog(
 
                 // Last contest comparison
                 if (lastContest != null && insight.repeatsFromLast > 0) {
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
                     Text(
                         text = "Comparação com Último Sorteio",
                         style = MaterialTheme.typography.titleSmall,
@@ -467,7 +466,7 @@ fun GameDetailsDialog(
                     Text(
                         text = "Números coincidentes: ${matches.joinToString(", ")}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                     )
                 }
             }
@@ -501,7 +500,7 @@ private fun StatsGrid(
                         Text(
                             text = label,
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                         )
                     }
                 }
@@ -509,4 +508,3 @@ private fun StatsGrid(
         }
     }
 }
-
