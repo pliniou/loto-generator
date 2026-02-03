@@ -70,6 +70,7 @@ import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
 import com.cebolao.domain.model.LotteryType
+import com.cebolao.app.component.ScannerAnimation
 import com.cebolao.domain.util.TimemaniaUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -369,50 +370,4 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
     }
 }
 
-@Composable
-fun ScannerAnimation(color: Color) {
-    val infiniteTransition = rememberInfiniteTransition(label = "scanner")
-    val offsetY by infiniteTransition.animateFloat(
-        initialValue = -100f,
-        targetValue = 100f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(1500),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "offset",
-    )
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(modifier = Modifier.size(200.dp), contentAlignment = Alignment.Center) {
-            // Scanner Frame
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .border(2.dp, color.copy(alpha = AlphaLevels.BORDER_LOW), MaterialTheme.shapes.medium),
-            )
-
-            // Scanning Line
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth(0.9f)
-                        .height(2.dp)
-                        .offset(y = offsetY.dp)
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(Color.Transparent, color, Color.Transparent),
-                            ),
-                        ),
-            )
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = "Analisando histórico...",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-        )
-    }
-}

@@ -138,7 +138,13 @@ fun CheckerDuplaModeSelector(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = stringResource(mode.nameRes),
+                        text = stringResource(
+                            when (mode) {
+                                DuplaMode.FIRST -> R.string.checker_dupla_mode_first
+                                DuplaMode.SECOND -> R.string.checker_dupla_mode_second
+                                DuplaMode.BEST -> R.string.checker_dupla_mode_best
+                            }
+                        ),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                         color = textColor,

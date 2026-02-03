@@ -41,7 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.R
 import com.cebolao.app.feature.games.components.SavedGameItem
-import com.cebolao.app.feature.generator.components.GameDetailsDialog
+import com.cebolao.app.component.GameDetailsDialog
 import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors

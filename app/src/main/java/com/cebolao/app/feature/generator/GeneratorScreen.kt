@@ -63,7 +63,8 @@ import com.cebolao.R
 import com.cebolao.app.component.ConfirmationDialog
 import com.cebolao.app.component.TeamSelectionDialog
 import com.cebolao.app.feature.generator.components.GeneratedGameItem
-import com.cebolao.app.feature.generator.components.GameDetailsDialog
+import com.cebolao.app.component.DrawingAnimation
+import com.cebolao.app.component.GameDetailsDialog
 import com.cebolao.app.feature.generator.components.GeneratorConfigSection
 import com.cebolao.app.feature.generator.components.GeneratorFilterConfigDialog
 import com.cebolao.app.feature.generator.components.GeneratorReportDetailsDialog
@@ -319,65 +320,4 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
     }
 }
 
-@Composable
-fun DrawingAnimation(color: Color) {
-    val infiniteTransition = rememberInfiniteTransition(label = "drawing")
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 0.8f,
-        targetValue = 1.2f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(600),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "scale",
-    )
-    val opacity by infiniteTransition.animateFloat(
-        initialValue = AlphaLevels.MEDIUM_LOW,
-        targetValue = AlphaLevels.FULL,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(600),
-                repeatMode = RepeatMode.Reverse,
-            ),
-        label = "opacity",
-    )
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            // Pulse Ring
-            Box(
-                modifier =
-                    Modifier
-                        .size(80.dp)
-                        .scale(scale)
-                        .background(color.copy(alpha = AlphaLevels.MINIMAL), CircleShape),
-            )
-            // Core Ball
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = CircleShape,
-                color = color,
-                shadowElevation = 8.dp,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "?",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                    )
-                }
-            }
-        }
-        Text(
-            text = "Sorteando...",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = opacity),
-        )
-    }
-}

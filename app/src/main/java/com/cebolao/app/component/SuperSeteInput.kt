@@ -2,26 +2,25 @@ package com.cebolao.app.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.cebolao.R
-import com.cebolao.app.theme.AlphaLevels
+import androidx.compose.ui.unit.sp
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.LotteryColors
 import com.cebolao.domain.model.LotteryType
@@ -34,26 +33,60 @@ fun SuperSeteInput(
     val spacing = LocalSpacing.current
     val lotteryColor = LotteryColors.getColor(LotteryType.SUPER_SETE)
 
-    // Layout com 7 colunas (0-9 cada)
+    // Layout com 7 colunas (0-6)
     val columns = 0..6
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        columns.forEach { colIndex ->
+        items(columns.toList()) { colIndex ->
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.width(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                        .clickable { onNumberClick(number) },
-                contentAlignment = Alignment.Center,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
+                // Header (Coluna)
                 Text(
-                    text = number.toString(),
-                    color = if (isSelected) onColor else MaterialTheme.colorScheme.onSurface,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    fontSize = 12.sp,
+                    text = "${colIndex + 1}",
+                    fontWeight = FontWeight.Bold,
+                    color = lotteryColor,
+                    fontSize = 14.sp
                 )
+
+                (0..9).forEach { number ->
+                    // Verifica se está selecionado. 
+                    // Assume que selectedNumbers pode conter valores mapeados (col*10 + num) 
+                    // ou se for lista posicional de 7 números (0-9)
+                    val isSelected = if (selectedNumbers.size == 7 && selectedNumbers.all { it in 0..9 || it == -1 }) {
+                         selectedNumbers.getOrNull(colIndex) == number
+                    } else {
+                         selectedNumbers.contains(colIndex * 10 + number)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(
+                                color = if (isSelected) lotteryColor else Color.Transparent,
+                                shape = CircleShape
+                            )
+                            .border(
+                                width = 1.dp, 
+                                color = if (isSelected) lotteryColor else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f), 
+                                shape = CircleShape
+                            )
+                            .clickable { onNumberClick(colIndex, number) },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = number.toString(),
+                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            fontSize = 12.sp,
+                        )
+                    }
+                }
             }
         }
     }

@@ -152,9 +152,9 @@ fun HomeScreen(
                                                 horizontalAlignment = Alignment.End,
                                             ) {
                                                 val formattedPrize = when {
-                                                    estimatedPrize >= 1_000_000_000 -> "R$ ${String.format("%.1f", estimatedPrize / 1_000_000_000.0)}B"
-                                                    estimatedPrize >= 1_000_000 -> "R$ ${String.format("%.1f", estimatedPrize / 1_000_000.0)}M"
-                                                    estimatedPrize >= 1_000 -> "R$ ${String.format("%.0f", estimatedPrize / 1_000.0)}K"
+                                                    estimatedPrize >= 1_000_000_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.1f", estimatedPrize / 1_000_000_000.0)}B"
+                                                    estimatedPrize >= 1_000_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.1f", estimatedPrize / 1_000_000.0)}M"
+                                                    estimatedPrize >= 1_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.0f", estimatedPrize / 1_000.0)}K"
                                                     else -> "R$ ${estimatedPrize.toLong()}"
                                                 }
                                                 Text(
