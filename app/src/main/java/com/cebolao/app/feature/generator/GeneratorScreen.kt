@@ -7,6 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -42,6 +43,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,11 +73,14 @@ import com.cebolao.app.feature.generator.components.GeneratorReportDetailsDialog
 import com.cebolao.app.feature.generator.components.GeneratorResultsSection
 import com.cebolao.app.feature.generator.components.TimemaniaTeamCard
 import com.cebolao.app.theme.AlphaLevels
+import com.cebolao.app.theme.ComponentDimensions
 import com.cebolao.app.theme.LocalSpacing
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
+import com.cebolao.app.core.UiEvent
+import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -87,6 +92,10 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
     var showTeamDialog by remember { mutableStateOf(false) }
     var showClearConfirmation by remember { mutableStateOf(false) }
     var selectedGameForDetails by remember { mutableStateOf<com.cebolao.domain.model.Game?>(null) }
+
+    // Derived states to avoid recomposition when list changes but derived state doesn't
+    val hasGeneratedGames by remember { derivedStateOf { uiState.generatedGames.isNotEmpty() } }
+    val showActionBar by remember { derivedStateOf { uiState.generatedGames.isNotEmpty() && !uiState.isLoading } }
 
     // Dialogs
     if (showClearConfirmation) {
@@ -155,21 +164,30 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
         }
     }
 
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
+    // Collect one-shot events for Snackbar
+    LaunchedEffect(Unit) {
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                is UiEvent.ShowSuccess -> snackbarHostState.showSnackbar(event.message)
+            }
+        }
     }
 
     CebolaoContent {
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = spacing.lg, bottom = 120.dp), // Espaço para a barra inferior
+                contentPadding = PaddingValues(top = spacing.lg, bottom = ComponentDimensions.bottomContentPadding), // Espaço para a barra inferior
                 verticalArrangement = Arrangement.spacedBy(spacing.lg),
             ) {
                 // 1. Config Section
                 item {
                     GeneratorConfigSection(
-                        uiState = uiState,
+                        selectedType = uiState.selectedType,
+                        quantity = uiState.quantity,
+                        activeFilters = uiState.activeFilters,
+                        profile = uiState.profile,
                         onTypeSelected = { viewModel.onTypeSelected(it) },
                         onQuantityChanged = { viewModel.onQuantityChanged(it) },
                         onFilterToggled = { viewModel.onFilterToggled(it) },
@@ -180,13 +198,14 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                 // 2. Timemania
                 item {
                     TimemaniaTeamCard(
-                        uiState = uiState,
+                        selectedType = uiState.selectedType,
+                        selectedTeam = uiState.selectedTeam,
                         onShowTeamDialog = { showTeamDialog = true },
                     )
                 }
 
                 // 3. Ação Gerar
-                if (uiState.generatedGames.isEmpty()) {
+                if (!hasGeneratedGames) {
                     item {
                         Spacer(modifier = Modifier.height(spacing.md))
                         Button(
@@ -194,7 +213,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
-                                    .height(64.dp),
+                                    .height(ComponentDimensions.generatorButtonHeight),
                             shape = MaterialTheme.shapes.large,
                             elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                             colors =
@@ -218,7 +237,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                 }
 
                 // 4. Resultados
-                if (uiState.generatedGames.isNotEmpty()) {
+                if (hasGeneratedGames) {
                     item {
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = spacing.sm),
@@ -226,7 +245,9 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
                         )
                         GeneratorResultsSection(
-                            uiState = uiState,
+                            generatedCount = uiState.generatedGames.size,
+                            quantity = uiState.quantity,
+                            report = uiState.generationReport,
                             onOpenReportDetails = { viewModel.onOpenReportDetails() },
                             onRetry = { viewModel.onGenerate() },
                         )
@@ -237,77 +258,25 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                             game = game,
                             lastContest = uiState.lastContest,
                             onClick = { selectedGameForDetails = game },
+                             modifier = Modifier
                         )
                     }
                 }
             }
 
             // Overlay de Carregamento (Drawing Animation)
-            AnimatedVisibility(
-                visible = uiState.isLoading,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = AlphaLevels.OVERLAY_DARK)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    DrawingAnimation(color = LotteryColors.getColor(uiState.selectedType))
-                }
-            }
+            GeneratorLoading(
+                isLoading = uiState.isLoading,
+                color = LotteryColors.getColor(uiState.selectedType),
+            )
 
             // Barra de Ações Inferior Redesenhada (Horizontal e Compacta)
-            AnimatedVisibility(
-                visible = uiState.generatedGames.isNotEmpty() && !uiState.isLoading,
-                enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
-                exit = fadeOut() + slideOutVertically(targetOffsetY = { it }),
+            GeneratorBottomBar(
+                visible = showActionBar,
+                onClear = { showClearConfirmation = true },
+                onSave = { viewModel.onSaveAll() },
                 modifier = Modifier.align(Alignment.BottomCenter),
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = AlphaLevels.GLASS_HIGH),
-                    tonalElevation = 8.dp,
-                    shadowElevation = 12.dp,
-                ) {
-                    Row(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(spacing.lg),
-                        horizontalArrangement = Arrangement.spacedBy(spacing.md),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        OutlinedButton(
-                            onClick = { showClearConfirmation = true },
-                            modifier = Modifier.weight(1f).height(56.dp),
-                            shape = MaterialTheme.shapes.medium,
-                            border =
-                                androidx.compose.foundation.BorderStroke(
-                                    1.dp,
-                                    MaterialTheme.colorScheme.outline.copy(alpha = AlphaLevels.BORDER_MEDIUM),
-                                ),
-                        ) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = null)
-                            Spacer(modifier = Modifier.width(spacing.sm))
-                            Text(stringResource(R.string.action_cancel), fontWeight = FontWeight.Bold)
-                        }
-
-                        Button(
-                            onClick = { viewModel.onSaveAll() },
-                            modifier = Modifier.weight(1.5f).height(56.dp),
-                            shape = MaterialTheme.shapes.medium,
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
-                        ) {
-                            Icon(imageVector = Icons.Default.Check, contentDescription = null)
-                            Spacer(modifier = Modifier.width(spacing.sm))
-                            Text(stringResource(R.string.action_save), fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            }
+            )
 
             SnackbarHost(
                 hostState = snackbarHostState,
@@ -316,6 +285,88 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                         .align(Alignment.BottomCenter)
                         .padding(bottom = if (uiState.generatedGames.isNotEmpty()) 100.dp else spacing.lg),
             )
+
+        }
+    }
+}
+
+@Composable
+private fun GeneratorLoading(
+    isLoading: Boolean,
+    color: Color,
+) {
+    AnimatedVisibility(
+        visible = isLoading,
+        enter = fadeIn(),
+        exit = fadeOut(),
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = AlphaLevels.OVERLAY_DARK)),
+            contentAlignment = Alignment.Center,
+        ) {
+            DrawingAnimation(color = color)
+        }
+    }
+}
+
+@Composable
+private fun GeneratorBottomBar(
+    visible: Boolean,
+    onClear: () -> Unit,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = LocalSpacing.current
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
+        exit = fadeOut() + slideOutVertically(targetOffsetY = { it }),
+        modifier = modifier,
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surface.copy(alpha = AlphaLevels.GLASS_HIGH),
+            tonalElevation = 8.dp,
+            shadowElevation = 12.dp,
+        ) {
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(spacing.lg),
+                horizontalArrangement = Arrangement.spacedBy(spacing.md),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+
+                OutlinedButton(
+                    onClick = onClear,
+                    modifier = Modifier.weight(1f).height(ComponentDimensions.bottomBarHeight),
+                    shape = MaterialTheme.shapes.medium,
+                    border =
+                        androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outline.copy(alpha = AlphaLevels.BORDER_MEDIUM),
+                        ),
+                ) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                    Spacer(modifier = Modifier.width(spacing.sm))
+                    Text(stringResource(R.string.action_cancel), fontWeight = FontWeight.Bold)
+                }
+
+                Button(
+                    onClick = onSave,
+                    modifier = Modifier.weight(1.5f).height(ComponentDimensions.bottomBarHeight),
+                    shape = MaterialTheme.shapes.medium,
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
+                ) {
+                    Icon(imageVector = Icons.Default.Check, contentDescription = null)
+                    Spacer(modifier = Modifier.width(spacing.sm))
+                    Text(stringResource(R.string.action_save), fontWeight = FontWeight.Bold)
+                }
+            }
         }
     }
 }

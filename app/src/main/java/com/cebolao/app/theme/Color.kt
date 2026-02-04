@@ -32,7 +32,7 @@ val OnBackground = Color(0xFFE6E1E5)
 val Surface = Color(0xFF141419)
 val OnSurface = Color(0xFFE6E1E5)
 val SurfaceVariant = Color(0xFF2A2A35)
-val OnSurfaceVariant = Color(0xFFCAC4D0)
+val OnSurfaceVariant = Color(0xFFE6E1E5) // Aumentado brilho para contraste
 
 // Outline & Error
 val Outline = Color(0xFF938F99)
@@ -94,7 +94,7 @@ object AlphaLevels {
     // Transparências para textos secundários
     const val TEXT_HIGH = 0.9f
     const val TEXT_MEDIUM = 0.7f
-    const val TEXT_LOW = 0.5f
+    const val TEXT_LOW = 0.4f
     const val TEXT_FAINT = 0.3f
 }
 

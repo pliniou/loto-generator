@@ -67,7 +67,7 @@ import com.cebolao.app.feature.checker.components.HistorySummaryRow
 import com.cebolao.app.feature.checker.components.NumberStatsSection
 import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
 import com.cebolao.domain.model.LotteryType
 import com.cebolao.app.component.ScannerAnimation

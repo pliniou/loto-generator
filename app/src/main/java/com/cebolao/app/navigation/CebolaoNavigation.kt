@@ -53,5 +53,8 @@ fun CebolaoNavHost(
         composable<Route.About> {
             AboutScreen()
         }
+        composable<Route.Statistics> {
+            com.cebolao.app.feature.statistics.StatisticsScreen()
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.cebolao.app.ui
+package com.cebolao.app.theme
 
 import androidx.compose.ui.graphics.Color
 import com.cebolao.domain.model.LotteryType

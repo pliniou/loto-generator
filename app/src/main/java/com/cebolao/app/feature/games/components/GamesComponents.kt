@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
@@ -36,14 +37,19 @@ import androidx.compose.ui.unit.dp
 import com.cebolao.R
 import com.cebolao.app.component.SmallLotteryBall
 import com.cebolao.app.theme.AlphaLevels
+import com.cebolao.app.theme.CebolaoElevation
+import com.cebolao.app.theme.ComponentDimensions
 import com.cebolao.app.theme.LocalSpacing
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.util.LotteryUiMapper
 import com.cebolao.domain.model.Game
 import com.cebolao.domain.util.TimemaniaUtil
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+// Shared date formatter to avoid expensive object creation on every recomposition
+private val savedGameDateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR"))
 
 @Composable
 fun SavedGameItem(
@@ -54,17 +60,16 @@ fun SavedGameItem(
 ) {
     val spacing = LocalSpacing.current
     val lotteryColor = LotteryColors.getColor(game.lotteryType)
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR"))
 
-    // Calculate insights
+    // Calculate insights (already optimized with remember(game))
     val insight = remember(game) { com.cebolao.domain.util.StatisticsUtil.analyzeGame(game.numbers, null, emptyList()) }
 
     Card(
         modifier = Modifier.fillMaxWidth().clickable { onClick() },
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = CebolaoElevation.level2),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, lotteryColor.copy(alpha = AlphaLevels.BORDER_FAINT)),
+        border = BorderStroke(ComponentDimensions.strokeWidthMedium, lotteryColor.copy(alpha = AlphaLevels.BORDER_FAINT)),
     ) {
         Column(modifier = Modifier.padding(spacing.lg)) {
             // Cabeçalho
@@ -80,7 +85,9 @@ fun SavedGameItem(
                     // Pin/Favorite indicator
                     IconButton(
                         onClick = onTogglePin,
-                        modifier = Modifier.size(40.dp),
+                        modifier = Modifier
+                            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                            .size(ComponentDimensions.buttonHeightSmall),
                     ) {
                         Icon(
                             imageVector = if (game.isPinned) Icons.Filled.Star else Icons.Outlined.StarOutline,
@@ -98,7 +105,7 @@ fun SavedGameItem(
                                 } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW)
                                 },
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(ComponentDimensions.iconSizeSmall),
                         )
                     }
 
@@ -112,7 +119,9 @@ fun SavedGameItem(
 
                 IconButton(
                     onClick = onDelete,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                        .size(ComponentDimensions.iconSizeMedium),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -148,7 +157,7 @@ fun SavedGameItem(
             }
 
             Spacer(modifier = Modifier.height(spacing.md))
-            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
+            HorizontalDivider(thickness = ComponentDimensions.dividerThicknessThin, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
             Spacer(modifier = Modifier.height(spacing.md))
 
             // Rodapé com Insights e Data
@@ -192,7 +201,7 @@ fun SavedGameItem(
                 }
 
                 Text(
-                    text = dateFormat.format(Date(game.createdAt)),
+                    text = savedGameDateFormat.format(Date(game.createdAt)),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
                     textAlign = TextAlign.End,

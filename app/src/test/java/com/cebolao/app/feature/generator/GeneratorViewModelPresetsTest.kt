@@ -67,7 +67,7 @@ class GeneratorViewModelPresetsTest {
                                 emptyList<com.cebolao.domain.model.Game>(),
                             )
 
-                        override suspend fun getLastContest(type: LotteryType) = null
+                        override suspend fun getLastContest(type: LotteryType) = AppResult.Success(null)
 
                         override suspend fun saveGame(game: com.cebolao.domain.model.Game): AppResult<Unit> = AppResult.Success(Unit)
 

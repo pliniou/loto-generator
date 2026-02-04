@@ -3,6 +3,7 @@ package com.cebolao.app.theme
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
  * Sistema de espaçamento e dimensões do Cebolão.
@@ -25,17 +26,17 @@ data class CebolaoSpacing(
  * Tokens de elevação para componentes.
  * Sistema modernizado com níveis refinados para profundidade visual.
  */
-data class CebolaoElevation(
-    val none: Dp = 0.dp,
-    val level1: Dp = 1.dp,
-    val level2: Dp = 2.dp,
-    val level3: Dp = 4.dp,
-    val level4: Dp = 6.dp,
-    val level5: Dp = 8.dp,
-    val level6: Dp = 12.dp,
-    val level7: Dp = 16.dp,
-    val level8: Dp = 24.dp,
-)
+object CebolaoElevation {
+    val none: Dp = 0.dp
+    val level1: Dp = 1.dp
+    val level2: Dp = 2.dp
+    val level3: Dp = 4.dp
+    val level4: Dp = 6.dp
+    val level5: Dp = 8.dp
+    val level6: Dp = 12.dp
+    val level7: Dp = 16.dp
+    val level8: Dp = 24.dp
+}
 
 /**
  * Tokens de border radius para componentes.
@@ -57,12 +58,25 @@ data class CebolaoCornerRadius(
  * Dimensões de componentes específicos.
  * Garante consistência visual em todo o app.
  */
+object AnimationDurations {
+    const val fast = 200
+    const val medium = 300
+    const val slow = 500
+}
+
+/**
+ * Dimensões de componentes específicos.
+ * Garante consistência visual em todo o app.
+ */
 object ComponentDimensions {
     // Botões
     val buttonHeightSmall = 40.dp
     val buttonHeightMedium = 48.dp
     val buttonHeightLarge = 56.dp
     val buttonHeightExtraLarge = 64.dp
+    val generatorButtonHeight = 64.dp
+    val bottomBarHeight = 56.dp
+    val bottomContentPadding = 120.dp
     
     // Cards
     val cardPaddingSmall = 12.dp
@@ -75,6 +89,11 @@ object ComponentDimensions {
     val iconSizeLarge = 32.dp
     val iconSizeExtraLarge = 48.dp
     
+    // Bolinhas (Lottery Balls)
+    val ballSizeLarge = 32.dp
+    val ballSizeSmall = 24.dp
+    val ballTextSizeSmall = 10.sp
+
     // Avatares
     val avatarSizeSmall = 32.dp
     val avatarSizeMedium = 40.dp

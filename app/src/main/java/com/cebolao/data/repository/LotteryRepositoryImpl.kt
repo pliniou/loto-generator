@@ -80,9 +80,11 @@ class LotteryRepositoryImpl
                 entities.map { GameMapper.toDomain(it) }
             }
 
-        override suspend fun getLastContest(type: LotteryType): Contest? =
-            withContext(ioDispatcher) {
-                lotteryDao.getLatestContest(type)?.let { ContestMapper.toDomain(it) }
+        override suspend fun getLastContest(type: LotteryType): AppResult<Contest?> =
+            appResultSuspend {
+                withContext(ioDispatcher) {
+                    lotteryDao.getLatestContest(type)?.let { ContestMapper.toDomain(it) }
+                }
             }
 
         // --- Writes ---

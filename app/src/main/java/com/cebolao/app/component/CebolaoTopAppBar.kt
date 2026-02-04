@@ -20,6 +20,7 @@ import com.cebolao.app.theme.AlphaLevels
 fun CebolaoTopAppBar(
     title: String,
     modifier: Modifier = Modifier,
+    scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior? = null,
     onNavigationClick: (() -> Unit)? = null,
     actions: @Composable () -> Unit = {},
 ) {
@@ -31,20 +32,22 @@ fun CebolaoTopAppBar(
             )
         },
         modifier = modifier,
+        scrollBehavior = scrollBehavior,
         navigationIcon = {
             if (onNavigationClick != null) {
                 IconButton(onClick = onNavigationClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.action_back),
+                        contentDescription = stringResource(R.string.content_description_back),
                     )
                 }
             }
         },
         actions = { actions() },
         colors =
-            TopAppBarDefaults.topAppBarColors(
+            TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surface.copy(alpha = AlphaLevels.GLASS_HIGH),
+                scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = AlphaLevels.GLASS_HIGH),
                 titleContentColor = MaterialTheme.colorScheme.onSurface,
             ),
     )

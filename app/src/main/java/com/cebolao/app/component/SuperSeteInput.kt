@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cebolao.app.theme.LocalSpacing
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.domain.model.LotteryType
 
 @Composable
@@ -40,7 +40,7 @@ fun SuperSeteInput(
         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        items(columns.toList()) { colIndex ->
+        items(items = columns.toList(), key = { it }) { colIndex ->
             Column(
                 modifier = Modifier.width(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,

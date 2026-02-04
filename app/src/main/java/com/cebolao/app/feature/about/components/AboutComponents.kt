@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.cebolao.R
 import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.model.LotteryType
 import java.util.Locale
@@ -86,8 +86,8 @@ fun LotteryInfoCard(profile: LotteryProfile) {
 
             Spacer(modifier = Modifier.height(spacing.lg))
 
-            if (profile.bolaoInfo != null) {
-                BolaoInfoSection(profile.bolaoInfo, locale = Locale("pt", "BR"), brandColor = lotteryColor)
+            if (profile.poolInfo != null) {
+                PoolInfoSection(profile.poolInfo, locale = Locale("pt", "BR"), brandColor = lotteryColor)
             } else {
                 Text(
                     text = stringResource(R.string.about_no_pool),
@@ -101,8 +101,8 @@ fun LotteryInfoCard(profile: LotteryProfile) {
 }
 
 @Composable
-fun BolaoInfoSection(
-    info: com.cebolao.domain.model.BolaoInfo,
+fun PoolInfoSection(
+    info: com.cebolao.domain.model.PoolInfo,
     locale: Locale,
     brandColor: Color,
 ) {

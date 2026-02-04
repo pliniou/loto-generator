@@ -22,3 +22,8 @@ data class GameInsight(
     val multiplesOf3: Int = 0,
     val primeCount: Int = 0,
 )
+
+data class DistributionStats(
+    val decadeDistribution: Map<String, Int>, // Key: "00-09", Value: count
+    val quadrantDistribution: List<Int>, // TopLeft, TopRight, BottomLeft, BottomRight
+)

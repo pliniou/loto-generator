@@ -1,7 +1,6 @@
 package com.cebolao.app.feature.home
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,12 +41,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.R
 import com.cebolao.app.component.LotteryCard
 import com.cebolao.app.component.WelcomeBanner
+import com.cebolao.app.component.LoadingState
+import com.cebolao.app.component.ErrorState
 import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
 import com.cebolao.app.util.LotteryUiMapper
+import com.cebolao.app.util.toUserMessage
 import com.cebolao.domain.model.LotteryType
+import com.cebolao.app.core.UiEvent
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,8 +64,14 @@ fun HomeScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
+    // Collect one-shot events for Snackbar
+    LaunchedEffect(Unit) {
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                is UiEvent.ShowSuccess -> snackbarHostState.showSnackbar(event.message)
+            }
+        }
     }
 
     CebolaoContent {
@@ -74,29 +84,23 @@ fun HomeScreen(
                         .padding(bottom = spacing.lg),
             )
 
-            if (uiState.isSyncing) {
-                val progressColor by animateColorAsState(
-                    targetValue = MaterialTheme.colorScheme.primary,
-                    animationSpec = tween(durationMillis = 300),
-                    label = "progress-color"
-                )
-                LinearProgressIndicator(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.TopCenter),
-                    color = progressColor,
-                )
-            }
-
-            LazyColumn(
-                contentPadding = PaddingValues(top = spacing.lg, bottom = spacing.xxl),
-                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(spacing.md),
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                item {
-                    WelcomeBanner(modifier = Modifier.padding(bottom = spacing.xs))
-                }
+            if (uiState.isLoading) {
+                 LoadingState(modifier = Modifier.fillMaxSize())
+            } else if (uiState.error != null) {
+                 ErrorState(
+                     message = uiState.error?.toUserMessage() ?: stringResource(R.string.state_error),
+                     onRetry = { viewModel.refreshData() },
+                     modifier = Modifier.fillMaxSize()
+                 )
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(top = spacing.lg, bottom = spacing.xxl),
+                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(spacing.md),
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    item {
+                         WelcomeBanner(modifier = Modifier.padding(bottom = spacing.xs))
+                    }
 
                 // Seção de Próximos Concursos e Previsões
                 item {
@@ -211,4 +215,5 @@ fun HomeScreen(
             }
         }
     }
+}
 }

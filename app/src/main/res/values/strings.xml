@@ -9,6 +9,7 @@
     <string name="nav_games">Jogos</string>
     <string name="nav_checker">Conferidor</string>
     <string name="nav_about">Sobre</string>
+    <string name="nav_statistics">Estatísticas</string>
 
     <!-- States -->
     <string name="state_loading">Carregando…</string>
@@ -17,6 +18,11 @@
     <string name="state_syncing">Atualizando resultados…</string>
     <string name="state_empty_games">Você ainda não salvou nenhum jogo.</string>
     <string name="state_stale_data">Dados de %s</string>
+    <string name="state_error_title">Ops, algo deu errado</string>
+    <string name="state_error_retry">Tentar novamente</string>
+    <string name="state_loading_message">Carregando informações…</string>
+    <string name="state_empty_title">Nada por aqui</string>
+    <string name="state_empty_action">Criar agora</string>
 
     <!-- Actions -->
     <string name="action_clear">Limpar seleção</string>
@@ -40,6 +46,16 @@
     <string name="action_generate_now">Gerar agora</string>
     <string name="action_pin">Fixar jogo</string>
     <string name="action_unpin">Desafixar jogo</string>
+    <string name="content_description_add_game">Adicionar novo jogo</string>
+    <string name="content_description_close">Fechar</string>
+    <string name="content_description_refresh">Atualizar dados</string>
+    <string name="content_description_filter">Filtrar por modalidade</string>
+    <string name="content_description_options">Mais opções</string>
+    <string name="content_description_back">Voltar</string>
+    <string name="content_description_delete">Excluir</string>
+    <string name="content_description_check">Conferir</string>
+    <string name="content_description_copy">Copiar</string>
+    <string name="content_description_share">Compartilhar</string>
 
     <!-- Generator -->
     <string name="generator_title">Gerador de Jogos</string>
@@ -198,4 +214,7 @@
     <string name="insight_sum">Soma: %d</string>
     <string name="insight_repeats">%d Repetidas</string>
     <string name="action_analyze">Analisar</string>
+    <string name="statistics_coming_soon_title">Em breve!</string>
+    <string name="statistics_coming_soon_description">Estatísticas detalhadas sobre os números mais sorteados, padrões de frequência e análises avançadas.</string>
+    <string name="statistics_title">Estatísticas</string>
 </resources>

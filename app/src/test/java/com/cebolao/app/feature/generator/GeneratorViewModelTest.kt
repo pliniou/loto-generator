@@ -34,7 +34,7 @@ class FakeLotteryRepo : LotteryRepository {
 
     override fun observeGamesByType(type: LotteryType) = kotlinx.coroutines.flow.flowOf(emptyList<Game>())
 
-    override suspend fun getLastContest(type: LotteryType): Contest? = null
+    override suspend fun getLastContest(type: LotteryType): AppResult<Contest?> = AppResult.Success(null)
 
     override suspend fun saveGame(game: Game): AppResult<Unit> = AppResult.Success(Unit)
 

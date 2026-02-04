@@ -1,8 +1,6 @@
 package com.cebolao.app.component
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,8 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.cebolao.R
 import com.cebolao.app.theme.AlphaLevels
+import com.cebolao.app.theme.CebolaoElevation
+import com.cebolao.app.theme.ComponentDimensions
 import com.cebolao.app.theme.LocalSpacing
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.util.LotteryUiMapper
 import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.LotteryType
@@ -42,17 +42,10 @@ fun LotteryCard(
     val lotteryColor = LotteryColors.getColor(lotteryType)
     
     // Animações de elevação e cor
-    val elevation by animateDpAsState(
-        targetValue = 2.dp,
-        animationSpec = tween(durationMillis = 300),
-        label = "card-elevation"
-    )
     
-    val borderColor by animateColorAsState(
-        targetValue = lotteryColor.copy(alpha = AlphaLevels.BORDER_MEDIUM),
-        animationSpec = tween(durationMillis = 300),
-        label = "card-border-color"
-    )
+    // Sem animação para valores constantes
+    val elevation = CebolaoElevation.level2
+    val borderColor = lotteryColor.copy(alpha = AlphaLevels.BORDER_MEDIUM)
 
     Card(
         onClick = onClick,
@@ -67,12 +60,12 @@ fun LotteryCard(
         elevation =
             CardDefaults.cardElevation(
                 defaultElevation = elevation,
-                pressedElevation = 4.dp,
-                hoveredElevation = 3.dp,
+                pressedElevation = CebolaoElevation.level3,
+                hoveredElevation = 3.dp, // Keeping slightly different hover if needed, or unify to level? Let's keep 3dp as level isn't exact or use level 2/3
             ),
         border =
             BorderStroke(
-                width = 1.dp,
+                width = ComponentDimensions.strokeWidthMedium,
                 color = borderColor,
             ),
         shape = MaterialTheme.shapes.large,
@@ -137,7 +130,7 @@ fun LotteryCard(
 
                 // Visual Separator
                 HorizontalDivider(
-                    thickness = 1.dp,
+                    thickness = ComponentDimensions.dividerThicknessMedium,
                     color = lotteryColor.copy(alpha = AlphaLevels.BORDER_FAINT),
                 )
 
@@ -165,7 +158,7 @@ fun LotteryCard(
 
                     // Visual Separator
                     HorizontalDivider(
-                        thickness = 1.dp,
+                        thickness = ComponentDimensions.dividerThicknessMedium,
                         color = lotteryColor.copy(alpha = AlphaLevels.BORDER_FAINT),
                     )
 
@@ -205,7 +198,7 @@ fun LotteryCard(
 
                     // Visual Separator
                     HorizontalDivider(
-                        thickness = 1.dp,
+                        thickness = ComponentDimensions.dividerThicknessMedium,
                         color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
                     )
 

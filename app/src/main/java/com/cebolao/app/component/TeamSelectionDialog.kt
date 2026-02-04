@@ -66,7 +66,7 @@ fun TeamSelectionDialog(
                     modifier = Modifier.height(400.dp),
                     verticalArrangement = Arrangement.spacedBy(spacing.xs),
                 ) {
-                    items(filteredTeams) { team ->
+                    items(items = filteredTeams, key = { it.id }) { team ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

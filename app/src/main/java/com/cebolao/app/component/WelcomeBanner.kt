@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.cebolao.R
 import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.util.LotteryUiMapper
 import com.cebolao.domain.util.DaySchedule
 import com.cebolao.domain.util.LotteryScheduleUtil

@@ -38,7 +38,7 @@ data class LotteryProfile(
     val isSuperSete: Boolean = false,
     val costPerGame: Int = 300, // padrão R$ 3,00
     val probabilityOfWinning: String = "", // Ex: "1 em 50.063.860"
-    val bolaoInfo: BolaoInfo? = null,
+    val poolInfo: PoolInfo? = null,
 ) {
     /**
      * Range de times (ex: 1..80 para Timemania), null se não tiver time.

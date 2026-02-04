@@ -2,9 +2,11 @@ package com.cebolao.domain.usecase
 
 import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.Game
+import com.cebolao.domain.model.DistributionStats
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.model.NumberStat
 import com.cebolao.domain.model.PrizeStat
+import com.cebolao.domain.util.StatisticsUtil
 import javax.inject.Inject
 
 class CalculateStatisticsUseCase
@@ -91,5 +93,42 @@ class CalculateStatisticsUseCase
             }
 
             return hitCounts.map { (hits, count) -> PrizeStat(hits, count) }.sortedByDescending { it.hits }
+        }
+
+        /**
+         * Calcula distribuição por dezenas e quadrantes para os concursos fornecidos.
+         */
+        fun calculateDistributionStats(
+            contests: List<Contest>,
+            profile: LotteryProfile,
+        ): DistributionStats {
+            if (contests.isEmpty()) {
+                return DistributionStats(emptyMap(), listOf(0, 0, 0, 0))
+            }
+
+            // Aggregate all numbers from all contests
+            val allNumbers = contests.flatMap { it.getAllNumbers() }
+
+            // Calculate decades
+            // This needs to be smarter to handle different lotteries ranges
+            // For now, simple 0-9, 10-19 grouping
+            val decades =
+                allNumbers
+                    .groupingBy { (it / 10) * 10 }
+                    .eachCount()
+                    .mapKeys { (start, _) ->
+                        val end = start + 9
+                        "$start-$end"
+                    }
+                    .toSortedMap()
+
+            // Calculate quadrants
+            // Need max number from profile to know where the center is
+            val quartrants = StatisticsUtil.calculateQuadrantDistribution(allNumbers, profile.maxNumber)
+
+            return DistributionStats(
+                decadeDistribution = decades.toMap(),
+                quadrantDistribution = quartrants.toList(),
+            )
         }
     }

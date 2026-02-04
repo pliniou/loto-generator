@@ -6,6 +6,7 @@ import com.cebolao.domain.model.Game
 import com.cebolao.domain.model.GenerationFilter
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.model.LotteryType
+import com.cebolao.domain.Constants
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.sqrt
@@ -27,15 +28,9 @@ class GameValidator
                 GenerationFilter.PRIME_NUMBERS to { game, _, _, _ -> validatePrimes(game) },
             )
 
-        private val defaultMinParityRatio = 0.2
-        private val defaultMaxParityRatio = 0.8
+        // Constants moved to Constants.kt
 
-        private val lotofacilFrameNumbers =
-            setOf(
-                1, 2, 3, 4, 5,
-                6, 10, 11, 15, 16, 20,
-                21, 22, 23, 24, 25,
-            )
+        // Constants moved to Constants.kt
 
         /**
          * Validação com filtros configuráveis.
@@ -82,8 +77,8 @@ class GameValidator
             val evens = numbers.count { it % 2 == 0 }
             val ratio = evens.toDouble() / total
 
-            val min = cfg?.minParityRatio ?: defaultMinParityRatio
-            val max = cfg?.maxParityRatio ?: defaultMaxParityRatio
+            val min = cfg?.minParityRatio ?: Constants.DEFAULT_MIN_PARITY_RATIO
+            val max = cfg?.maxParityRatio ?: Constants.DEFAULT_MAX_PARITY_RATIO
             return ratio in min..max
         }
 
@@ -113,8 +108,8 @@ class GameValidator
         ): Boolean {
             if (profile.type != LotteryType.LOTOFACIL) return true
             val numbers = game.numbers
-            val containsFrame = numbers.any { it in lotofacilFrameNumbers }
-            val containsInner = numbers.any { it !in lotofacilFrameNumbers }
+            val containsFrame = numbers.any { it in Constants.LOTOFACIL_FRAME_NUMBERS }
+            val containsInner = numbers.any { it !in Constants.LOTOFACIL_FRAME_NUMBERS }
             return containsFrame && containsInner
         }
 

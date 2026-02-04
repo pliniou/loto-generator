@@ -2,8 +2,11 @@ package com.cebolao.app.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -22,13 +25,14 @@ import com.cebolao.app.theme.CebolaoTheme
  * Composable raiz do app.
  * Configura tema, navegação e bottom bar.
  */
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CebolaoApp(startDestination: Route = Route.Home) {
     CebolaoTheme {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
-
         // Check if current destination is Onboarding using route class
         val isOnboarding = currentDestination?.hasRoute<Route.Onboarding>() == true
 
@@ -46,7 +50,9 @@ fun CebolaoApp(startDestination: Route = Route.Home) {
                             currentDestination?.hasRoute<Route.About>() == true -> R.string.about_title
                             else -> R.string.app_name
                         }
-                    CebolaoTopAppBar(title = stringResource(titleRes))
+                    CebolaoTopAppBar(
+                        title = stringResource(titleRes),
+                    )
                 }
             },
             bottomBar = {

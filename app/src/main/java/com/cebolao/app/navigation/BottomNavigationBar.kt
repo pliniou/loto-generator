@@ -3,6 +3,7 @@ package com.cebolao.app.navigation
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.CheckCircle
@@ -40,6 +41,7 @@ private val bottomNavItems =
         BottomNavItem(Route.Generator, R.string.nav_generator, Icons.Filled.Casino),
         BottomNavItem(Route.Games, R.string.nav_games, Icons.Filled.Calculate),
         BottomNavItem(Route.Checker, R.string.nav_checker, Icons.Filled.CheckCircle),
+        BottomNavItem(Route.Statistics, R.string.nav_statistics, Icons.Filled.Analytics),
         BottomNavItem(Route.About, R.string.nav_about, Icons.Filled.Info),
     )
 

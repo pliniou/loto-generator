@@ -25,11 +25,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.cebolao.app.core.UiEvent
 import javax.inject.Inject
 
 @Immutable
@@ -39,7 +43,7 @@ data class GeneratorUiState(
     val profile: LotteryProfile? = null,
     val generatedGames: List<Game> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
+
     val lastSavedCount: Int = 0,
     val selectedTeam: Int? = null,
     val activeFilters: List<GenerationFilter> = emptyList(),
@@ -63,6 +67,10 @@ class GeneratorViewModel
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(GeneratorUiState())
         val uiState: StateFlow<GeneratorUiState> = _uiState.asStateFlow()
+
+        private val _events = MutableSharedFlow<UiEvent>()
+        val events: SharedFlow<UiEvent> = _events.asSharedFlow()
+
         private var latestContestJob: Job? = null
 
         init {
@@ -94,7 +102,7 @@ class GeneratorViewModel
             val profile = currentState.profile ?: return
 
             viewModelScope.launch {
-                _uiState.value = currentState.copy(isLoading = true, errorMessage = null)
+                _uiState.value = currentState.copy(isLoading = true)
                 try {
                     // Configuração da geração
                     val config =
@@ -111,7 +119,12 @@ class GeneratorViewModel
                             delay(800)
 
                             // Usa último concurso já observado; faz fallback pontual se ainda não veio nada
-                            val lastContest = _uiState.value.lastContest ?: lotteryRepository.getLastContest(profile.type)
+                            val lastContest = _uiState.value.lastContest ?: run {
+                                when (val result = lotteryRepository.getLastContest(profile.type)) {
+                                    is AppResult.Success -> result.value
+                                    is AppResult.Failure -> null
+                                }
+                            }
                             generateGamesUseCase(profile, config, lastContest = lastContest)
                         }
 
@@ -131,11 +144,11 @@ class GeneratorViewModel
                             isLoading = false,
                             lastSavedCount = 0,
                             generationReport = result.report,
-                            errorMessage = null,
                         )
                 } catch (e: Exception) {
                     Log.e("GeneratorVM", "Erro ao gerar jogos", e)
-                    _uiState.value = currentState.copy(isLoading = false, errorMessage = e.message ?: "Erro ao gerar jogos")
+                    _uiState.value = currentState.copy(isLoading = false)
+                    _events.emit(UiEvent.ShowSnackbar(e.message ?: "Erro ao gerar jogos"))
                 }
             }
         }
@@ -153,12 +166,13 @@ class GeneratorViewModel
                                 generatedGames = emptyList(),
                                 lastSavedCount = currentState.generatedGames.size,
                                 isLoading = false,
-                                errorMessage = null,
                             )
+                        _events.emit(UiEvent.ShowSuccess("Jogos salvos com sucesso!"))
                     }
                     is AppResult.Failure -> {
                         Log.e("GeneratorVM", "Erro ao salvar jogos", result.cause)
-                        _uiState.value = currentState.copy(isLoading = false, errorMessage = result.error.toUserMessage())
+                        _uiState.value = currentState.copy(isLoading = false)
+                        _events.emit(UiEvent.ShowSnackbar(result.error.toUserMessage()))
                     }
                 }
             }
@@ -221,8 +235,8 @@ class GeneratorViewModel
                 )
             viewModelScope.launch {
                 when (val result = userPresetRepository.savePreset(preset)) {
-                    is AppResult.Success -> _uiState.value = _uiState.value.copy(errorMessage = null)
-                    is AppResult.Failure -> _uiState.value = _uiState.value.copy(errorMessage = result.error.toUserMessage())
+                    is AppResult.Success -> _events.emit(UiEvent.ShowSuccess("Preset salvo!"))
+                    is AppResult.Failure -> _events.emit(UiEvent.ShowSnackbar(result.error.toUserMessage()))
                 }
             }
         }
@@ -234,7 +248,10 @@ class GeneratorViewModel
                 val profile = profileRepository.getProfile(type)
                 val filteredFilters = _uiState.value.activeFilters.filter { it.isApplicable(profile) }
                 val filteredConfigs = _uiState.value.filterConfigs.filterKeys { it.isApplicable(profile) }
-                val lastContest = lotteryRepository.getLastContest(type) // Snapshot inicial
+                val lastContest = when (val result = lotteryRepository.getLastContest(type)) {
+                    is AppResult.Success -> result.value
+                    is AppResult.Failure -> null
+                }
 
                 _uiState.value =
                     _uiState.value.copy(

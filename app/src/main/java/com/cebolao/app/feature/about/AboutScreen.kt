@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.BuildConfig
 import com.cebolao.R
 import com.cebolao.app.feature.about.components.LotteryInfoCard
@@ -35,7 +37,8 @@ import com.cebolao.app.ui.layout.CebolaoContent
 
 @Composable
 fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
-    val profiles = viewModel.profiles
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val profiles = uiState.profiles
     val scrollState = rememberScrollState()
     val spacing = LocalSpacing.current
 

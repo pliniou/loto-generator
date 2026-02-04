@@ -39,7 +39,7 @@ interface LotteryRepository {
     /**
      * Retorna último concurso de uma modalidade.
      */
-    suspend fun getLastContest(type: LotteryType): Contest?
+    suspend fun getLastContest(type: LotteryType): AppResult<Contest?>
 
     /**
      * Salva um novo jogo.

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -50,8 +51,10 @@ import com.cebolao.R
 import com.cebolao.app.component.SmallLotteryBall
 import com.cebolao.app.feature.generator.GeneratorUiState
 import com.cebolao.app.theme.AlphaLevels
+import com.cebolao.app.theme.AnimationDurations
+import com.cebolao.app.theme.ComponentDimensions
 import com.cebolao.app.theme.LocalSpacing
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.util.GenerationFilterUiMapper
 import com.cebolao.app.util.LotteryUiMapper
 import com.cebolao.domain.model.Game
@@ -61,14 +64,17 @@ import com.cebolao.domain.util.TimemaniaUtil
 
 @Composable
 fun GeneratorConfigSection(
-    uiState: GeneratorUiState,
+    selectedType: LotteryType,
+    quantity: Int,
+    activeFilters: List<GenerationFilter>,
+    profile: com.cebolao.domain.model.LotteryProfile?,
     onTypeSelected: (LotteryType) -> Unit,
     onQuantityChanged: (Int) -> Unit,
     onFilterToggled: (GenerationFilter) -> Unit,
     onOpenFilterConfig: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val lotteryColor = LotteryColors.getColor(uiState.selectedType)
+    val lotteryColor = LotteryColors.getColor(selectedType)
 
     // 1. Seletor de Modalidade
     Text(
@@ -82,16 +88,17 @@ fun GeneratorConfigSection(
         modifier = Modifier.padding(bottom = spacing.lg),
     ) {
         items(items = LotteryType.entries, key = { it.name }) { type ->
-            val isSelected = type == uiState.selectedType
+            val isSelected = type == selectedType
             val chipColor by animateColorAsState(
                 targetValue = LotteryColors.getColor(type),
-                animationSpec = tween(durationMillis = 300),
+                animationSpec = tween(durationMillis = AnimationDurations.medium),
                 label = "chip-color-$type"
             )
             FilterChip(
                 selected = isSelected,
                 onClick = { onTypeSelected(type) },
                 label = { Text(stringResource(LotteryUiMapper.getNameRes(type))) },
+                modifier = Modifier.sizeIn(minHeight = 48.dp),
                 colors =
                     FilterChipDefaults.filterChipColors(
                         selectedContainerColor = chipColor,
@@ -135,7 +142,7 @@ fun GeneratorConfigSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        text = pluralStringResource(R.plurals.games_count, uiState.quantity, uiState.quantity),
+                        text = pluralStringResource(R.plurals.games_count, quantity, quantity),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.ExtraBold,
                     )
@@ -146,8 +153,8 @@ fun GeneratorConfigSection(
                     horizontalArrangement = Arrangement.spacedBy(spacing.sm),
                 ) {
                     IconButton(
-                        onClick = { if (uiState.quantity > 1) onQuantityChanged(uiState.quantity - 1) },
-                        enabled = uiState.quantity > 1,
+                        onClick = { if (quantity > 1) onQuantityChanged(quantity - 1) },
+                        enabled = quantity > 1,
                         colors =
                             IconButtonDefaults.filledIconButtonColors(
                                 containerColor = MaterialTheme.colorScheme.surface,
@@ -158,12 +165,12 @@ fun GeneratorConfigSection(
                     }
 
                     IconButton(
-                        onClick = { if (uiState.quantity < 50) onQuantityChanged(uiState.quantity + 1) },
-                        enabled = uiState.quantity < 50,
+                        onClick = { if (quantity < 50) onQuantityChanged(quantity + 1) },
+                        enabled = quantity < 50,
                         colors =
                             IconButtonDefaults.filledIconButtonColors(
                                 containerColor = lotteryColor,
-                                contentColor = LotteryColors.getOnColor(uiState.selectedType),
+                                contentColor = LotteryColors.getOnColor(selectedType),
                             ),
                     ) {
                         Icon(Icons.Default.Add, contentDescription = stringResource(R.string.action_increase))
@@ -174,7 +181,7 @@ fun GeneratorConfigSection(
             Spacer(modifier = Modifier.height(spacing.md))
 
             // Custo estimado com visual mais limpo
-            val totalCost = (uiState.profile?.costPerGame ?: 0) * uiState.quantity
+            val totalCost = (profile?.costPerGame ?: 0) * quantity
             val costFormatted = com.cebolao.app.util.FormatUtils.formatCurrency(totalCost.toLong())
 
             Surface(
@@ -212,13 +219,13 @@ fun GeneratorConfigSection(
                 // Badge com contador
                 BadgedBox(
                     badge = {
-                        if (uiState.activeFilters.isNotEmpty()) {
+                        if (activeFilters.isNotEmpty()) {
                             Badge(
                                 containerColor = lotteryColor,
-                                contentColor = LotteryColors.getOnColor(uiState.selectedType),
+                                contentColor = LotteryColors.getOnColor(selectedType),
                             ) {
                                 Text(
-                                    text = uiState.activeFilters.size.toString(),
+                                    text = activeFilters.size.toString(),
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -236,29 +243,29 @@ fun GeneratorConfigSection(
                 }
             }
 
-            val options =
-                remember(uiState.profile) {
-                    val base =
-                        listOf(
-                            GenerationFilter.MULTIPLES_OF_3,
-                            GenerationFilter.REPEATED_FROM_PREVIOUS,
-                            GenerationFilter.MOLDURA_MIOLO,
-                            GenerationFilter.PARITY_BALANCE,
-                        )
-                    uiState.profile?.let { profile -> base.filter { it.isApplicable(profile) } } ?: base
-                }
+            val options = remember(profile) {
+                val base = listOf(
+                    GenerationFilter.PARITY_BALANCE,
+                    GenerationFilter.MULTIPLES_OF_3,
+                    GenerationFilter.REPEATED_FROM_PREVIOUS,
+                    GenerationFilter.MOLDURA_MIOLO,
+                    GenerationFilter.PRIME_NUMBERS,
+                )
+                profile?.let { p -> base.filter { it.isApplicable(p) } } ?: base
+            }
 
             LazyRow(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
-                items(options) { filter ->
-                    val isActive = uiState.activeFilters.contains(filter)
+                items(items = options, key = { it.name }) { filter ->
+                    val isActive = activeFilters.contains(filter)
                     FilterChip(
                         selected = isActive,
                         onClick = { onFilterToggled(filter) },
                         label = { Text(stringResource(GenerationFilterUiMapper.getLabelRes(filter))) },
+                        modifier = Modifier.sizeIn(minHeight = 48.dp),
                         colors =
                             FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = lotteryColor,
-                                selectedLabelColor = LotteryColors.getOnColor(uiState.selectedType),
+                                selectedLabelColor = LotteryColors.getOnColor(selectedType),
                             ),
                         border =
                             if (isActive) {
@@ -279,11 +286,12 @@ fun GeneratorConfigSection(
 
 @Composable
 fun TimemaniaTeamCard(
-    uiState: GeneratorUiState,
+    selectedType: LotteryType,
+    selectedTeam: Int?,
     onShowTeamDialog: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    if (uiState.selectedType == LotteryType.TIMEMANIA) {
+    if (selectedType == LotteryType.TIMEMANIA) {
         val lotteryColor = LotteryColors.getColor(LotteryType.TIMEMANIA)
         Card(
             modifier =
@@ -312,7 +320,7 @@ fun TimemaniaTeamCard(
                     )
                     Text(
                         text =
-                            uiState.selectedTeam?.let { TimemaniaUtil.getTeamName(it) }
+                            selectedTeam?.let { TimemaniaUtil.getTeamName(it) }
                                 ?: stringResource(R.string.timemania_random_team_saved),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
@@ -330,7 +338,9 @@ fun TimemaniaTeamCard(
 
 @Composable
 fun GeneratorResultsSection(
-    uiState: GeneratorUiState,
+    generatedCount: Int,
+    quantity: Int,
+    report: com.cebolao.domain.model.GenerationReport?,
     onOpenReportDetails: () -> Unit,
     onRetry: () -> Unit,
 ) {
@@ -341,19 +351,19 @@ fun GeneratorResultsSection(
         verticalAlignment = Alignment.Bottom,
     ) {
         Text(
-            text = pluralStringResource(R.plurals.games_generated_count, uiState.generatedGames.size, uiState.generatedGames.size),
+            text = pluralStringResource(R.plurals.games_generated_count, generatedCount, generatedCount),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.ExtraBold,
         )
-        if (uiState.generatedGames.isNotEmpty()) {
+        if (generatedCount > 0) {
             TextButton(onClick = onRetry) {
                 Text(stringResource(R.string.action_redo), fontWeight = FontWeight.Bold)
             }
         }
     }
 
+
     // Banner de geração parcial
-    val report = uiState.generationReport
     if (report != null && report.partial) {
         Card(
             modifier = Modifier.fillMaxWidth().padding(bottom = spacing.lg),
@@ -365,7 +375,7 @@ fun GeneratorResultsSection(
                     Icon(imageVector = Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onErrorContainer)
                     Spacer(modifier = Modifier.width(spacing.sm))
                     Text(
-                        text = stringResource(R.string.generation_partial_warning, report.generated, uiState.quantity),
+                        text = stringResource(R.string.generation_partial_warning, report.generated, quantity),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onErrorContainer,
@@ -387,6 +397,7 @@ fun GeneratedGameItem(
     game: Game,
     lastContest: com.cebolao.domain.model.Contest? = null,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val spacing = LocalSpacing.current
     val lotteryColor = LotteryColors.getColor(game.lotteryType)
@@ -396,7 +407,7 @@ fun GeneratedGameItem(
 
     Card(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clickable { onClick() },
         shape = MaterialTheme.shapes.medium,

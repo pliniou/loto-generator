@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
  * @property maxShares Quantidade máxima de cotas permitida.
  */
 @Serializable
-data class BolaoInfo(
+data class PoolInfo(
     val minPoolPrice: Int,
     val minSharePrice: Int,
     val minShares: Int,

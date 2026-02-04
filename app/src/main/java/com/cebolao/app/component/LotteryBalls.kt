@@ -1,8 +1,6 @@
 package com.cebolao.app.component
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -18,10 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.cebolao.app.theme.AlphaLevels
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.CebolaoElevation
+import com.cebolao.app.theme.ComponentDimensions
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.domain.model.LotteryType
 
 /**
@@ -33,25 +33,15 @@ fun LotteryBall(
     number: Int,
     lotteryType: LotteryType,
     modifier: Modifier = Modifier,
-    size: Dp = 32.dp,
+    size: Dp = ComponentDimensions.ballSizeLarge,
     style: androidx.compose.ui.text.TextStyle = androidx.compose.material3.MaterialTheme.typography.labelLarge,
 ) {
     val backgroundColor = LotteryColors.getColor(lotteryType)
     val contentColor = LotteryColors.getOnColor(lotteryType)
     
-    // Animação de sombra suave
-    val elevation by animateDpAsState(
-        targetValue = 2.dp,
-        animationSpec = tween(durationMillis = 300),
-        label = "ball-elevation"
-    )
-    
-    // Animação de cor de fundo
-    val animatedBackgroundColor by animateColorAsState(
-        targetValue = backgroundColor,
-        animationSpec = tween(durationMillis = 300),
-        label = "ball-background-color"
-    )
+    // Sem animação para valores constantes
+    val elevation = CebolaoElevation.level2
+    val animatedBackgroundColor = backgroundColor
 
     Box(
         modifier =
@@ -85,10 +75,10 @@ fun SmallLotteryBall(
     LotteryBall(
         number = number,
         lotteryType = lotteryType,
-        size = 24.dp,
+        size = ComponentDimensions.ballSizeSmall,
         style =
             androidx.compose.material3.MaterialTheme.typography.labelSmall.copy(
-                fontSize = 10.sp,
+                fontSize = ComponentDimensions.ballTextSizeSmall,
             ),
     )
 }

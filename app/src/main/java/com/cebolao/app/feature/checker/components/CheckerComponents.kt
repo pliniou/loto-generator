@@ -18,11 +18,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -53,7 +55,7 @@ import com.cebolao.app.feature.checker.CheckerUiState
 import com.cebolao.app.feature.checker.HistoryHit
 import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
-import com.cebolao.app.ui.LotteryColors
+import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.util.LotteryUiMapper
 import com.cebolao.domain.model.DuplaMode
 import com.cebolao.domain.model.LotteryType
@@ -79,6 +81,7 @@ fun CheckerTypeSelector(
                 selected = isSelected,
                 onClick = { onTypeSelected(type) },
                 label = { Text(stringResource(LotteryUiMapper.getNameRes(type))) },
+                modifier = Modifier.sizeIn(minHeight = 48.dp),
                 colors =
                     FilterChipDefaults.filterChipColors(
                         selectedContainerColor = chipColor,
@@ -263,8 +266,7 @@ fun CheckerNumberGrid(
         modifier = modifier,
     ) {
         val list = range.toList()
-        items(list.size) { index ->
-            val number = list[index]
+        items(items = list, key = { it }) { number ->
             val isSelected = uiState.selectedNumbers.contains(number)
             NumberCell(
                 number = number,

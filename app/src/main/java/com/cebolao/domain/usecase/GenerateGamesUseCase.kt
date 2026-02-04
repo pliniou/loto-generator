@@ -3,7 +3,7 @@ package com.cebolao.domain.usecase
 import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.Game
 import com.cebolao.domain.model.GenerationConfig
-import com.cebolao.domain.model.GenerationConstants
+import com.cebolao.domain.Constants
 import com.cebolao.domain.model.GenerationFilter
 import com.cebolao.domain.model.GenerationReport
 import com.cebolao.domain.model.GenerationResult
@@ -25,7 +25,7 @@ class GenerateGamesUseCase
             profile: LotteryProfile,
             config: GenerationConfig,
             lastContest: Contest? = null,
-            maxRetry: Int = GenerationConstants.DEFAULT_MAX_RETRY,
+            maxRetry: Int = Constants.DEFAULT_MAX_RETRY,
             random: Random = Random,
         ): GenerationResult {
             validateConfig(profile, config)

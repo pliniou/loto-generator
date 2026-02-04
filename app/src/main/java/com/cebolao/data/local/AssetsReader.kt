@@ -3,6 +3,7 @@ package com.cebolao.data.local
 import android.content.Context
 import android.util.Log
 import com.cebolao.data.util.LotteryTypeMappings
+import com.cebolao.domain.Constants
 import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.model.LotteryType
@@ -115,8 +116,8 @@ class AssetsReader
                         prizeRanges = listOf(15, 14, 13, 12, 11),
                         costPerGame = 350, // R$ 3,50
                         probabilityOfWinning = "1 em 3.268.760",
-                        bolaoInfo =
-                            com.cebolao.domain.model.BolaoInfo(
+                        poolInfo =
+                            com.cebolao.domain.model.PoolInfo(
                                 minPoolPrice = 1250, // R$ 12,50
                                 minSharePrice = 400, // R$ 4,00
                                 minShares = 2,
@@ -133,8 +134,8 @@ class AssetsReader
                         prizeRanges = listOf(6, 5, 4),
                         costPerGame = 600, // R$ 6,00 (Julho/2025)
                         probabilityOfWinning = "1 em 50.063.860",
-                        bolaoInfo =
-                            com.cebolao.domain.model.BolaoInfo(
+                        poolInfo =
+                            com.cebolao.domain.model.PoolInfo(
                                 minPoolPrice = 1800, // R$ 18,00
                                 minSharePrice = 700, // R$ 7,00
                                 minShares = 2,
@@ -151,8 +152,8 @@ class AssetsReader
                         prizeRanges = listOf(5, 4, 3, 2),
                         costPerGame = 300, // R$ 3,00
                         probabilityOfWinning = "1 em 24.040.016",
-                        bolaoInfo =
-                            com.cebolao.domain.model.BolaoInfo(
+                        poolInfo =
+                            com.cebolao.domain.model.PoolInfo(
                                 minPoolPrice = 1500, // R$ 15,00
                                 minSharePrice = 400, // R$ 4,00
                                 minShares = 2,
@@ -169,7 +170,7 @@ class AssetsReader
                         prizeRanges = listOf(20, 19, 18, 17, 16, 0), // Inclui faixa "0 acertos"
                         costPerGame = 300,
                         probabilityOfWinning = "1 em 11.372.635",
-                        bolaoInfo = null, // Lotomania não possui bolão oficial
+                        poolInfo = null, // Lotomania não possui bolão oficial
                     )
                 LotteryType.DUPLA_SENA ->
                     LotteryProfile(
@@ -182,8 +183,8 @@ class AssetsReader
                         hasSecondDraw = true,
                         costPerGame = 300, // R$ 3,00
                         probabilityOfWinning = "1 em 15.890.700",
-                        bolaoInfo =
-                            com.cebolao.domain.model.BolaoInfo(
+                        poolInfo =
+                            com.cebolao.domain.model.PoolInfo(
                                 minPoolPrice = 1000, // R$ 10,00
                                 minSharePrice = 300, // R$ 3,00
                                 minShares = 2,
@@ -199,12 +200,12 @@ class AssetsReader
                         numbersPerGame = 10,
                         prizeRanges = listOf(7, 6, 5, 4, 3),
                         hasTeam = true,
-                        teamRangeStart = 1,
-                        teamRangeEnd = 80,
+                        teamRangeStart = Constants.TIMEMANIA_TEAM_RANGE.first,
+                        teamRangeEnd = Constants.TIMEMANIA_TEAM_RANGE.last,
                         costPerGame = 350, // R$ 3,50
                         probabilityOfWinning = "1 em 26.472.637",
-                        bolaoInfo =
-                            com.cebolao.domain.model.BolaoInfo(
+                        poolInfo =
+                            com.cebolao.domain.model.PoolInfo(
                                 minPoolPrice = 700, // R$ 7,00
                                 minSharePrice = 350, // R$ 3,50
                                 minShares = 2,
@@ -222,8 +223,8 @@ class AssetsReader
                         isSuperSete = true,
                         costPerGame = 300, // R$ 3,00
                         probabilityOfWinning = "1 em 10.000.000",
-                        bolaoInfo =
-                            com.cebolao.domain.model.BolaoInfo(
+                        poolInfo =
+                            com.cebolao.domain.model.PoolInfo(
                                 minPoolPrice = 1000, // R$ 10,00
                                 minSharePrice = 600, // R$ 6,00 (cotas a partir de R$ 6,00)
                                 minShares = 2,

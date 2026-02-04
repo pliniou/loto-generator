@@ -3,8 +3,15 @@ package com.cebolao.app.feature.about
 import androidx.lifecycle.ViewModel
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.repository.ProfileRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+
+data class AboutUiState(
+    val profiles: List<LotteryProfile> = emptyList(),
+)
 
 @HiltViewModel
 class AboutViewModel
@@ -12,6 +19,11 @@ class AboutViewModel
     constructor(
         profileRepository: ProfileRepository,
     ) : ViewModel() {
-        // Profiles são estáticos, então podemos expor direto
-        val profiles: List<LotteryProfile> = profileRepository.getAllProfiles()
+        private val _uiState = MutableStateFlow(AboutUiState())
+        val uiState: StateFlow<AboutUiState> = _uiState.asStateFlow()
+
+        init {
+            val profiles = profileRepository.getAllProfiles()
+            _uiState.value = AboutUiState(profiles)
+        }
     }
