@@ -26,7 +26,7 @@ data class Contest(
     init {
         require(numbers.isNotEmpty()) { "O concurso deve conter ao menos um número" }
         require(id > 0) { "O ID do concurso deve ser positivo" }
-        teamNumber?.let { require(it in 1..80) { "teamNumber deve estar entre 1 e 80" } }
+        teamNumber?.let { require(it > 0) { "teamNumber deve ser positivo" } }
     }
 
     /**

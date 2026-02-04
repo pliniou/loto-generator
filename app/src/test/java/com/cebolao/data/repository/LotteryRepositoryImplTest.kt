@@ -129,4 +129,27 @@ class LotteryRepositoryImplTest {
 
             coVerify(atLeast = 1) { lotteryDao.insertContests(any()) }
         }
+
+    @Test
+    fun `refresh retorna Failure quando migração falha com JSON corrompido`() =
+        runTest {
+            // Arrange: simular arquivo JSON existente mas com dados corrompidos
+            every { jsonFileStore.exists() } returns true
+            coEvery { jsonFileStore.read() } throws kotlinx.serialization.SerializationException("Malformed JSON")
+
+            // Act
+            val result = repository.refresh()
+
+            // Assert
+            assertTrue(result is AppResult.Failure)
+            val failure = result as AppResult.Failure
+            assertTrue(failure.error is com.cebolao.domain.error.AppError.DataCorruption)
+            assertEquals(
+                "Erro ao carregar dados salvos. Os dados podem estar corrompidos.",
+                (failure.error as com.cebolao.domain.error.AppError.DataCorruption).message
+            )
+
+            // Verificar que não tentou sincronizar quando a migração falhou
+            coVerify(exactly = 0) { lotteryApi.getLatestContest(any()) }
+        }
 }

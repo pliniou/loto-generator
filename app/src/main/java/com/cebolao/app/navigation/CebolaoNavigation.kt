@@ -29,7 +29,7 @@ fun CebolaoNavHost(
             com.cebolao.app.feature.onboarding.OnboardScreen(
                 onNavigateToHome = {
                     navController.navigate(Route.Home) {
-                        popUpTo<Route.Onboarding> { inclusive = true }
+                        popUpTo(0) { inclusive = true }
                     }
                 },
             )

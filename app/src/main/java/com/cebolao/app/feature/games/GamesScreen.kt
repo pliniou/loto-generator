@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -170,7 +171,7 @@ fun GamesScreen(
                             verticalArrangement = Arrangement.Center,
                             modifier = Modifier.padding(spacing.xl),
                         ) {
-                            Surface(
+                            androidx.compose.material3.Surface(
                                 modifier = Modifier.size(80.dp),
                                 shape = androidx.compose.foundation.shape.CircleShape,
                                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
@@ -224,17 +225,4 @@ fun GamesScreen(
     }
 }
 
-@Composable
-private fun Surface(
-    modifier: Modifier = Modifier,
-    shape: androidx.compose.ui.graphics.Shape,
-    color: androidx.compose.ui.graphics.Color,
-    content: @Composable () -> Unit,
-) {
-    androidx.compose.material3.Surface(
-        modifier = modifier,
-        shape = shape,
-        color = color,
-        content = content,
-    )
-}
+

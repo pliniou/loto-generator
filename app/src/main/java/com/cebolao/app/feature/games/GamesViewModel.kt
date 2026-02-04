@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -35,41 +36,43 @@ class GamesViewModel
         private val _errorMessage = MutableStateFlow<String?>(null)
 
         // Combina filtro com fluxo do repositório
-        @OptIn(ExperimentalCoroutinesApi::class)
-        val uiState: StateFlow<GamesUiState> =
-            _filterType
-                .flatMapLatest { type ->
-                    val flow =
-                        if (type == null) {
-                            repository.observeGames()
-                        } else {
-                            repository.observeGamesByType(type)
+        private val _uiState = MutableStateFlow(GamesUiState(isLoading = true))
+        val uiState: StateFlow<GamesUiState> = _uiState.asStateFlow()
+
+        init {
+            viewModelScope.launch {
+                _filterType
+                    .flatMapLatest { type ->
+                        val flow =
+                            if (type == null) {
+                                repository.observeGames()
+                            } else {
+                                repository.observeGamesByType(type)
+                            }
+                        kotlinx.coroutines.flow.combine(
+                            flow,
+                            _errorMessage,
+                        ) { games, error ->
+                            GamesUiState(
+                                filterType = type,
+                                games =
+                                    games.sortedWith(
+                                        compareByDescending<Game> { it.isPinned }
+                                            .thenByDescending { it.createdAt },
+                                    ),
+                                isLoading = false,
+                                errorMessage = error,
+                            )
                         }
-                    kotlinx.coroutines.flow.combine(
-                        flow,
-                        _filterType,
-                        _errorMessage,
-                    ) { games: List<Game>, filter: LotteryType?, error: String? ->
-                        GamesUiState(
-                            filterType = filter,
-                            games =
-                                games.sortedWith(
-                                    compareByDescending<Game> { it.isPinned }
-                                        .thenByDescending { it.createdAt },
-                                ),
-                            isLoading = false,
-                            errorMessage = error,
-                        )
                     }
-                }
-                .catch {
-                    emit(GamesUiState(games = emptyList())) // Tratamento básico de erro
-                }
-                .stateIn(
-                    viewModelScope,
-                    SharingStarted.WhileSubscribed(5000),
-                    GamesUiState(isLoading = true), // Carregamento inicial no stateIn não funciona bem com flatMap, mas ok
-                )
+                    .catch {
+                        emit(GamesUiState(games = emptyList())) // Tratamento básico de erro
+                    }
+                    .collect { newState ->
+                        _uiState.value = newState
+                    }
+            }
+        }
 
         fun onFilterChanged(type: LotteryType?) {
             _filterType.value = type

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Background circle -->
+    <path
+        android:fillColor="#803594"
+        android:pathData="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2Z"/>
+    
+    <!-- Cebolão logo simplified -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,8L8,16M10,8L10,16M12,8L12,16M14,8L14,16M16,8L16,16M8,12L16,12"/>
+        
+    <!-- Decorative elements -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6,6L6,6M18,6L18,6M6,18L6,18M18,18L18,18"/>
+        
+</vector>

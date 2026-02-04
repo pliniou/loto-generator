@@ -33,17 +33,29 @@ data class LotteryProfile(
     val prizeRanges: List<Int>,
     val hasSecondDraw: Boolean = false,
     val hasTeam: Boolean = false,
+    val teamRangeStart: Int? = null, // Início do range de times (ex: 1 para Timemania)
+    val teamRangeEnd: Int? = null, // Fim do range de times (ex: 80 para Timemania)
     val isSuperSete: Boolean = false,
     val costPerGame: Int = 300, // padrão R$ 3,00
     val probabilityOfWinning: String = "", // Ex: "1 em 50.063.860"
     val bolaoInfo: BolaoInfo? = null,
 ) {
+    /**
+     * Range de times (ex: 1..80 para Timemania), null se não tiver time.
+     */
+    @kotlinx.serialization.Transient
+    val teamRange: IntRange? = if (teamRangeStart != null && teamRangeEnd != null) teamRangeStart..teamRangeEnd else null
+
     init {
         require(minNumber >= 0) { "minNumber deve ser >= 0" }
         require(maxNumber > minNumber) { "maxNumber deve ser > minNumber" }
         require(numbersPerGame > 0) { "numbersPerGame deve ser > 0" }
         require(numbersPerGame <= (maxNumber - minNumber + 1)) { "numbersPerGame deve ser <= tamanho do range" }
         require(prizeRanges.isNotEmpty()) { "prizeRanges não pode ser vazio" }
+        if (hasTeam) {
+            require(teamRange != null) { "teamRange deve ser definido quando hasTeam = true" }
+            require(!teamRange.isEmpty()) { "teamRange não pode ser vazio" }
+        }
     }
 
     /**

@@ -129,7 +129,10 @@ class LotteryRepositoryImpl
         override suspend fun refresh(): AppResult<Unit> =
             withContext(ioDispatcher) {
                 // Checagem de migração (legado JSON -> Room)
-                migrateIfNeeded()
+                val migrationResult = migrateIfNeeded()
+                if (migrationResult is Failure) {
+                    return@withContext migrationResult
+                }
 
                 var hadAnyNetworkSuccess = false
                 var lastNetworkFailure: Throwable? = null
@@ -207,31 +210,40 @@ class LotteryRepositoryImpl
             return entities
         }
 
-        private suspend fun migrateIfNeeded() {
-            if (jsonFileStore.exists()) {
-                try {
-                    val data = jsonFileStore.read()
-                    if (data != null) {
-                        logD("Migration", "Migrando dados JSON legados para Room")
+        private suspend fun migrateIfNeeded(): AppResult<Unit> {
+            if (!jsonFileStore.exists()) {
+                return Success(Unit)
+            }
 
-                        // Migrate Games
-                        if (data.games.isNotEmpty()) {
-                            val gameEntities = data.games.map { GameMapper.toEntity(it) }
-                            lotteryDao.insertGames(gameEntities)
-                        }
+            return runCatching {
+                val data = jsonFileStore.read()
+                if (data != null) {
+                    logD("Migration", "Migrando dados JSON legados para Room")
 
-                        // Migrate Contests
-                        data.contests.forEach { (_, list) ->
-                            val entities = list.map { domainContest -> ContestMapper.toEntity(domainContest) }
-                            lotteryDao.insertContests(entities)
-                        }
-
-                        logD("Migration", "Migração concluída. Removendo arquivo JSON")
-                        jsonFileStore.clear() // Or delete file
+                    // Migrate Games
+                    if (data.games.isNotEmpty()) {
+                        val gameEntities = data.games.map { GameMapper.toEntity(it) }
+                        lotteryDao.insertGames(gameEntities)
                     }
-                } catch (e: Exception) {
-                    logE("Migration", "Falha ao migrar dados", e)
+
+                    // Migrate Contests
+                    data.contests.forEach { (_, list) ->
+                        val entities = list.map { domainContest -> ContestMapper.toEntity(domainContest) }
+                        lotteryDao.insertContests(entities)
+                    }
+
+                    logD("Migration", "Migração concluída. Removendo arquivo JSON")
+                    jsonFileStore.clear()
                 }
+                Success(Unit)
+            }.getOrElse { error ->
+                logE("Migration", "Falha ao migrar dados", error)
+                Failure(
+                    com.cebolao.domain.error.AppError.DataCorruption(
+                        message = "Erro ao carregar dados salvos. Os dados podem estar corrompidos."
+                    ),
+                    error
+                )
             }
         }
     }

@@ -199,6 +199,8 @@ class AssetsReader
                         numbersPerGame = 10,
                         prizeRanges = listOf(7, 6, 5, 4, 3),
                         hasTeam = true,
+                        teamRangeStart = 1,
+                        teamRangeEnd = 80,
                         costPerGame = 350, // R$ 3,50
                         probabilityOfWinning = "1 em 26.472.637",
                         bolaoInfo =

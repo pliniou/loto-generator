@@ -31,7 +31,7 @@ data class Game(
         require(id.isNotBlank()) { "O ID do jogo não pode estar em branco" }
         require(numbers.isNotEmpty()) { "O jogo deve conter ao menos um número" }
         require(createdAt > 0) { "createdAt deve ser positivo" }
-        teamNumber?.let { require(it in 1..80) { "teamNumber deve estar entre 1 e 80" } }
+        teamNumber?.let { require(it > 0) { "teamNumber deve ser positivo" } }
     }
 
     /**

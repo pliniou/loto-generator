@@ -3,6 +3,7 @@ package com.cebolao.domain.usecase
 import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.Game
 import com.cebolao.domain.model.GenerationConfig
+import com.cebolao.domain.model.GenerationConstants
 import com.cebolao.domain.model.GenerationFilter
 import com.cebolao.domain.model.GenerationReport
 import com.cebolao.domain.model.GenerationResult
@@ -20,13 +21,11 @@ class GenerateGamesUseCase
     constructor(
         private val gameValidator: GameValidator,
     ) {
-        private val defaultMaxRetry = 5000
-
         operator fun invoke(
             profile: LotteryProfile,
             config: GenerationConfig,
             lastContest: Contest? = null,
-            maxRetry: Int = defaultMaxRetry,
+            maxRetry: Int = GenerationConstants.DEFAULT_MAX_RETRY,
             random: Random = Random,
         ): GenerationResult {
             validateConfig(profile, config)
@@ -117,9 +116,10 @@ class GenerateGamesUseCase
             random: Random,
         ): Int? {
             if (!profile.hasTeam) return null
+            val teamRange = requireNotNull(profile.teamRange) { "teamRange deve estar definido para loterias com time" }
 
-            // Se tem time fixo na config, usa ele. Senão gera aleatório 1..80
-            return config.fixedTeam ?: (random.nextInt(1, 81))
+            // Se tem time fixo na config, usa ele. Senão gera aleatório do teamRange
+            return config.fixedTeam ?: random.nextInt(teamRange.first, teamRange.last + 1)
         }
 
         private fun validateConfig(
@@ -138,7 +138,8 @@ class GenerateGamesUseCase
             require(fixedNumbers.size <= profile.numbersPerGame) { "fixedNumbers não pode exceder numbersPerGame" }
 
             if (profile.hasTeam && config.fixedTeam != null) {
-                require(config.fixedTeam in 1..80) { "fixedTeam deve estar entre 1 e 80" }
+                val teamRange = requireNotNull(profile.teamRange) { "teamRange deve estar definido" }
+                require(config.fixedTeam in teamRange) { "fixedTeam deve estar entre ${teamRange.first} e ${teamRange.last}" }
             }
         }
     }
