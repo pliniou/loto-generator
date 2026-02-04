@@ -45,7 +45,7 @@ fun CebolaoTopAppBar(
         },
         actions = { actions() },
         colors =
-            TopAppBarDefaults.centerAlignedTopAppBarColors(
+            TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surface.copy(alpha = AlphaLevels.GLASS_HIGH),
                 scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = AlphaLevels.GLASS_HIGH),
                 titleContentColor = MaterialTheme.colorScheme.onSurface,

@@ -8,7 +8,7 @@ object LotteryInfoProvider {
 
     fun getInfo(type: LotteryType): LotteryInfo {
         return when (type) {
-            LotteryType.MEGASENA -> megaSenaInfo
+            LotteryType.MEGA_SENA -> megaSenaInfo
             LotteryType.LOTOFACIL -> lotofacilInfo
             LotteryType.QUINA -> quinaInfo
             LotteryType.LOTOMANIA -> lotomaniaInfo
@@ -21,7 +21,7 @@ object LotteryInfoProvider {
     }
 
     private val megaSenaInfo = LotteryInfo(
-        type = LotteryType.MEGASENA,
+        type = LotteryType.MEGA_SENA,
         howToPlay = "A Mega-Sena paga milhões para o acertador dos 6 números sorteados. Ainda é possível ganhar prêmios ao acertar 4 ou 5 números dentre os 60 disponíveis no volante de apostas. Para realizar o sonho de ser o próximo milionário, você deve marcar de 6 a 20 números do volante, podendo deixar que o sistema escolha os números para você (Surpresinha) e/ou concorrer com a mesma aposta por 2, 4 ou 8 concursos consecutivos (Teimosinha).",
         drawFrequency = "Os sorteios da Mega-Sena são realizados três vezes por semana, às terças, quintas e aos sábados.",
         betsInfo = "A aposta mínima, de 6 números, custa R$ 5,00. Quanto mais números marcar, maior o preço da aposta e maiores as chances de faturar o prêmio mais cobiçado do país.",

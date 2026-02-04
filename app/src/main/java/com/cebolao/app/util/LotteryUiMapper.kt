@@ -19,5 +19,7 @@ object LotteryUiMapper {
             LotteryType.TIMEMANIA -> R.string.lottery_timemania
             LotteryType.DUPLA_SENA -> R.string.lottery_dupla_sena
             LotteryType.SUPER_SETE -> R.string.lottery_super_sete
+            LotteryType.DIA_DE_SORTE -> R.string.lottery_dia_de_sorte
+            LotteryType.MAIS_MILIONARIA -> R.string.lottery_mais_milionaria
         }
 }

@@ -231,6 +231,44 @@ class AssetsReader
                                 maxShares = 100,
                             ),
                     )
+                LotteryType.DIA_DE_SORTE ->
+                    LotteryProfile(
+                        type = LotteryType.DIA_DE_SORTE,
+                        name = "Dia de Sorte",
+                        minNumber = 1,
+                        maxNumber = 31,
+                        numbersPerGame = 7,
+                        prizeRanges = listOf(7, 6, 5, 4),
+                        costPerGame = 250, // R$ 2,50
+                        probabilityOfWinning = "1 em 2.629.575",
+                        poolInfo =
+                            com.cebolao.domain.model.PoolInfo(
+                                minPoolPrice = 1200, // R$ 12,00
+                                minSharePrice = 400, // R$ 4,00? Verificar oficial. Colocando similar a outros.
+                                minShares = 2,
+                                maxShares = 60,
+                            ),
+                    )
+                LotteryType.MAIS_MILIONARIA ->
+                    LotteryProfile(
+                        type = LotteryType.MAIS_MILIONARIA,
+                        name = "+Milionária",
+                        minNumber = 1,
+                        maxNumber = 50,
+                        numbersPerGame = 6, // Números principais
+                        // Nota: +Milionária tem trevos também, mas o Profile simplificado foca nos números ou precisa de adaptação se a lógica pedir.
+                        // Assumindo que o gerador vai lidar com números principais por enquanto ou que 6 é o core.
+                        prizeRanges = listOf(6), // Faixa máxima
+                        costPerGame = 600, // R$ 6,00
+                        probabilityOfWinning = "1 em 238.360.500",
+                        poolInfo =
+                            com.cebolao.domain.model.PoolInfo(
+                                minPoolPrice = 1200,
+                                minSharePrice = 600,
+                                minShares = 2,
+                                maxShares = 100,
+                            ),
+                    )
             }
 
         /**

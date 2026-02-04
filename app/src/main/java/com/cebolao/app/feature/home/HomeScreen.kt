@@ -1,6 +1,5 @@
 package com.cebolao.app.feature.home
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +20,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -39,10 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.R
+import com.cebolao.app.component.ErrorState
+import com.cebolao.app.component.LoadingState
 import com.cebolao.app.component.LotteryCard
 import com.cebolao.app.component.WelcomeBanner
-import com.cebolao.app.component.LoadingState
-import com.cebolao.app.component.ErrorState
+import com.cebolao.app.core.UiEvent
 import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.theme.LotteryColors
@@ -50,7 +49,6 @@ import com.cebolao.app.ui.layout.CebolaoContent
 import com.cebolao.app.util.LotteryUiMapper
 import com.cebolao.app.util.toUserMessage
 import com.cebolao.domain.model.LotteryType
-import com.cebolao.app.core.UiEvent
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -170,6 +168,7 @@ fun HomeScreen(
                     )
                 }
                 item { Spacer(modifier = Modifier.height(spacing.xxl)) }
+                }
             }
 
             FloatingActionButton(
@@ -189,9 +188,8 @@ fun HomeScreen(
     }
 }
 
-
-@Composable
-private fun NextContestRow(
+    @Composable
+    fun NextContestRow(
     contest: com.cebolao.domain.model.Contest,
     lotteryColor: androidx.compose.ui.graphics.Color,
     type: LotteryType
@@ -235,11 +233,6 @@ private fun NextContestRow(
                     fontWeight = FontWeight.ExtraBold,
                     color = lotteryColor,
                 )
-//                Text(
-//                    text = "Estimado",
-//                    style = MaterialTheme.typography.labelSmall,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
-//                )
             }
         } else {
              Text(
@@ -251,4 +244,3 @@ private fun NextContestRow(
         }
     }
 }
-

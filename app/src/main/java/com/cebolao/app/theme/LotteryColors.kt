@@ -26,6 +26,12 @@ object LotteryColors {
     private val OnTimemaniaColor = Color(0xFF00AB67) // Verde Mega-Sena sobre amarelo
     private val OnDuplaSenaColor = Color(0xFFFFFFFF)
     private val OnSuperSeteColor = Color(0xFFFFFFFF)
+    private val OnDiaDeSorteColor = Color(0xFFFFFFFF)
+    private val OnMaisMilionariaColor = Color(0xFFFFFFFF)
+
+    // Cores específicas para as novas loterias
+    private val DiaDeSorteColor = Color(0xFFCB8829)
+    private val MaisMilionariaColor = Color(0xFF112349)
 
     fun getColor(type: LotteryType): Color =
         when (type) {
@@ -36,6 +42,8 @@ object LotteryColors {
             LotteryType.TIMEMANIA -> TimemaniaColor
             LotteryType.DUPLA_SENA -> DuplaSenaColor
             LotteryType.SUPER_SETE -> SuperSeteColor
+            LotteryType.DIA_DE_SORTE -> DiaDeSorteColor
+            LotteryType.MAIS_MILIONARIA -> MaisMilionariaColor
         }
 
     fun getOnColor(type: LotteryType): Color =
@@ -47,5 +55,7 @@ object LotteryColors {
             LotteryType.TIMEMANIA -> OnTimemaniaColor
             LotteryType.DUPLA_SENA -> OnDuplaSenaColor
             LotteryType.SUPER_SETE -> OnSuperSeteColor
+            LotteryType.DIA_DE_SORTE -> OnDiaDeSorteColor
+            LotteryType.MAIS_MILIONARIA -> OnMaisMilionariaColor
         }
 }

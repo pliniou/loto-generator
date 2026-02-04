@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -70,7 +71,6 @@ fun GeneratorConfigSection(
     profile: com.cebolao.domain.model.LotteryProfile?,
     onTypeSelected: (LotteryType) -> Unit,
     onQuantityChanged: (Int) -> Unit,
-    onFilterToggled: (GenerationFilter) -> Unit,
     onFilterToggled: (GenerationFilter) -> Unit,
     onOpenFilterConfig: () -> Unit,
     onInfoClick: () -> Unit,

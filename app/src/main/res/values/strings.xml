@@ -153,6 +153,8 @@
     <string name="lottery_dupla_sena">Dupla Sena</string>
     <string name="lottery_timemania">Timemania</string>
     <string name="lottery_super_sete">Super Sete</string>
+    <string name="lottery_dia_de_sorte">Dia de Sorte</string>
+    <string name="lottery_mais_milionaria">+Milionária</string>
 
     <!-- Timemania -->
     <string name="timemania_team_heart">Time do Coração</string>

@@ -12,4 +12,6 @@ enum class LotteryType {
     DUPLA_SENA,
     TIMEMANIA,
     SUPER_SETE,
+    DIA_DE_SORTE,
+    MAIS_MILIONARIA,
 }
