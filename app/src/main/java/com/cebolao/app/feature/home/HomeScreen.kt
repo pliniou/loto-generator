@@ -104,79 +104,41 @@ fun HomeScreen(
 
                 // Seção de Próximos Concursos e Previsões
                 item {
+                    Text(
+                        text = stringResource(R.string.home_schedule_title), // "Próximos Sorteios"
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(horizontal = spacing.sm, vertical = spacing.sm)
+                    )
+                }
+
+                // Seção de Próximos Concursos (Card unificado)
+                item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = spacing.lg),
                         shape = MaterialTheme.shapes.large,
                         colors =
                             CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = AlphaLevels.CARD_LOW),
+                                containerColor = MaterialTheme.colorScheme.surface,
                             ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
                     ) {
                         Column(
-                            modifier = Modifier.padding(spacing.lg),
-                            verticalArrangement = Arrangement.spacedBy(spacing.sm),
+                            modifier = Modifier.padding(vertical = spacing.md, horizontal = spacing.lg),
+                            verticalArrangement = Arrangement.spacedBy(spacing.md),
                         ) {
-                            Text(
-                                text = stringResource(R.string.home_schedule_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-
-                            LotteryType.entries.forEach { type ->
+                            LotteryType.entries.forEachIndexed { index, type ->
                                 val contest = uiState.contests[type]
                                 val lotteryColor = LotteryColors.getColor(type)
 
                                 if (contest != null) {
-                                    val estimatedPrize = contest.nextContestEstimatedPrize ?: 0.0
-                                    val hasPrize = estimatedPrize > 0
-
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = stringResource(LotteryUiMapper.getNameRes(type)),
-                                                style = MaterialTheme.typography.bodyLarge,
-                                                fontWeight = FontWeight.Bold,
-                                                color = lotteryColor,
-                                            )
-                                            Text(
-                                                text = "Próximo: Conc. ${contest.id + 1}",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
-                                            )
-                                        }
-
-                                        if (hasPrize) {
-                                            Column(
-                                                horizontalAlignment = Alignment.End,
-                                            ) {
-                                                val formattedPrize = when {
-                                                    estimatedPrize >= 1_000_000_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.1f", estimatedPrize / 1_000_000_000.0)}B"
-                                                    estimatedPrize >= 1_000_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.1f", estimatedPrize / 1_000_000.0)}M"
-                                                    estimatedPrize >= 1_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.0f", estimatedPrize / 1_000.0)}K"
-                                                    else -> "R$ ${estimatedPrize.toLong()}"
-                                                }
-                                                Text(
-                                                    text = formattedPrize,
-                                                    style = MaterialTheme.typography.titleSmall,
-                                                    fontWeight = FontWeight.ExtraBold,
-                                                    color = lotteryColor,
-                                                )
-                                                Text(
-                                                    text = "Prêmio est.",
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
-                                                )
-                                            }
-                                        }
-                                    }
-
-                                    if (type != LotteryType.entries.last()) {
+                                    NextContestRow(contest, lotteryColor, type)
+                                    
+                                    if (index < LotteryType.entries.lastIndex) {
                                         HorizontalDivider(
                                             modifier = Modifier.padding(vertical = spacing.xs),
                                             thickness = 0.5.dp,
@@ -187,6 +149,16 @@ fun HomeScreen(
                             }
                         }
                     }
+                }
+                
+                item {
+                    Text(
+                        text = "Últimos Resultados",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(horizontal = spacing.sm, vertical = spacing.sm)
+                    )
                 }
 
                 items(items = LotteryType.entries, key = { it.name }) { type ->
@@ -216,4 +188,67 @@ fun HomeScreen(
         }
     }
 }
+
+
+@Composable
+private fun NextContestRow(
+    contest: com.cebolao.domain.model.Contest,
+    lotteryColor: androidx.compose.ui.graphics.Color,
+    type: LotteryType
+) {
+    val estimatedPrize = contest.nextContestEstimatedPrize ?: 0.0
+    val hasPrize = estimatedPrize > 0
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(LotteryUiMapper.getNameRes(type)),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = lotteryColor,
+            )
+            val dateText = contest.nextContestDate?.let { " • $it" } ?: ""
+            Text(
+                text = "Conc. ${contest.id + 1}${dateText}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
+            )
+        }
+
+        if (hasPrize) {
+            Column(
+                horizontalAlignment = Alignment.End,
+            ) {
+                val formattedPrize = when {
+                    estimatedPrize >= 1_000_000_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.1f", estimatedPrize / 1_000_000_000.0)}B"
+                    estimatedPrize >= 1_000_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.1f", estimatedPrize / 1_000_000.0)}M"
+                    estimatedPrize >= 1_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.0f", estimatedPrize / 1_000.0)}K"
+                    else -> "R$ ${estimatedPrize.toLong()}"
+                }
+                Text(
+                    text = formattedPrize,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = lotteryColor,
+                )
+//                Text(
+//                    text = "Estimado",
+//                    style = MaterialTheme.typography.labelSmall,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
+//                )
+            }
+        } else {
+             Text(
+                text = "Aguardando",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
 }
+

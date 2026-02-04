@@ -173,21 +173,13 @@ fun LotteryCard(
 
                     Spacer(modifier = Modifier.height(spacing.sm))
 
-                    // Show top prize tiers (limit to first 4 to avoid card being too large)
-                    contest.prizeList.take(4).forEach { prize ->
+                    // Show all prize tiers
+                    contest.prizeList.forEachIndexed { index, prize ->
                         PrizeTierRow(
                             prize = prize,
                             lotteryColor = lotteryColor,
-                        )
-                    }
-
-                    // Show indication if there are more prize tiers
-                    if (contest.prizeList.size > 4) {
-                        Text(
-                            text = "e mais ${contest.prizeList.size - 4} faixas...",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = spacing.xs),
+                            isMainPrize = index == 0,
+                            isAccumulated = contest.accumulated
                         )
                     }
                 }
@@ -249,6 +241,8 @@ fun LotteryCard(
 private fun PrizeTierRow(
     prize: com.cebolao.domain.model.Prize,
     lotteryColor: androidx.compose.ui.graphics.Color,
+    isMainPrize: Boolean,
+    isAccumulated: Boolean,
 ) {
     val spacing = LocalSpacing.current
     val formattedPrize = com.cebolao.app.util.FormatUtils.formatCurrency(prize.prizeValue)
@@ -288,12 +282,29 @@ private fun PrizeTierRow(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                Text(
-                    text = "Acumulou",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.tertiary,
-                )
+                // Only show "Acumulou" if it's the main prize AND the contest is actually accumulated.
+                // For other tiers with 0 winners, just show "0" or "Sem ganhadores" if preferred, 
+                // but usually "0" is clearer for secondary tiers.
+                if (isMainPrize && isAccumulated) {
+                    Text(
+                        text = "ACUMULOU",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary, // Use a distinct color for accumulated
+                    )
+                } else {
+                    Text(
+                        text = "0",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = "ganhadores",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
 

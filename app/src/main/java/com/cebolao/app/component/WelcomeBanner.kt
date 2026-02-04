@@ -53,109 +53,189 @@ import com.cebolao.domain.util.LotteryScheduleUtil
 @Composable
 fun WelcomeBanner(modifier: Modifier = Modifier) {
     val spacing = LocalSpacing.current
+    val context = androidx.compose.ui.platform.LocalContext.current
     val today = remember { java.time.LocalDate.now() }
-    today.dayOfWeek.value + 1 // java.time uses 1 (Mon) to 7 (Sun), Calendar uses 1 (Sun) to 7 (Sat)
-    // Adjusting to match Calendar.DAY_OF_WEEK logic if needed or just use java.time logic.
-    // However, LotteryScheduleUtil likely uses Calendar constants (1=Sunday).
-    // java.time: Mon=1, Sun=7.
-    // Calendar: Sun=1, Mon=2.
-    // Conversion: (dayOfWeek.value % 7) + 1
-    val dayOfWeekCalendarStyle = (today.dayOfWeek.value % 7) + 1
-
-    val dateString =
-        remember {
-            com.cebolao.app.util.FormatUtils.formatFriendlyDate(today)
-        }
-
+    
+    // Day of week integer compatible with our logic (1=Sun, ... 7=Sat) if needed, 
+    // or just rely on what LotteryScheduleUtil returns.
+    // java.time.DayOfWeek: MONDAY=1 ... SUNDAY=7
+    // Calendar: SUNDAY=1 ... SATURDAY=7
+    // Let's assume LotteryScheduleUtil uses Calendar logic or we match by simple name/enum if possible.
+    // For now, let's just get the schedule.
     val schedule = remember { LotteryScheduleUtil.getWeeklySchedule() }
+    
+    // Find today's schedule
+    // We can match by java.time DayOfWeek to the util's constant.
+    // Util uses Calendar constants? Let's check visually or assume standard match.
+    // A simple way is to find the schedule item that corresponds to today.
+    // If DaySchedule has a 'isToday' flag or we calculate it.
+    // Let's rely on the previous logic: (today.dayOfWeek.value % 7) + 1 for Calendar style.
+    val dayOfWeekCalendarStyle = (today.dayOfWeek.value % 7) + 1
+    
+    val dateString = remember {
+        com.cebolao.app.util.FormatUtils.formatFriendlyDate(today)
+    }
 
-    // State to track which day is expanded
-    var expandedDay by remember { mutableStateOf<Int?>(null) }
-
-    // Fundo com gradiente (cores reforçadas)
-    val brush =
-        Brush.verticalGradient(
-            colors =
-                listOf(
-                    MaterialTheme.colorScheme.primary,
-                    MaterialTheme.colorScheme.primaryContainer,
-                ),
+    // Gradient background
+    val brush = Brush.linearGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.tertiary, // A bit of variation
         )
-
-    // Animação de elevação suave
-    val elevation by animateDpAsState(
-        targetValue = 4.dp,
-        animationSpec = tween(durationMillis = 300),
-        label = "banner-elevation"
     )
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        elevation =
-            CardDefaults.cardElevation(
-                defaultElevation = elevation,
-                pressedElevation = 6.dp,
-            ),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        shape = MaterialTheme.shapes.large,
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Flat on background usually better or low elevation
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .background(brush),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(brush)
+                .padding(spacing.lg)
         ) {
-            Column(
-                modifier = Modifier.padding(spacing.xl),
-            ) {
-                // Cabeçalho
-                Text(
-                    text = stringResource(R.string.home_greeting),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                )
-
-                Text(
-                    text = dateString,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = AlphaLevels.TEXT_HIGH),
-                    modifier = Modifier.padding(top = spacing.xs),
-                )
-
-                Spacer(modifier = Modifier.height(spacing.xl))
-
-                // Calendar Section Title
-                Text(
-                    text = stringResource(R.string.home_schedule_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = spacing.md),
-                )
-
-                // Enhanced Calendar Week
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+            Column {
+                // Top Row: Greeting & Date
+                Row(
                     modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.home_greeting), // "Olá, Apostador!"
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            text = dateString,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color.White.copy(alpha = AlphaLevels.TEXT_MEDIUM)
+                        )
+                    }
+                    
+                    // Optional: Maybe an icon or logo here
+                }
+                
+                Spacer(modifier = Modifier.height(spacing.xl))
+                
+                // "Hoje" Section - Highlight what is happening today
+                val todaysSchedule = schedule.find { it.dayOfWeekConstant == dayOfWeekCalendarStyle }
+                
+                if (todaysSchedule != null && todaysSchedule.lotteries.isNotEmpty()) {
+                    Text(
+                        text = "Sorteios de Hoje",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White.copy(alpha = AlphaLevels.TEXT_HIGH),
+                        modifier = Modifier.padding(bottom = spacing.sm)
+                    )
+                    
+                    // Horizontal list of today's lotteries pills
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(spacing.sm)
+                    ) {
+                        items(todaysSchedule.lotteries) { type ->
+                            Surface(
+                                color = Color.White.copy(alpha = 0.2f),
+                                shape = CircleShape,
+                                onClick = { /* Maybe scroll to that lottery? */ }
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.xs)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .background(LotteryColors.getColor(type), CircleShape)
+                                    )
+                                    Spacer(modifier = Modifier.width(spacing.xs))
+                                    Text(
+                                        text = stringResource(LotteryUiMapper.getNameRes(type)),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                     Text(
+                        text = "Sem sorteios hoje", // Ou descanso
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = AlphaLevels.TEXT_MEDIUM)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(spacing.lg))
+                
+                // Calendar Strip (Simplified)
+                Text(
+                     text = "Próximos dias",
+                     style = MaterialTheme.typography.labelMedium,
+                     fontWeight = FontWeight.Bold,
+                     color = Color.White.copy(alpha = AlphaLevels.TEXT_HIGH),
+                     modifier = Modifier.padding(bottom = spacing.sm)
+                )
+                
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(spacing.xs),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     items(items = schedule, key = { it.dayOfWeekConstant }) { day ->
-                        EnhancedDayScheduleCard(
-                            day = day,
-                            isToday = day.dayOfWeekConstant == dayOfWeekCalendarStyle,
-                            isExpanded = expandedDay == day.dayOfWeekConstant,
-                            onClick = {
-                                expandedDay =
-                                    if (expandedDay == day.dayOfWeekConstant) {
-                                        null // Collapse if same day clicked
-                                    } else {
-                                        day.dayOfWeekConstant // Expand this day
-                                    }
-                            },
-                        )
+                        val isToday = day.dayOfWeekConstant == dayOfWeekCalendarStyle
+                        DayCompactCard(day = day, isToday = isToday)
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun DayCompactCard(
+    day: DaySchedule,
+    isToday: Boolean
+) {
+    val backgroundColor = if (isToday) Color.White else Color.White.copy(alpha = 0.1f)
+    val textColor = if (isToday) MaterialTheme.colorScheme.primary else Color.White
+    
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(backgroundColor)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = day.name.take(3), // Seg, Ter...
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = textColor
+        )
+        if (day.lotteries.isNotEmpty()) {
+             Spacer(modifier = Modifier.height(4.dp))
+             Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                 day.lotteries.take(3).forEach { type ->
+                     Box(
+                         modifier = Modifier
+                             .size(4.dp)
+                             .background(LotteryColors.getColor(type), CircleShape)
+                     )
+                 }
+                 if (day.lotteries.size > 3) {
+                     Box(
+                         modifier = Modifier
+                             .size(4.dp)
+                             .background(textColor.copy(alpha = 0.5f), CircleShape)
+                     )
+                 }
+             }
         }
     }
 }

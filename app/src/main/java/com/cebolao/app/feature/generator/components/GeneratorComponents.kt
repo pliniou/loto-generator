@@ -71,18 +71,36 @@ fun GeneratorConfigSection(
     onTypeSelected: (LotteryType) -> Unit,
     onQuantityChanged: (Int) -> Unit,
     onFilterToggled: (GenerationFilter) -> Unit,
+    onFilterToggled: (GenerationFilter) -> Unit,
     onOpenFilterConfig: () -> Unit,
+    onInfoClick: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
     val lotteryColor = LotteryColors.getColor(selectedType)
 
     // 1. Seletor de Modalidade
-    Text(
-        text = stringResource(R.string.generator_select_lottery),
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(bottom = spacing.sm),
-    )
+    // 1. Seletor de Modalidade
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(bottom = spacing.sm),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.generator_select_lottery),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        IconButton(
+            onClick = onInfoClick,
+            modifier = Modifier.size(24.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = "Informações da Loteria",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
         modifier = Modifier.padding(bottom = spacing.lg),

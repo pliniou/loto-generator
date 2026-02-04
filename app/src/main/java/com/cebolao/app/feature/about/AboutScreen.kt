@@ -31,8 +31,12 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.BuildConfig
 import com.cebolao.R
-import com.cebolao.app.feature.about.components.LotteryInfoCard
+
 import com.cebolao.app.theme.LocalSpacing
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.cebolao.app.feature.about.components.LotteryDetailedInfoCard
+import com.cebolao.domain.util.LotteryInfoProvider
 import com.cebolao.app.ui.layout.CebolaoContent
 
 @Composable
@@ -41,6 +45,9 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
     val profiles = uiState.profiles
     val scrollState = rememberScrollState()
     val spacing = LocalSpacing.current
+    
+    // Track expanded card
+    var expandedProfileType by remember { mutableStateOf<com.cebolao.domain.model.LotteryType?>(null) }
 
     CebolaoContent {
         Column(
@@ -126,8 +133,17 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
             )
 
             // Cards com informações das loterias
+            // Cards com informações das loterias
             profiles.forEach { profile ->
-                LotteryInfoCard(profile)
+                val info = remember(profile.type) { LotteryInfoProvider.getInfo(profile.type) }
+                LotteryDetailedInfoCard(
+                    profile = profile,
+                    info = info,
+                    isExpanded = expandedProfileType == profile.type,
+                    onExpandClick = {
+                        expandedProfileType = if (expandedProfileType == profile.type) null else profile.type
+                    }
+                )
                 Spacer(modifier = Modifier.height(spacing.md))
             }
 

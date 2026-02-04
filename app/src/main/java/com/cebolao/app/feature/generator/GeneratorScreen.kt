@@ -42,6 +42,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
+import com.cebolao.app.feature.about.components.LotteryDetailedInfoCard
+import com.cebolao.domain.util.LotteryInfoProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -93,6 +97,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
 
     var showTeamDialog by remember { mutableStateOf(false) }
     var showClearConfirmation by remember { mutableStateOf(false) }
+    var showInfoSheet by remember { mutableStateOf(false) }
     var selectedGameForDetails by remember { mutableStateOf<com.cebolao.domain.model.Game?>(null) }
 
     // Derived states to avoid recomposition when list changes but derived state doesn't
@@ -146,6 +151,33 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
         )
     }
 
+
+    // Info Bottom Sheet
+    if (showInfoSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showInfoSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 8.dp
+        ) {
+            Box(modifier = Modifier.padding(bottom = spacing.xl)) {
+                val info = remember(uiState.selectedType) { LotteryInfoProvider.getInfo(uiState.selectedType) }
+                // Use profile if available, otherwise construct a dummy or fetch it.
+                // Since LotteryDetailedInfoCard needs a profile, and we have uiState.profile in Generator...
+                // Ideally uiState.profile should be non-null if we are in generator.
+                
+                if (uiState.profile != null) {
+                    com.cebolao.app.feature.about.components.LotteryDetailedInfoCard(
+                        profile = uiState.profile!!,
+                        info = info,
+                        isExpanded = true, // Always expanded in the sheet
+                        onExpandClick = {}, // No op or toggle
+                        modifier = Modifier.padding(horizontal = spacing.md)
+                    )
+                }
+            }
+        }
+    }
     // Recommendation Logic
     val recommendedPreset = remember(uiState.recommendation, uiState.userPresets) {
         val rec = uiState.recommendation
@@ -213,6 +245,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                         onQuantityChanged = { viewModel.onQuantityChanged(it) },
                         onFilterToggled = { viewModel.onFilterToggled(it) },
                         onOpenFilterConfig = { viewModel.onOpenFilterConfig() },
+                        onInfoClick = { showInfoSheet = true },
                     )
                 }
 
