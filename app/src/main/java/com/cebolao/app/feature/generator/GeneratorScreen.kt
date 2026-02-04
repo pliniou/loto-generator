@@ -30,6 +30,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -60,6 +61,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.cebolao.domain.model.UserUsageStats
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.R
 import com.cebolao.app.component.ConfirmationDialog
@@ -144,6 +146,14 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
         )
     }
 
+    // Recommendation Logic
+    val recommendedPreset = remember(uiState.recommendation, uiState.userPresets) {
+        val rec = uiState.recommendation
+        if (rec != null) {
+             uiState.userPresets.find { it.name == rec.presetName }
+        } else null
+    }
+
     // Feedback de salvamento e háptica
     LaunchedEffect(uiState.lastSavedCount) {
         if (uiState.lastSavedCount > 0) {
@@ -181,6 +191,17 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                 contentPadding = PaddingValues(top = spacing.lg, bottom = ComponentDimensions.bottomContentPadding), // Espaço para a barra inferior
                 verticalArrangement = Arrangement.spacedBy(spacing.lg),
             ) {
+                // 0. Recomendação (se houver)
+                if (recommendedPreset != null && uiState.recommendation != null) {
+                    item {
+                        RecommendationCard(
+                            stats = uiState.recommendation!!,
+                            onApply = { viewModel.onApplyUserPreset(recommendedPreset) },
+                            onDismiss = { /* Optional: add dismiss logic to VM */ }
+                        )
+                    }
+                }
+
                 // 1. Config Section
                 item {
                     GeneratorConfigSection(
@@ -370,5 +391,51 @@ private fun GeneratorBottomBar(
         }
     }
 }
-
+@Composable
+private fun RecommendationCard(
+    stats: com.cebolao.domain.model.UserUsageStats,
+    onApply: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val spacing = LocalSpacing.current
+    Surface(
+        color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.4f),
+        shape = MaterialTheme.shapes.medium,
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f)),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(spacing.md),
+            verticalArrangement = Arrangement.spacedBy(spacing.sm)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Star, // Or other icon like Verified/ThumbUp
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(spacing.sm))
+                Text(
+                    text = "Sugestão para você",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Text(
+                text = "O preset '${stats.presetName}' tem bons resultados: ${stats.savedGamesCount} jogos salvos e ${stats.usageCount} usos. Que tal usá-lo?",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Button(
+                onClick = onApply,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text("Usar Preset")
+            }
+        }
+    }
+}
 

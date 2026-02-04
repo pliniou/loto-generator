@@ -1,0 +1,111 @@
+package com.cebolao.data.repository
+
+import android.content.Context
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import com.cebolao.domain.model.LotteryType
+import com.cebolao.domain.model.UserUsageStats
+import com.cebolao.domain.repository.UserStatisticsRepository
+import com.cebolao.domain.result.AppResult
+import com.cebolao.domain.result.appResultSuspend
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import javax.inject.Inject
+import javax.inject.Singleton
+
+private val Context.statsDataStore by preferencesDataStore(name = "user_stats")
+
+@Singleton
+class UserStatisticsRepositoryImpl
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) : UserStatisticsRepository {
+        private val statsKey = stringPreferencesKey("user_stats_json")
+        private val json = Json { ignoreUnknownKeys = true }
+
+        override fun observeStats(): Flow<List<UserUsageStats>> =
+            context.statsDataStore.data.map { prefs ->
+                val raw = prefs[statsKey] ?: "[]"
+                try {
+                    json.decodeFromString<List<UserUsageStats>>(raw)
+                } catch (e: Exception) {
+                    emptyList()
+                }
+            }
+
+        override suspend fun recordUsage(presetName: String): AppResult<Unit> =
+            updateStats(presetName) { current ->
+                current.copy(
+                    usageCount = current.usageCount + 1,
+                    lastUsed = System.currentTimeMillis(),
+                )
+            }
+
+        override suspend fun recordSavedGames(
+            presetName: String,
+            count: Int,
+        ): AppResult<Unit> =
+            updateStats(presetName) { current ->
+                current.copy(savedGamesCount = current.savedGamesCount + count)
+            }
+
+        override suspend fun recordHits(
+            presetName: String,
+            hits: Int,
+        ): AppResult<Unit> =
+            updateStats(presetName) { current ->
+                current.copy(totalHits = current.totalHits + hits)
+            }
+
+        override suspend fun getBestPreset(type: LotteryType): UserUsageStats? {
+             // Simplest logic: return preset with most saved games or hits
+             // Since we track by name, we don't strictly know the type unless we parse the name or store type.
+             // For now, we return the overall most successful one. Better logic could filter by naming conventions if needed.
+             // OR we just recommend the one with highest hits/saved ratio.
+             
+             // Let's implement getting the best by Total Hits for now to be simple and effective.
+             // We need to collect the flow once.
+             val statsList = observeStats().firstOrNull() ?: emptyList()
+             if (statsList.isEmpty()) return null
+             
+             return statsList.maxByOrNull { it.totalHits }
+        }
+        
+        // Helper method inside companion or private to avoid flow collection issues in getBestPreset?
+        // Actually we can't call flow.first from here easily without being suspend or having scope.
+        // But getBestPreset IS suspend. So we can do:
+        // context.statsDataStore.data.first() ...
+        
+        // Helper method removed (using standard lib)
+
+        private suspend fun updateStats(
+            presetName: String,
+            update: (UserUsageStats) -> UserUsageStats,
+        ): AppResult<Unit> =
+            appResultSuspend {
+                context.statsDataStore.edit { prefs ->
+                    val raw = prefs[statsKey] ?: "[]"
+                    val list =
+                        try {
+                            json.decodeFromString<MutableList<UserUsageStats>>(raw)
+                        } catch (_: Exception) {
+                            mutableListOf()
+                        }
+
+                    val idx = list.indexOfFirst { it.presetName == presetName }
+                    if (idx >= 0) {
+                        list[idx] = update(list[idx])
+                    } else {
+                        val newStats = UserUsageStats(presetName = presetName)
+                        list.add(update(newStats))
+                    }
+                    prefs[statsKey] = json.encodeToString(list)
+                }
+            }
+    }

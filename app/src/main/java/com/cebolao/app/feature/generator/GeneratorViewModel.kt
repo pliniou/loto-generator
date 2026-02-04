@@ -17,7 +17,9 @@ import com.cebolao.domain.model.UserFilterPreset
 import com.cebolao.domain.repository.LotteryRepository
 import com.cebolao.domain.repository.ProfileRepository
 import com.cebolao.domain.repository.UserPresetRepository
+import com.cebolao.domain.repository.UserStatisticsRepository
 import com.cebolao.domain.result.AppResult
+import com.cebolao.domain.model.UserUsageStats
 import com.cebolao.domain.rules.FilterPresets
 import com.cebolao.domain.usecase.GenerateGamesUseCase
 import com.cebolao.app.di.DefaultDispatcher
@@ -53,6 +55,8 @@ data class GeneratorUiState(
     val generationReport: GenerationReport? = null,
     val userPresets: List<UserFilterPreset> = emptyList(),
     val lastContest: Contest? = null,
+    val recommendation: UserUsageStats? = null,
+    val activePresetName: String? = null,
 )
 
 @HiltViewModel
@@ -62,6 +66,7 @@ class GeneratorViewModel
         private val profileRepository: ProfileRepository,
         private val lotteryRepository: LotteryRepository,
         private val userPresetRepository: UserPresetRepository,
+        private val userStatisticsRepository: UserStatisticsRepository,
         private val generateGamesUseCase: GenerateGamesUseCase,
         @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     ) : ViewModel() {
@@ -111,6 +116,7 @@ class GeneratorViewModel
                             filters = currentState.activeFilters,
                             filterConfigs = currentState.filterConfigs,
                             fixedTeam = currentState.selectedTeam,
+                            fixedNumbers = emptyList(), // Assuming empty for now or extracted from state if added
                         )
 
                     val result =
@@ -145,6 +151,10 @@ class GeneratorViewModel
                             lastSavedCount = 0,
                             generationReport = result.report,
                         )
+                    // Se estivermos usando um preset, registra uso
+                    currentState.activePresetName?.let { presetName ->
+                        userStatisticsRepository.recordUsage(presetName)
+                    }
                 } catch (e: Exception) {
                     Log.e("GeneratorVM", "Erro ao gerar jogos", e)
                     _uiState.value = currentState.copy(isLoading = false)
@@ -159,7 +169,21 @@ class GeneratorViewModel
 
             viewModelScope.launch {
                 _uiState.value = currentState.copy(isLoading = true)
-                when (val result = lotteryRepository.saveGames(currentState.generatedGames)) {
+
+                // Busca concursos para estatísticas
+                val type = currentState.selectedType
+                val recentContests = (lotteryRepository.getRecentContests(type, 10) as? AppResult.Success)?.value ?: emptyList()
+                val historyContests = (lotteryRepository.getRecentContests(type, 100) as? AppResult.Success)?.value ?: emptyList()
+
+                val gamesWithStats = currentState.generatedGames.map { game ->
+                    game.copy(
+                        recentHitRate = com.cebolao.domain.util.StatisticsUtil.calculateHitRate(game.numbers, recentContests),
+                        historicalHitRate = com.cebolao.domain.util.StatisticsUtil.calculateHitRate(game.numbers, historyContests),
+                        sourcePreset = currentState.activePresetName
+                    )
+                }
+
+                when (val result = lotteryRepository.saveGames(gamesWithStats)) {
                     is AppResult.Success -> {
                         _uiState.value =
                             currentState.copy(
@@ -167,6 +191,10 @@ class GeneratorViewModel
                                 lastSavedCount = currentState.generatedGames.size,
                                 isLoading = false,
                             )
+                        // Registra quantidade salva para o preset
+                        currentState.activePresetName?.let { presetName ->
+                            userStatisticsRepository.recordSavedGames(presetName, currentState.generatedGames.size)
+                        }
                         _events.emit(UiEvent.ShowSuccess("Jogos salvos com sucesso!"))
                     }
                     is AppResult.Failure -> {
@@ -214,6 +242,16 @@ class GeneratorViewModel
                 current.copy(
                     activeFilters = preset.filters,
                     filterConfigs = preset.configs,
+                    activePresetName = "Perfil padrão" // Identificador para o preset do perfil
+                )
+        }
+
+        fun onApplyUserPreset(preset: UserFilterPreset) {
+             _uiState.value =
+                _uiState.value.copy(
+                    activeFilters = preset.filters,
+                    filterConfigs = preset.filterConfigs,
+                    activePresetName = preset.name
                 )
         }
 
@@ -263,7 +301,15 @@ class GeneratorViewModel
                         activeFilters = filteredFilters,
                         filterConfigs = filteredConfigs,
                         lastContest = lastContest,
+                        recommendation = null, 
+                        activePresetName = null
                     )
+                
+                // Fetch recommendations
+                val recommendation = userStatisticsRepository.getBestPreset(type)
+                if (recommendation != null && recommendation.usageCount > 2) {
+                     _uiState.value = _uiState.value.copy(recommendation = recommendation)
+                }
             }
 
             // Mantém lastContest reativo aos updates do Room (sync/worker)

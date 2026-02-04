@@ -87,6 +87,13 @@ class LotteryRepositoryImpl
                 }
             }
 
+        override suspend fun getRecentContests(type: LotteryType, limit: Int): AppResult<List<Contest>> =
+            appResultSuspend {
+                withContext(ioDispatcher) {
+                    lotteryDao.getRecentContests(type, limit).map { ContestMapper.toDomain(it) }
+                }
+            }
+
         // --- Writes ---
 
         override suspend fun saveGame(game: Game): AppResult<Unit> =

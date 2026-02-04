@@ -12,6 +12,8 @@ import com.cebolao.domain.repository.LotteryRepository
 import com.cebolao.domain.repository.ProfileRepository
 import com.cebolao.domain.repository.SettingsRepository
 import com.cebolao.domain.repository.UserPresetRepository
+import com.cebolao.domain.repository.UserStatisticsRepository
+import com.cebolao.data.repository.UserStatisticsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -38,6 +40,10 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindUserPresetRepository(impl: UserPresetDataStoreRepository): UserPresetRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUserStatisticsRepository(impl: UserStatisticsRepositoryImpl): UserStatisticsRepository
 
     companion object {
         @Provides

@@ -5,6 +5,8 @@ import com.cebolao.domain.model.UserFilterPreset
 import com.cebolao.domain.repository.LotteryRepository
 import com.cebolao.domain.repository.ProfileRepository
 import com.cebolao.domain.repository.UserPresetRepository
+import com.cebolao.domain.repository.UserStatisticsRepository
+import com.cebolao.domain.model.UserUsageStats
 import com.cebolao.domain.result.AppResult
 import com.cebolao.test.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,6 +36,18 @@ class FakeUserPresetRepo : UserPresetRepository {
     override suspend fun getAllPresets(): AppResult<List<UserFilterPreset>> = AppResult.Success(state.value)
 
     override fun observePresets() = state
+}
+
+private class FakePresetsTestUserStatsRepo : UserStatisticsRepository {
+    override fun observeStats(): kotlinx.coroutines.flow.Flow<List<UserUsageStats>> = kotlinx.coroutines.flow.flowOf(emptyList())
+
+    override suspend fun recordUsage(presetName: String): AppResult<Unit> = AppResult.Success(Unit)
+
+    override suspend fun recordSavedGames(presetName: String, count: Int): AppResult<Unit> = AppResult.Success(Unit)
+
+    override suspend fun recordHits(presetName: String, hits: Int): AppResult<Unit> = AppResult.Success(Unit)
+
+    override suspend fun getBestPreset(type: LotteryType): UserUsageStats? = null
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,6 +83,8 @@ class GeneratorViewModelPresetsTest {
 
                         override suspend fun getLastContest(type: LotteryType) = AppResult.Success(null)
 
+                        override suspend fun getRecentContests(type: LotteryType, limit: Int) = AppResult.Success(emptyList<com.cebolao.domain.model.Contest>())
+
                         override suspend fun saveGame(game: com.cebolao.domain.model.Game): AppResult<Unit> = AppResult.Success(Unit)
 
                         override suspend fun saveGames(games: List<com.cebolao.domain.model.Game>): AppResult<Unit> =
@@ -93,6 +109,7 @@ class GeneratorViewModelPresetsTest {
                         override suspend fun refresh(): AppResult<Unit> = AppResult.Success(Unit)
                     },
                     FakeUserPresetRepo(),
+                    FakePresetsTestUserStatsRepo(),
                     com.cebolao.domain.usecase.GenerateGamesUseCase(com.cebolao.domain.service.GameValidator()),
                     mainDispatcherRule.testDispatcher,
                 )

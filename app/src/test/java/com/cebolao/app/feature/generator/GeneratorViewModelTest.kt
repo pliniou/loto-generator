@@ -9,6 +9,8 @@ import com.cebolao.domain.repository.LotteryRepository
 import com.cebolao.domain.repository.ProfileRepository
 import com.cebolao.domain.repository.UserPresetRepository
 import com.cebolao.domain.result.AppResult
+import com.cebolao.domain.repository.UserStatisticsRepository
+import com.cebolao.domain.model.UserUsageStats
 import com.cebolao.test.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +37,8 @@ class FakeLotteryRepo : LotteryRepository {
     override fun observeGamesByType(type: LotteryType) = kotlinx.coroutines.flow.flowOf(emptyList<Game>())
 
     override suspend fun getLastContest(type: LotteryType): AppResult<Contest?> = AppResult.Success(null)
+
+    override suspend fun getRecentContests(type: LotteryType, limit: Int): AppResult<List<Contest>> = AppResult.Success(emptyList())
 
     override suspend fun saveGame(game: Game): AppResult<Unit> = AppResult.Success(Unit)
 
@@ -64,6 +68,18 @@ class FakeUserPresetRepository : UserPresetRepository {
     override fun observePresets(): Flow<List<com.cebolao.domain.model.UserFilterPreset>> = kotlinx.coroutines.flow.flowOf(emptyList())
 }
 
+private class FakeGeneratorTestUserStatsRepo : UserStatisticsRepository {
+    override fun observeStats(): Flow<List<UserUsageStats>> = kotlinx.coroutines.flow.flowOf(emptyList())
+
+    override suspend fun recordUsage(presetName: String): AppResult<Unit> = AppResult.Success(Unit)
+
+    override suspend fun recordSavedGames(presetName: String, count: Int): AppResult<Unit> = AppResult.Success(Unit)
+
+    override suspend fun recordHits(presetName: String, hits: Int): AppResult<Unit> = AppResult.Success(Unit)
+
+    override suspend fun getBestPreset(type: LotteryType): UserUsageStats? = null
+}
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class GeneratorViewModelTest {
     @get:Rule
@@ -77,6 +93,7 @@ class GeneratorViewModelTest {
                     FakeProfileRepo(),
                     FakeLotteryRepo(),
                     FakeUserPresetRepository(),
+                    FakeGeneratorTestUserStatsRepo(),
                     com.cebolao.domain.usecase.GenerateGamesUseCase(com.cebolao.domain.service.GameValidator()),
                     mainDispatcherRule.testDispatcher,
                 )

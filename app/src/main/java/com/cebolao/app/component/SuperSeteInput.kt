@@ -73,7 +73,11 @@ fun SuperSeteInput(
                             )
                             .border(
                                 width = 1.dp, 
-                                color = if (isSelected) lotteryColor else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f), 
+                                color = if (isSelected) {
+                                    lotteryColor
+                                } else {
+                                    MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                                },
                                 shape = CircleShape
                             )
                             .clickable { onNumberClick(colIndex, number) },

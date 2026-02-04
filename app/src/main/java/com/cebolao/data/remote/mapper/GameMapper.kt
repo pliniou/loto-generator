@@ -18,6 +18,9 @@ object GameMapper {
             teamNumber = teamNumber,
             isPinned = entity.isPinned,
             createdAt = entity.createdAt,
+            recentHitRate = entity.recentHitRate,
+            historicalHitRate = entity.historicalHitRate,
+            sourcePreset = entity.sourcePreset,
         )
     }
 
@@ -32,6 +35,9 @@ object GameMapper {
             isPinned = domain.isPinned,
             secondDrawNumbers = domain.secondDrawNumbers?.map { it.toString() },
             teamName = teamName,
+            recentHitRate = domain.recentHitRate,
+            historicalHitRate = domain.historicalHitRate,
+            sourcePreset = domain.sourcePreset,
         )
     }
 }

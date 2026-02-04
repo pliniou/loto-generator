@@ -13,4 +13,7 @@ data class GameEntity(
     val isPinned: Boolean = false,
     val secondDrawNumbers: List<String>? = null, // For Dupla Sena
     val teamName: String? = null, // For Timemania
+    val recentHitRate: Float = 0f,
+    val historicalHitRate: Float = 0f,
+    val sourcePreset: String? = null,
 )
