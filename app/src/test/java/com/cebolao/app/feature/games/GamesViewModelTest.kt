@@ -3,7 +3,6 @@ package com.cebolao.app.feature.games
 import com.cebolao.domain.model.Game
 import com.cebolao.domain.model.LotteryType
 import com.cebolao.domain.repository.LotteryRepository
-import com.cebolao.domain.result.AppResult
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

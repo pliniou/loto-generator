@@ -30,7 +30,6 @@ import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.theme.LotteryColors
 import com.cebolao.domain.model.LotteryProfile
-import com.cebolao.domain.model.LotteryType
 import java.util.Locale
 
 @Composable

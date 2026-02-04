@@ -1,16 +1,11 @@
 package com.cebolao.app.feature.generator
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +21,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
@@ -37,15 +31,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
-import com.cebolao.app.feature.about.components.LotteryDetailedInfoCard
-import com.cebolao.domain.util.LotteryInfoProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -55,7 +47,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -65,14 +56,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.cebolao.domain.model.UserUsageStats
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.R
 import com.cebolao.app.component.ConfirmationDialog
-import com.cebolao.app.component.TeamSelectionDialog
-import com.cebolao.app.feature.generator.components.GeneratedGameItem
 import com.cebolao.app.component.DrawingAnimation
 import com.cebolao.app.component.GameDetailsDialog
+import com.cebolao.app.component.TeamSelectionDialog
+import com.cebolao.app.core.UiEvent
+import com.cebolao.app.feature.generator.components.GeneratedGameItem
 import com.cebolao.app.feature.generator.components.GeneratorConfigSection
 import com.cebolao.app.feature.generator.components.GeneratorFilterConfigDialog
 import com.cebolao.app.feature.generator.components.GeneratorReportDetailsDialog
@@ -83,7 +74,7 @@ import com.cebolao.app.theme.ComponentDimensions
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
-import com.cebolao.app.core.UiEvent
+import com.cebolao.domain.util.LotteryInfoProvider
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)

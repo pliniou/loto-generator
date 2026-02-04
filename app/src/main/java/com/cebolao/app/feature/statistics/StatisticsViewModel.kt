@@ -2,7 +2,6 @@ package com.cebolao.app.feature.statistics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.DistributionStats
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.model.LotteryType

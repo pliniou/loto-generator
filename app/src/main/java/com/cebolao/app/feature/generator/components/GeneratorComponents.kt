@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -50,10 +50,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.cebolao.R
 import com.cebolao.app.component.SmallLotteryBall
-import com.cebolao.app.feature.generator.GeneratorUiState
 import com.cebolao.app.theme.AlphaLevels
 import com.cebolao.app.theme.AnimationDurations
-import com.cebolao.app.theme.ComponentDimensions
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.util.GenerationFilterUiMapper
