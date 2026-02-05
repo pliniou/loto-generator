@@ -4,7 +4,7 @@ import java.text.NumberFormat
 import java.util.Locale
 
 object FormatUtils {
-    private val brLocale = Locale("pt", "BR")
+    private val brLocale = Locale.Builder().setLanguage("pt").setRegion("BR").build()
 
     fun formatCurrency(amount: Double): String {
         return NumberFormat.getCurrencyInstance(brLocale).format(amount)

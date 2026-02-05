@@ -38,7 +38,7 @@ fun LotteryInfoCard(profile: LotteryProfile) {
     val lotteryColor = LotteryColors.getColor(profile.type)
     val priceFormat =
         remember(profile.costPerGame) {
-            val format = java.text.NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+            val format = java.text.NumberFormat.getCurrencyInstance(Locale.Builder().setLanguage("pt").setRegion("BR").build())
             format.format(profile.costPerGame / 100.0)
         }
 
@@ -86,7 +86,7 @@ fun LotteryInfoCard(profile: LotteryProfile) {
             Spacer(modifier = Modifier.height(spacing.lg))
 
             if (profile.poolInfo != null) {
-                PoolInfoSection(profile.poolInfo, locale = Locale("pt", "BR"), brandColor = lotteryColor)
+                PoolInfoSection(profile.poolInfo, locale = Locale.Builder().setLanguage("pt").setRegion("BR").build(), brandColor = lotteryColor)
             } else {
                 Text(
                     text = stringResource(R.string.about_no_pool),

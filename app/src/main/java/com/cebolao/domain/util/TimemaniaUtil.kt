@@ -123,12 +123,12 @@ object TimemaniaUtil {
     private fun normalize(value: String): String {
         val normalized = Normalizer.normalize(value, Normalizer.Form.NFD)
         return normalized.replace("\\p{Mn}+".toRegex(), "")
-            .uppercase(Locale("pt", "BR"))
+            .uppercase(Locale.Builder().setLanguage("pt").setRegion("BR").build())
             .replace("[^A-Z0-9]".toRegex(), "")
     }
 
     private fun extractUf(value: String): String? {
-        val upper = value.uppercase(Locale("pt", "BR"))
+        val upper = value.uppercase(Locale.Builder().setLanguage("pt").setRegion("BR").build())
         val match = Regex("\\b([A-Z]{2})\\b").find(upper)
         return match?.groupValues?.get(1)
     }

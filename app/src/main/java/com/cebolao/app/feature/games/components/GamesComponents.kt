@@ -48,7 +48,7 @@ import java.util.Date
 import java.util.Locale
 
 // Shared date formatter to avoid expensive object creation on every recomposition
-private val savedGameDateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR"))
+private val savedGameDateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.Builder().setLanguage("pt").setRegion("BR").build())
 
 @Composable
 fun SavedGameItem(

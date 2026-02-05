@@ -7,7 +7,7 @@ import com.cebolao.domain.model.LotteryType
 
 internal object MegaSenaRules : LotteryRules {
     override val type = LotteryType.MEGA_SENA
-    override val apiSlug = "mega-sena"
+    override val apiSlug = "megasena"
     override val assetFilename = "mega_sena.json"
     override val defaultPreset =
         com.cebolao.domain.model.FilterPreset(
@@ -68,6 +68,20 @@ internal object SuperSeteRules : LotteryRules {
     override val defaultPreset = null
 }
 
+internal object DiaDeSorteRules : LotteryRules {
+    override val type = LotteryType.DIA_DE_SORTE
+    override val apiSlug = "diadesorte"
+    override val assetFilename = "dia_de_sorte.json" // Assuming this follows pattern, though not critical if file missing for now
+    override val defaultPreset = null
+}
+
+internal object MaisMilionariaRules : LotteryRules {
+    override val type = LotteryType.MAIS_MILIONARIA
+    override val apiSlug = "maismilionaria"
+    override val assetFilename = "mais_milionaria.json"
+    override val defaultPreset = null
+}
+
 /**
  * Registry centralizado de regras por modalidade.
  * Elimina a necessidade de `when(lotteryType)` espalhado pelo código.
@@ -82,6 +96,8 @@ object LotteryRulesRegistry {
             LotteryType.TIMEMANIA to TimemaniaRules,
             LotteryType.DUPLA_SENA to DuplaSenaRules,
             LotteryType.SUPER_SETE to SuperSeteRules,
+            LotteryType.DIA_DE_SORTE to DiaDeSorteRules,
+            LotteryType.MAIS_MILIONARIA to MaisMilionariaRules,
         )
 
     /**
