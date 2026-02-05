@@ -7,9 +7,9 @@ import com.cebolao.domain.model.GenerationFilter
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.model.LotteryType
 import com.cebolao.domain.Constants
+import com.cebolao.domain.util.StatisticsUtil
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.sqrt
 
 private typealias FilterValidator = (game: Game, profile: LotteryProfile, lastContest: Contest?, config: FilterConfig?) -> Boolean
 
@@ -27,10 +27,6 @@ class GameValidator
                 GenerationFilter.MOLDURA_MIOLO to { game, profile, _, _ -> validateMolduraMiolo(game, profile) },
                 GenerationFilter.PRIME_NUMBERS to { game, _, _, _ -> validatePrimes(game) },
             )
-
-        // Constants moved to Constants.kt
-
-        // Constants moved to Constants.kt
 
         /**
          * Validação com filtros configuráveis.
@@ -114,15 +110,7 @@ class GameValidator
         }
 
         private fun validatePrimes(game: Game): Boolean {
-            return game.numbers.any(::isPrime)
-        }
-
-        private fun isPrime(value: Int): Boolean {
-            if (value < 2) return false
-            val limit = sqrt(value.toDouble()).toInt()
-            for (candidate in 2..limit) {
-                if (value % candidate == 0) return false
-            }
-            return true
+            return game.numbers.any(StatisticsUtil::isPrime)
         }
     }
+}

@@ -109,22 +109,19 @@ class GeneratorViewModel
             viewModelScope.launch {
                 _uiState.value = currentState.copy(isLoading = true)
                 try {
-                    // Configuração da geração
                     val config =
                         GenerationConfig(
                             quantity = currentState.quantity,
                             filters = currentState.activeFilters,
                             filterConfigs = currentState.filterConfigs,
                             fixedTeam = currentState.selectedTeam,
-                            fixedNumbers = emptyList(), // Assuming empty for now or extracted from state if added
+                            fixedNumbers = emptyList(),
                         )
 
                     val result =
                         withContext(defaultDispatcher) {
-                            // Simula um delay "mecânico" para a animação de sorteio ser percebida
                             delay(800)
 
-                            // Usa último concurso já observado; faz fallback pontual se ainda não veio nada
                             val lastContest = _uiState.value.lastContest ?: run {
                                 when (val result = lotteryRepository.getLastContest(profile.type)) {
                                     is AppResult.Success -> result.value
@@ -136,7 +133,6 @@ class GeneratorViewModel
 
                     val games = result.games
 
-                    // Se parcial, registrar e expor via estado da UI
                     if (result.report.partial) {
                         Log.w(
                             "GeneratorVM",
@@ -151,7 +147,6 @@ class GeneratorViewModel
                             lastSavedCount = 0,
                             generationReport = result.report,
                         )
-                    // Se estivermos usando um preset, registra uso
                     currentState.activePresetName?.let { presetName ->
                         userStatisticsRepository.recordUsage(presetName)
                     }

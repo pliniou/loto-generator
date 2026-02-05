@@ -86,7 +86,8 @@ object StatisticsUtil {
         if (n < 2) return false
         if (n == 2) return true
         if (n % 2 == 0) return false
-        for (i in 3..kotlin.math.sqrt(n.toDouble()).toInt() step 2) {
+        val limit = kotlin.math.sqrt(n.toDouble()).toInt()
+        for (i in 3..limit step 2) {
             if (n % i == 0) return false
         }
         return true
@@ -127,10 +128,6 @@ object StatisticsUtil {
     /**
      * Calcula a taxa de acertos em uma lista de concursos.
      * @return Valor entre 0.0 (nenhum acerto) e 1.0 (acertou tudo em todos - impossível na prática, mas é a escala)
-     * Simplificação para o requisito "Taxa de acertos em 10 concursos: 20%":
-     * Se em 10 concursos, eu acertei 30 números (somando tudo), e o jogo tem 15 números.
-     * Média de acertos = 3.0 por concurso.
-     * Percentual de acerto = 3.0 / 15 = 0.20 (20%).
      */
     fun calculateHitRate(
         numbers: List<Int>,

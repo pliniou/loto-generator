@@ -159,10 +159,8 @@ class CheckerViewModel
                     createdAt = System.currentTimeMillis(),
                 )
 
-            // Resultado contra o último concurso (exibição principal)
             val latestResult = checkGameUseCase(tempGame, contest, profile, state.selectedDuplaMode)
 
-            // Conferência contra todos os concursos disponíveis
             val history =
                 cachedContests.map { c ->
                     val r = checkGameUseCase(tempGame, c, profile, state.selectedDuplaMode)
@@ -178,7 +176,6 @@ class CheckerViewModel
             val bestHit = history.maxOfOrNull { it.hits } ?: 0
             val prizeCount = history.count { it.isPrize }
 
-            // Estatísticas de frequência/atraso das dezenas para insights
             val numberStats = calculateStatisticsUseCase.calculateNumberStats(cachedContests, profile)
 
             _uiState.value =
@@ -186,7 +183,6 @@ class CheckerViewModel
                     checkResult =
                         CheckerResult(
                             hits = latestResult.hits,
-                            // BUG FIX: Only set teamHit if the lottery actually has a team (Timemania)
                             teamHit = if (profile.hasTeam) latestResult.teamHit else null,
                             contestNumber = contest.id,
                             contestDate = contest.drawDate,
@@ -206,7 +202,6 @@ class CheckerViewModel
             val profile = state.profile ?: return
             val gameNumbers = state.selectedNumbers
 
-            // Basic validation before analysis
             if (state.selectedType == LotteryType.SUPER_SETE) {
                 if (gameNumbers.any { it == -1 }) return
             } else {
@@ -215,13 +210,11 @@ class CheckerViewModel
 
             viewModelScope.launch {
                 _uiState.value = state.copy(isAnalyzing = true)
-                // Use cached data for heavy calculation
                 val stats = calculateStatisticsUseCase.checkHistory(gameNumbers, cachedContests, profile)
                 _uiState.value =
                     _uiState.value.copy(
                         analysisResults = stats,
                         isAnalyzing = false,
-                        // Inline display - no dialog needed
                     )
             }
         }
@@ -242,7 +235,6 @@ class CheckerViewModel
                 viewModelScope.launch {
                     repository.observeContests(type).collect { contests ->
                         cachedContests = contests
-                        // Flow já vem ordenado por contestNumber DESC; usar o primeiro garante o mais recente.
                         val latest = contests.firstOrNull()
                         _uiState.value = _uiState.value.copy(lastContest = latest)
                     }

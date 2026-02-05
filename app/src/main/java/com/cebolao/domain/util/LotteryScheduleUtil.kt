@@ -1,52 +1,48 @@
 package com.cebolao.domain.util
 
 import com.cebolao.domain.model.LotteryType
-import java.util.Calendar
+import java.time.DayOfWeek
 
 object LotteryScheduleUtil {
     private val schedule =
         mapOf(
-            Calendar.SUNDAY to emptyList(),
-            Calendar.MONDAY to listOf(LotteryType.DUPLA_SENA, LotteryType.LOTOFACIL, LotteryType.LOTOMANIA, LotteryType.QUINA, LotteryType.SUPER_SETE),
-            Calendar.TUESDAY to listOf(LotteryType.LOTOFACIL, LotteryType.MEGA_SENA, LotteryType.QUINA, LotteryType.TIMEMANIA),
-            Calendar.WEDNESDAY to listOf(LotteryType.DUPLA_SENA, LotteryType.LOTOFACIL, LotteryType.LOTOMANIA, LotteryType.QUINA, LotteryType.SUPER_SETE),
-            Calendar.THURSDAY to listOf(LotteryType.LOTOFACIL, LotteryType.MEGA_SENA, LotteryType.QUINA, LotteryType.TIMEMANIA),
-            Calendar.FRIDAY to listOf(LotteryType.DUPLA_SENA, LotteryType.LOTOFACIL, LotteryType.LOTOMANIA, LotteryType.QUINA, LotteryType.SUPER_SETE),
-            Calendar.SATURDAY to listOf(LotteryType.LOTOFACIL, LotteryType.MEGA_SENA, LotteryType.QUINA, LotteryType.TIMEMANIA),
+            DayOfWeek.SUNDAY to emptyList(),
+            DayOfWeek.MONDAY to listOf(LotteryType.DUPLA_SENA, LotteryType.LOTOFACIL, LotteryType.LOTOMANIA, LotteryType.QUINA, LotteryType.SUPER_SETE),
+            DayOfWeek.TUESDAY to listOf(LotteryType.LOTOFACIL, LotteryType.MEGA_SENA, LotteryType.QUINA, LotteryType.TIMEMANIA),
+            DayOfWeek.WEDNESDAY to listOf(LotteryType.DUPLA_SENA, LotteryType.LOTOFACIL, LotteryType.LOTOMANIA, LotteryType.QUINA, LotteryType.SUPER_SETE),
+            DayOfWeek.THURSDAY to listOf(LotteryType.LOTOFACIL, LotteryType.MEGA_SENA, LotteryType.QUINA, LotteryType.TIMEMANIA),
+            DayOfWeek.FRIDAY to listOf(LotteryType.DUPLA_SENA, LotteryType.LOTOFACIL, LotteryType.LOTOMANIA, LotteryType.QUINA, LotteryType.SUPER_SETE),
+            DayOfWeek.SATURDAY to listOf(LotteryType.LOTOFACIL, LotteryType.MEGA_SENA, LotteryType.QUINA, LotteryType.TIMEMANIA),
         )
 
-    fun getLotteriesForDay(dayOfWeek: Int): List<LotteryType> {
+    fun getLotteriesForDay(dayOfWeek: DayOfWeek): List<LotteryType> {
         return schedule[dayOfWeek] ?: emptyList()
     }
 
-    /**
-     * Retorna lista de pares (DiaSemana, Lista<Lottery>) para a semana atual ou genérica.
-     * Retorna nomes curtos: "Dom", "Seg", etc.
-     */
     fun getWeeklySchedule(): List<DaySchedule> {
         val days =
             listOf(
-                Calendar.SUNDAY to "Dom",
-                Calendar.MONDAY to "Seg",
-                Calendar.TUESDAY to "Ter",
-                Calendar.WEDNESDAY to "Qua",
-                Calendar.THURSDAY to "Qui",
-                Calendar.FRIDAY to "Sex",
-                Calendar.SATURDAY to "Sáb",
+                DayOfWeek.SUNDAY to "Dom",
+                DayOfWeek.MONDAY to "Seg",
+                DayOfWeek.TUESDAY to "Ter",
+                DayOfWeek.WEDNESDAY to "Qua",
+                DayOfWeek.THURSDAY to "Qui",
+                DayOfWeek.FRIDAY to "Sex",
+                DayOfWeek.SATURDAY to "Sáb",
             )
 
-        return days.map { (calDay, name) ->
+        return days.map { (day, name) ->
             DaySchedule(
-                dayOfWeekConstant = calDay,
+                dayOfWeek = day,
                 name = name,
-                lotteries = getLotteriesForDay(calDay),
+                lotteries = getLotteriesForDay(day),
             )
         }
     }
 }
 
 data class DaySchedule(
-    val dayOfWeekConstant: Int,
+    val dayOfWeek: DayOfWeek,
     val name: String,
     val lotteries: List<LotteryType>,
 )

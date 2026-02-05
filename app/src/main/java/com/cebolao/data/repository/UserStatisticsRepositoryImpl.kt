@@ -64,25 +64,11 @@ class UserStatisticsRepositoryImpl
             }
 
         override suspend fun getBestPreset(type: LotteryType): UserUsageStats? {
-             // Simplest logic: return preset with most saved games or hits
-             // Since we track by name, we don't strictly know the type unless we parse the name or store type.
-             // For now, we return the overall most successful one. Better logic could filter by naming conventions if needed.
-             // OR we just recommend the one with highest hits/saved ratio.
-             
-             // Let's implement getting the best by Total Hits for now to be simple and effective.
-             // We need to collect the flow once.
              val statsList = observeStats().firstOrNull() ?: emptyList()
              if (statsList.isEmpty()) return null
              
              return statsList.maxByOrNull { it.totalHits }
         }
-        
-        // Helper method inside companion or private to avoid flow collection issues in getBestPreset?
-        // Actually we can't call flow.first from here easily without being suspend or having scope.
-        // But getBestPreset IS suspend. So we can do:
-        // context.statsDataStore.data.first() ...
-        
-        // Helper method removed (using standard lib)
 
         private suspend fun updateStats(
             presetName: String,

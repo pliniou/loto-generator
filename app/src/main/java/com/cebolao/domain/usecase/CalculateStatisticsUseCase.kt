@@ -66,7 +66,7 @@ class CalculateStatisticsUseCase
             contests: List<Contest>,
             profile: LotteryProfile,
         ): List<PrizeStat> {
-            val hitCounts = mutableMapOf<Int, Int>() // acertos -> quantidade
+            val hitCounts = mutableMapOf<Int, Int>()
 
             contests.forEach { contest ->
                 val result =
@@ -83,10 +83,6 @@ class CalculateStatisticsUseCase
                         profile = profile,
                     )
                 val hits = result.hits
-                // Só conta se for relevante (ex: > 0 ou > faixa mínima de prêmio, mas usuário quer ver estatística geral)
-                // Vamos contar todos > 0 para ter gráfico bonito, ou filtrar pelos que premiam?
-                // O requisito diz "número de acertos por faixa de premiação".
-                // Vamos guardar todos os hits para flexibilidade.
                 if (hits > 0) {
                     hitCounts[hits] = (hitCounts[hits] ?: 0) + 1
                 }

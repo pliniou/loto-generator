@@ -16,7 +16,7 @@ object TimemaniaUtil {
             Team(6, "SÃO PAULO", "SP"),
             Team(7, "GRÊMIO", "RS"),
             Team(8, "CRUZEIRO", "MG"),
-            Team(9, "ATLÉTICO", "MG"), // MG
+            Team(9, "ATLÉTICO", "MG"),
             Team(10, "BOTAFOGO", "RJ"),
             Team(11, "FLUMINENSE", "RJ"),
             Team(12, "INTERNACIONAL", "RS"),
@@ -25,7 +25,7 @@ object TimemaniaUtil {
             Team(15, "GOIÁS", "GO"),
             Team(16, "ATHLETICO", "PR"),
             Team(17, "FORTALEZA", "CE"),
-            Team(18, "ATLÉTICO", "GO"), // GO
+            Team(18, "ATLÉTICO", "GO"),
             Team(19, "CORITIBA", "PR"),
             Team(20, "AMÉRICA", "MG"),
             Team(21, "ABC", "RN"),
@@ -49,7 +49,7 @@ object TimemaniaUtil {
             Team(39, "NÁUTICO", "PE"),
             Team(40, "APARECIDENSE", "GO"),
             Team(41, "SAMPAIO CORRÊA", "MA"),
-            Team(42, "BOTAFOGO", "PB"), // PB
+            Team(42, "BOTAFOGO", "PB"),
             Team(43, "AMAZONAS", "AM"),
             Team(44, "FERROVIÁRIA", "SP"),
             Team(45, "GUARANI", "SP"),
@@ -60,11 +60,11 @@ object TimemaniaUtil {
             Team(50, "FLORESTA", "CE"),
             Team(51, "JUVENTUDE", "RS"),
             Team(52, "CAXIAS", "RS"),
-            Team(53, "FERROVIÁRIO", "CE"), // CE
+            Team(53, "FERROVIÁRIO", "CE"),
             Team(54, "YPIRANGA", "RS"),
             Team(55, "BAHIA DE FEIRA", "BA"),
             Team(56, "ITUANO", "SP"),
-            Team(57, "BOTAFOGO", "SP"), // SP
+            Team(57, "BOTAFOGO", "SP"),
             Team(58, "CHAPECOENSE", "SC"),
             Team(59, "BRASIL DE PELOTAS", "RS"),
             Team(60, "ATHLETIC CLUB", "MG"),
@@ -79,7 +79,7 @@ object TimemaniaUtil {
             Team(69, "POUSO ALEGRE", "MG"),
             Team(70, "RETRÔ", "PE"),
             Team(71, "TOCANTINÓPOLIS", "TO"),
-            Team(72, "ATLÉTICO", "CE"), // CE
+            Team(72, "ATLÉTICO", "CE"),
             Team(73, "BOAVISTA", "RJ"),
             Team(74, "CIANORTE", "PR"),
             Team(75, "IMPERATRIZ", "MA"),
