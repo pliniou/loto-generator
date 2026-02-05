@@ -6,5 +6,6 @@ package com.cebolao.app.core
  */
 sealed class UiEvent {
     data class ShowSnackbar(val message: String) : UiEvent()
+
     data class ShowSuccess(val message: String) : UiEvent()
 }

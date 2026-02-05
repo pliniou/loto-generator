@@ -27,13 +27,14 @@ fun NumberFrequencyChart(
     if (stats.isEmpty()) return
 
     val density = LocalDensity.current
-    val textPaint = remember(density) {
-        Paint().apply {
-            color = android.graphics.Color.GRAY
-            textSize = density.run { 10.sp.toPx() }
-            textAlign = Paint.Align.CENTER
+    val textPaint =
+        remember(density) {
+            Paint().apply {
+                color = android.graphics.Color.GRAY
+                textSize = density.run { 10.sp.toPx() }
+                textAlign = Paint.Align.CENTER
+            }
         }
-    }
 
     val maxFreq = remember(stats) { stats.maxOfOrNull { it.frequency }?.toFloat() ?: 1f }
     // Sort by number to display in order (1, 2, 3...) not by freq
@@ -55,7 +56,7 @@ fun NumberFrequencyChart(
                 drawRect(
                     color = barColor,
                     topLeft = Offset(x, y),
-                    size = Size(barWidth, barHeight)
+                    size = Size(barWidth, barHeight),
                 )
 
                 // Draw number label below
@@ -63,7 +64,7 @@ fun NumberFrequencyChart(
                     stat.number.toString(),
                     x + barWidth / 2,
                     size.height,
-                    textPaint
+                    textPaint,
                 )
             }
         }

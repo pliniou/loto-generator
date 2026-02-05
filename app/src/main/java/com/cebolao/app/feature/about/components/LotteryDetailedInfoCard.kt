@@ -48,51 +48,55 @@ fun LotteryDetailedInfoCard(
     info: LotteryInfo,
     isExpanded: Boolean,
     onExpandClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val spacing = LocalSpacing.current
     val lotteryColor = LotteryColors.getColor(profile.type)
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .animateContentSize(),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .animateContentSize(),
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column {
             // Header (Always Visible)
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onExpandClick() }
-                    .padding(spacing.md),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { onExpandClick() }
+                        .padding(spacing.md),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(lotteryColor)
+                        modifier =
+                            Modifier
+                                .size(12.dp)
+                                .clip(MaterialTheme.shapes.small)
+                                .background(lotteryColor),
                     )
                     Spacer(modifier = Modifier.size(spacing.sm))
                     Text(
                         text = stringResource(LotteryUiMapper.getNameRes(profile.type)),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
 
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
@@ -100,10 +104,10 @@ fun LotteryDetailedInfoCard(
             AnimatedVisibility(
                 visible = isExpanded,
                 enter = expandVertically(tween(300)) + fadeIn(tween(300)),
-                exit = shrinkVertically(tween(300)) + fadeOut(tween(300))
+                exit = shrinkVertically(tween(300)) + fadeOut(tween(300)),
             ) {
                 Column(
-                    modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.sm)
+                    modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.sm),
                 ) {
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
                     Spacer(modifier = Modifier.height(spacing.md))
@@ -113,38 +117,38 @@ fun LotteryDetailedInfoCard(
                     InfoSection(title = "Apostas", content = info.betsInfo, color = lotteryColor)
                     InfoSection(title = "Bolão", content = info.bolaoInfo, color = lotteryColor)
                     InfoSection(title = "Premiação", content = info.prizeAllocation, color = lotteryColor)
-                    
+
                     if (info.probabilityInfo.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(spacing.md))
                         Text(
                             text = "Probabilidades",
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
-                            color = lotteryColor
+                            color = lotteryColor,
                         )
                         Spacer(modifier = Modifier.height(spacing.xs))
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             info.probabilityInfo.forEach { prob ->
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     Text(
                                         text = "${prob.numbersPlayed} números",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = MaterialTheme.colorScheme.onSurface,
                                     )
                                     Text(
                                         text = prob.probability,
                                         style = MaterialTheme.typography.bodySmall,
                                         fontWeight = FontWeight.Medium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
                                 HorizontalDivider(
-                                     modifier = Modifier.padding(top = 4.dp),
-                                     thickness = 0.5.dp, 
-                                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
+                                    modifier = Modifier.padding(top = 4.dp),
+                                    thickness = 0.5.dp,
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f),
                                 )
                             }
                         }
@@ -161,7 +165,7 @@ fun LotteryDetailedInfoCard(
 private fun InfoSection(
     title: String,
     content: String,
-    color: Color
+    color: Color,
 ) {
     val spacing = LocalSpacing.current
     Column(modifier = Modifier.padding(bottom = spacing.md)) {
@@ -169,14 +173,14 @@ private fun InfoSection(
             text = title,
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,
-            color = color
+            color = color,
         )
         Spacer(modifier = Modifier.height(spacing.xs))
         Text(
             text = content,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = AlphaLevels.TEXT_MEDIUM),
-            lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.2
+            lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.2,
         )
     }
 }

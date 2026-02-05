@@ -146,7 +146,7 @@ class LotteryRepositoryImplTest {
             assertTrue(failure.error is com.cebolao.domain.error.AppError.DataCorruption)
             assertEquals(
                 "Erro ao carregar dados salvos. Os dados podem estar corrompidos.",
-                (failure.error as com.cebolao.domain.error.AppError.DataCorruption).message
+                (failure.error as com.cebolao.domain.error.AppError.DataCorruption).message,
             )
 
             // Verificar que não tentou sincronizar quando a migração falhou

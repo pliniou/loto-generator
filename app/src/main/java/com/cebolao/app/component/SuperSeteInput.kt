@@ -51,36 +51,39 @@ fun SuperSeteInput(
                     text = "${colIndex + 1}",
                     fontWeight = FontWeight.Bold,
                     color = lotteryColor,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
                 )
 
                 (0..9).forEach { number ->
-                    // Verifica se está selecionado. 
-                    // Assume que selectedNumbers pode conter valores mapeados (col*10 + num) 
+                    // Verifica se está selecionado.
+                    // Assume que selectedNumbers pode conter valores mapeados (col*10 + num)
                     // ou se for lista posicional de 7 números (0-9)
-                    val isSelected = if (selectedNumbers.size == 7 && selectedNumbers.all { it in 0..9 || it == -1 }) {
-                         selectedNumbers.getOrNull(colIndex) == number
-                    } else {
-                         selectedNumbers.contains(colIndex * 10 + number)
-                    }
+                    val isSelected =
+                        if (selectedNumbers.size == 7 && selectedNumbers.all { it in 0..9 || it == -1 }) {
+                            selectedNumbers.getOrNull(colIndex) == number
+                        } else {
+                            selectedNumbers.contains(colIndex * 10 + number)
+                        }
 
                     Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .background(
-                                color = if (isSelected) lotteryColor else Color.Transparent,
-                                shape = CircleShape
-                            )
-                            .border(
-                                width = 1.dp, 
-                                color = if (isSelected) {
-                                    lotteryColor
-                                } else {
-                                    MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                                },
-                                shape = CircleShape
-                            )
-                            .clickable { onNumberClick(colIndex, number) },
+                        modifier =
+                            Modifier
+                                .size(32.dp)
+                                .background(
+                                    color = if (isSelected) lotteryColor else Color.Transparent,
+                                    shape = CircleShape,
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color =
+                                        if (isSelected) {
+                                            lotteryColor
+                                        } else {
+                                            MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                                        },
+                                    shape = CircleShape,
+                                )
+                                .clickable { onNumberClick(colIndex, number) },
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(

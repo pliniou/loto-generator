@@ -53,5 +53,8 @@ interface LotteryDao {
     suspend fun getLatestContest(type: LotteryType): ContestEntity?
 
     @Query("SELECT * FROM contests WHERE lotteryType = :type ORDER BY contestNumber DESC LIMIT :limit")
-    suspend fun getRecentContests(type: LotteryType, limit: Int): List<ContestEntity>
+    suspend fun getRecentContests(
+        type: LotteryType,
+        limit: Int,
+    ): List<ContestEntity>
 }

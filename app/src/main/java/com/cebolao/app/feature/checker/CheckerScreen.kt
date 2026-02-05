@@ -150,9 +150,10 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.medium,
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
-                            ),
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
+                                ),
                         ) {
                             Row(
                                 modifier = Modifier.padding(spacing.md),
@@ -213,9 +214,10 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
                                     .semantics { role = Role.Button }
                                     .clickable { showTeamDialog = true },
                             shape = MaterialTheme.shapes.medium,
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
-                            ),
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
+                                ),
                             border = androidx.compose.foundation.BorderStroke(1.dp, lotteryColor.copy(alpha = AlphaLevels.BORDER_LOW)),
                         ) {
                             Row(
@@ -233,8 +235,9 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                     Text(
-                                        text = uiState.selectedTeam?.let { TimemaniaUtil.getTeamName(it) }
-                                            ?: stringResource(R.string.checker_select_team),
+                                        text =
+                                            uiState.selectedTeam?.let { TimemaniaUtil.getTeamName(it) }
+                                                ?: stringResource(R.string.checker_select_team),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.Bold,
                                     )
@@ -258,10 +261,11 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
                                 .height(56.dp),
                         enabled = isSelectionValid && uiState.lastContest != null && !uiState.isAnalyzing,
                         shape = MaterialTheme.shapes.medium,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = lotteryColor,
-                            contentColor = LotteryColors.getOnColor(uiState.selectedType),
-                        ),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = lotteryColor,
+                                contentColor = LotteryColors.getOnColor(uiState.selectedType),
+                            ),
                     ) {
                         Text(
                             text = if (uiState.isAnalyzing) "Analisando..." else stringResource(R.string.action_check) + " & " + stringResource(R.string.action_analyze),
@@ -360,5 +364,3 @@ fun CheckerScreen(viewModel: CheckerViewModel = hiltViewModel()) {
         }
     }
 }
-
-

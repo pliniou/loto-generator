@@ -46,4 +46,3 @@ data class Game(
      */
     fun togglePin(): Game = copy(isPinned = !isPinned)
 }
-

@@ -1,9 +1,9 @@
 // Baseline Profile Module build configuration
 
 plugins {
-    id("com.android.test")
-    id("org.jetbrains.kotlin.android")
-    id("androidx.baselineprofile")
+    alias(libs.plugins.android.test)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
@@ -38,6 +38,7 @@ dependencies {
 }
 
 baselineProfile {
-    managedDevices += "pixel7Api34"
-    useConnectedDevices = false
+    // Prefer connected devices by default to keep builds lightweight and stable.
+    // For managed devices, configure them explicitly when running profile generation.
+    useConnectedDevices = true
 }

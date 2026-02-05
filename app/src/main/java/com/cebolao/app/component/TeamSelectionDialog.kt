@@ -67,13 +67,14 @@ fun TeamSelectionDialog(
                 ) {
                     items(items = filteredTeams, key = { it.id }) { team ->
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onTeamSelected(team.id)
-                                    onDismissRequest()
-                                }
-                                .padding(vertical = spacing.sm),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onTeamSelected(team.id)
+                                        onDismissRequest()
+                                    }
+                                    .padding(vertical = spacing.sm),
                             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                         ) {
                             Text(
@@ -85,6 +86,6 @@ fun TeamSelectionDialog(
                     }
                 }
             }
-        }
+        },
     )
 }

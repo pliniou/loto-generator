@@ -20,11 +20,11 @@ data class LotteryInfo(
     val betsInfo: String,
     val probabilityInfo: List<ProbabilityRow>,
     val bolaoInfo: String,
-    val prizeAllocation: String
+    val prizeAllocation: String,
 )
 
 @Serializable
 data class ProbabilityRow(
     val numbersPlayed: Int,
-    val probability: String // Ex: "1 em 50.063.860"
+    val probability: String, // Ex: "1 em 50.063.860"
 )

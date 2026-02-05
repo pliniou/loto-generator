@@ -84,9 +84,10 @@ fun SavedGameItem(
                     // Pin/Favorite indicator
                     IconButton(
                         onClick = onTogglePin,
-                        modifier = Modifier
-                            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
-                            .size(ComponentDimensions.buttonHeightSmall),
+                        modifier =
+                            Modifier
+                                .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                                .size(ComponentDimensions.buttonHeightSmall),
                     ) {
                         Icon(
                             imageVector = if (game.isPinned) Icons.Filled.Star else Icons.Outlined.StarOutline,
@@ -118,9 +119,10 @@ fun SavedGameItem(
 
                 IconButton(
                     onClick = onDelete,
-                    modifier = Modifier
-                        .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
-                        .size(ComponentDimensions.iconSizeMedium),
+                    modifier =
+                        Modifier
+                            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+                            .size(ComponentDimensions.iconSizeMedium),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -156,7 +158,10 @@ fun SavedGameItem(
             }
 
             Spacer(modifier = Modifier.height(spacing.md))
-            HorizontalDivider(thickness = ComponentDimensions.dividerThicknessThin, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
+            HorizontalDivider(
+                thickness = ComponentDimensions.dividerThicknessThin,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
+            )
             Spacer(modifier = Modifier.height(spacing.md))
 
             // Rodapé com Insights e Data
@@ -205,14 +210,15 @@ fun SavedGameItem(
                         Text(
                             text = "Taxa de acertos em 10 concursos: ${(game.recentHitRate * 100).toInt()}%",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         LinearProgressIndicator(
                             progress = { game.recentHitRate },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(6.dp)
-                                .clip(MaterialTheme.shapes.small),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(6.dp)
+                                    .clip(MaterialTheme.shapes.small),
                             color = lotteryColor,
                             trackColor = lotteryColor.copy(alpha = AlphaLevels.BORDER_FAINT),
                         )

@@ -1,12 +1,12 @@
 package com.cebolao.domain.service
 
+import com.cebolao.domain.Constants
 import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.FilterConfig
 import com.cebolao.domain.model.Game
 import com.cebolao.domain.model.GenerationFilter
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.model.LotteryType
-import com.cebolao.domain.Constants
 import com.cebolao.domain.util.StatisticsUtil
 import javax.inject.Inject
 import javax.inject.Singleton

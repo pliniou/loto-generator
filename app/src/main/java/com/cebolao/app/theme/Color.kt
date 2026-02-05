@@ -59,38 +59,38 @@ object AlphaLevels {
     const val MINIMAL = 0.15f
     const val FAINT = 0.08f
     const val GHOST = 0.04f
-    
+
     // Transparências específicas para componentes
     const val GLASS_HIGH = 0.95f
     const val GLASS_MEDIUM = 0.85f
     const val GLASS_LOW = 0.75f
     const val GLASS_DIM = 0.6f
-    
+
     // Transparências para overlays e modais
     const val OVERLAY_DARK = 0.8f
     const val OVERLAY_MEDIUM = 0.6f
     const val OVERLAY_LIGHT = 0.4f
-    
+
     // Transparências para borders e strokes
     const val BORDER_HIGH = 0.4f
     const val BORDER_MEDIUM = 0.25f
     const val BORDER_LOW = 0.15f
     const val BORDER_FAINT = 0.08f
-    
+
     // Transparências para backgrounds de cards
     const val CARD_HIGH = 0.12f
     const val CARD_MEDIUM = 0.08f
     const val CARD_LOW = 0.05f
     const val CARD_FAINT = 0.03f
-    
+
     // Transparências para estados hover/pressed
     const val HOVER = 0.12f
     const val PRESSED = 0.2f
     const val FOCUSED = 0.16f
-    
+
     // Transparências para disabled states
     const val DISABLED = 0.38f
-    
+
     // Transparências para textos secundários
     const val TEXT_HIGH = 0.9f
     const val TEXT_MEDIUM = 0.7f

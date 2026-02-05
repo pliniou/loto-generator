@@ -98,13 +98,11 @@ class DataInitializer
 
             Log.d(TAG, "Banco vazio: aplicando seed a partir dos assets")
 
-            val allEntities =
-                LotteryType.entries.flatMap { type ->
-                    assetsReader.readContests(type).map { contest -> ContestMapper.toEntity(contest) }
+            LotteryType.entries.forEach { type ->
+                val entities = assetsReader.readContests(type).map { contest -> ContestMapper.toEntity(contest) }
+                entities.chunked(500).forEach { chunk ->
+                    lotteryDao.insertContests(chunk)
                 }
-
-            allEntities.chunked(500).forEach { chunk ->
-                lotteryDao.insertContests(chunk)
             }
         }
 

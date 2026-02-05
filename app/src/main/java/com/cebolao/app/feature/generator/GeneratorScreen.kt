@@ -142,40 +142,42 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
         )
     }
 
-
     // Info Bottom Sheet
     if (showInfoSheet) {
         ModalBottomSheet(
             onDismissRequest = { showInfoSheet = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = 8.dp
+            tonalElevation = 8.dp,
         ) {
             Box(modifier = Modifier.padding(bottom = spacing.xl)) {
                 val info = remember(uiState.selectedType) { LotteryInfoProvider.getInfo(uiState.selectedType) }
                 // Use profile if available, otherwise construct a dummy or fetch it.
                 // Since LotteryDetailedInfoCard needs a profile, and we have uiState.profile in Generator...
                 // Ideally uiState.profile should be non-null if we are in generator.
-                
+
                 if (uiState.profile != null) {
                     com.cebolao.app.feature.about.components.LotteryDetailedInfoCard(
                         profile = uiState.profile!!,
                         info = info,
                         isExpanded = true, // Always expanded in the sheet
                         onExpandClick = {}, // No op or toggle
-                        modifier = Modifier.padding(horizontal = spacing.md)
+                        modifier = Modifier.padding(horizontal = spacing.md),
                     )
                 }
             }
         }
     }
     // Recommendation Logic
-    val recommendedPreset = remember(uiState.recommendation, uiState.userPresets) {
-        val rec = uiState.recommendation
-        if (rec != null) {
-             uiState.userPresets.find { it.name == rec.presetName }
-        } else null
-    }
+    val recommendedPreset =
+        remember(uiState.recommendation, uiState.userPresets) {
+            val rec = uiState.recommendation
+            if (rec != null) {
+                uiState.userPresets.find { it.name == rec.presetName }
+            } else {
+                null
+            }
+        }
 
     // Feedback de salvamento e háptica
     LaunchedEffect(uiState.lastSavedCount) {
@@ -211,7 +213,12 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = spacing.lg, bottom = ComponentDimensions.bottomContentPadding), // Espaço para a barra inferior
+                contentPadding =
+                    PaddingValues(
+                        top = spacing.lg,
+                        bottom = ComponentDimensions.bottomContentPadding,
+                    ),
+                // Espaço para a barra inferior
                 verticalArrangement = Arrangement.spacedBy(spacing.lg),
             ) {
                 // 0. Recomendação (se houver)
@@ -220,7 +227,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                         RecommendationCard(
                             stats = uiState.recommendation!!,
                             onApply = { viewModel.onApplyUserPreset(recommendedPreset) },
-                            onDismiss = { /* Optional: add dismiss logic to VM */ }
+                            onDismiss = { /* Optional: add dismiss logic to VM */ },
                         )
                     }
                 }
@@ -303,7 +310,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                             game = game,
                             lastContest = uiState.lastContest,
                             onClick = { selectedGameForDetails = game },
-                             modifier = Modifier
+                            modifier = Modifier,
                         )
                     }
                 }
@@ -330,7 +337,6 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                         .align(Alignment.BottomCenter)
                         .padding(bottom = if (uiState.generatedGames.isNotEmpty()) 100.dp else spacing.lg),
             )
-
         }
     }
 }
@@ -385,7 +391,6 @@ private fun GeneratorBottomBar(
                 horizontalArrangement = Arrangement.spacedBy(spacing.md),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-
                 OutlinedButton(
                     onClick = onClear,
                     modifier = Modifier.weight(1f).height(ComponentDimensions.bottomBarHeight),
@@ -415,6 +420,7 @@ private fun GeneratorBottomBar(
         }
     }
 }
+
 @Composable
 private fun RecommendationCard(
     stats: com.cebolao.domain.model.UserUsageStats,
@@ -426,40 +432,39 @@ private fun RecommendationCard(
         color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.4f),
         shape = MaterialTheme.shapes.medium,
         border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f)),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
             modifier = Modifier.padding(spacing.md),
-            verticalArrangement = Arrangement.spacedBy(spacing.sm)
+            verticalArrangement = Arrangement.spacedBy(spacing.sm),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Star, // Or other icon like Verified/ThumbUp
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(spacing.sm))
                 Text(
                     text = "Sugestão para você",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.tertiary,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             }
             Text(
                 text = "O preset '${stats.presetName}' tem bons resultados: ${stats.savedGamesCount} jogos salvos e ${stats.usageCount} usos. Que tal usá-lo?",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Button(
                 onClick = onApply,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier.align(Alignment.End),
             ) {
                 Text("Usar Preset")
             }
         }
     }
 }
-

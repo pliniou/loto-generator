@@ -16,9 +16,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -26,19 +29,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.BuildConfig
 import com.cebolao.R
-
-import com.cebolao.app.theme.LocalSpacing
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.cebolao.app.feature.about.components.LotteryDetailedInfoCard
-import com.cebolao.domain.util.LotteryInfoProvider
+import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.ui.layout.CebolaoContent
+import com.cebolao.domain.util.LotteryInfoProvider
 
 @Composable
 fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
@@ -46,7 +45,7 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
     val profiles = uiState.profiles
     val scrollState = rememberScrollState()
     val spacing = LocalSpacing.current
-    
+
     // Track expanded card
     var expandedProfileType by remember { mutableStateOf<com.cebolao.domain.model.LotteryType?>(null) }
 
@@ -143,7 +142,7 @@ fun AboutScreen(viewModel: AboutViewModel = hiltViewModel()) {
                     isExpanded = expandedProfileType == profile.type,
                     onExpandClick = {
                         expandedProfileType = if (expandedProfileType == profile.type) null else profile.type
-                    }
+                    },
                 )
                 Spacer(modifier = Modifier.height(spacing.md))
             }

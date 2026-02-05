@@ -3,10 +3,10 @@ package com.cebolao.app.feature.about
 import androidx.lifecycle.ViewModel
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.repository.ProfileRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 data class AboutUiState(

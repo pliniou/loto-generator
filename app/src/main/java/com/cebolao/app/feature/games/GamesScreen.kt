@@ -112,7 +112,7 @@ fun GamesScreen(
 
                 GamesFilterSection(
                     selectedFilter = uiState.filterType,
-                    onFilterChanged = viewModel::onFilterChanged
+                    onFilterChanged = viewModel::onFilterChanged,
                 )
 
                 if (isGamesEmpty) {
@@ -122,7 +122,7 @@ fun GamesScreen(
                         games = uiState.games,
                         onDelete = { gameToDelete = it },
                         onTogglePin = { viewModel.onTogglePin(it) },
-                        onClick = { selectedGameForDetails = it }
+                        onClick = { selectedGameForDetails = it },
                     )
                 }
             }
@@ -190,14 +190,12 @@ private fun GamesFilterSection(
 }
 
 @Composable
-private fun GamesEmptyState(
-    onNavigateToGenerator: () -> Unit,
-) {
+private fun GamesEmptyState(onNavigateToGenerator: () -> Unit) {
     EmptyState(
         message = stringResource(R.string.state_empty_games),
         actionLabel = stringResource(R.string.state_empty_action),
         onAction = onNavigateToGenerator,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     )
 }
 
@@ -223,5 +221,3 @@ private fun GamesList(
         }
     }
 }
-
-

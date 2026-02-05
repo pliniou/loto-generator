@@ -20,7 +20,6 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GamesViewModelTest {
-
     private val repository: LotteryRepository = mockk(relaxed = true)
     private lateinit var viewModel: GamesViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -39,20 +38,21 @@ class GamesViewModelTest {
     }
 
     @Test
-    fun `initial state is correct`() = runTest {
-        val state = viewModel.uiState.value
-        assertEquals(null, state.filterType)
-        assertEquals(emptyList<Game>(), state.games)
-    }
+    fun `initial state is correct`() =
+        runTest {
+            val state = viewModel.uiState.value
+            assertEquals(null, state.filterType)
+            assertEquals(emptyList<Game>(), state.games)
+        }
 
     @Test
-    fun `changing filter updates repository call`() = runTest {
-        viewModel.onFilterChanged(LotteryType.MEGA_SENA)
-        
-        // Allow flow to collect
-        testDispatcher.scheduler.advanceUntilIdle()
-        
-        coVerify { repository.observeGamesByType(LotteryType.MEGA_SENA) }
-        assertEquals(LotteryType.MEGA_SENA, viewModel.uiState.value.filterType)
-    }
+    fun `changing filter updates repository call`() =
+        runTest {
+            viewModel.onFilterChanged(LotteryType.MEGA_SENA)
+
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            coVerify { repository.observeGamesByType(LotteryType.MEGA_SENA) }
+            assertEquals(LotteryType.MEGA_SENA, viewModel.uiState.value.filterType)
+        }
 }

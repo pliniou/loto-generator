@@ -43,14 +43,16 @@ fun GameDetailsDialog(
     val lotteryColor = LotteryColors.getColor(game.lotteryType)
 
     // Calculate full insights
-    val insight = remember(game, lastContest) {
-        StatisticsUtil.analyzeGame(game.numbers, lastContest, emptyList())
-    }
+    val insight =
+        remember(game, lastContest) {
+            StatisticsUtil.analyzeGame(game.numbers, lastContest, emptyList())
+        }
 
     // Calculate decade distribution
-    val decadeDistribution = remember(game) {
-        StatisticsUtil.calculateDecadeDistribution(game.numbers)
-    }
+    val decadeDistribution =
+        remember(game) {
+            StatisticsUtil.calculateDecadeDistribution(game.numbers)
+        }
 
     AlertDialog(
         onDismissRequest = onClose,
@@ -161,14 +163,17 @@ fun GameDetailsDialog(
                         val endNum = startNum + 9
                         val fraction = count.toFloat() / maxDecadeCount.toFloat()
 
-
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(spacing.sm),
                         ) {
                             Text(
-                                text = "${String.format(Locale.getDefault(), "%02d", if (startNum == 0) 1 else startNum)}-${String.format(Locale.getDefault(), "%02d", endNum)}",
+                                text = "${String.format(
+                                    Locale.getDefault(),
+                                    "%02d",
+                                    if (startNum == 0) 1 else startNum,
+                                )}-${String.format(Locale.getDefault(), "%02d", endNum)}",
                                 style = MaterialTheme.typography.labelMedium,
                                 modifier = Modifier.width(48.dp),
                             )
@@ -232,9 +237,7 @@ fun GameDetailsDialog(
 }
 
 @Composable
-private fun StatsGrid(
-    items: List<Pair<String, String>>,
-) {
+private fun StatsGrid(items: List<Pair<String, String>>) {
     val spacing = LocalSpacing.current
 
     Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {

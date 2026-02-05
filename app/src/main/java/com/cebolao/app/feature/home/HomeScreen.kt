@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -60,7 +59,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val spacing = LocalSpacing.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
+    val hasAnyContest = uiState.contests.values.any { it != null }
 
     // Collect one-shot events for Snackbar
     LaunchedEffect(Unit) {
@@ -82,14 +81,14 @@ fun HomeScreen(
                         .padding(bottom = spacing.lg),
             )
 
-            if (uiState.isLoading) {
-                 LoadingState(modifier = Modifier.fillMaxSize())
-            } else if (uiState.error != null) {
-                 ErrorState(
-                     message = uiState.error?.toUserMessage() ?: stringResource(R.string.state_error),
-                     onRetry = { viewModel.refreshData() },
-                     modifier = Modifier.fillMaxSize()
-                 )
+            if (uiState.isLoading && !hasAnyContest) {
+                LoadingState(modifier = Modifier.fillMaxSize())
+            } else if (uiState.error != null && !hasAnyContest) {
+                ErrorState(
+                    message = uiState.error?.toUserMessage() ?: stringResource(R.string.state_error),
+                    onRetry = { viewModel.refreshData() },
+                    modifier = Modifier.fillMaxSize(),
+                )
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(top = spacing.lg, bottom = spacing.xxl),
@@ -97,77 +96,82 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     item {
-                         WelcomeBanner(modifier = Modifier.padding(bottom = spacing.xs))
+                        WelcomeBanner(modifier = Modifier.padding(bottom = spacing.xs))
                     }
 
-                // Seção de Próximos Concursos e Previsões
-                item {
-                    Text(
-                        text = stringResource(R.string.home_schedule_title), // "Próximos Sorteios"
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(horizontal = spacing.sm, vertical = spacing.sm)
-                    )
-                }
+                    // Seção de Próximos Concursos e Previsões
+                    item {
+                        Text(
+                            text = stringResource(R.string.home_schedule_title), // "Próximos Sorteios"
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(horizontal = spacing.sm, vertical = spacing.sm),
+                        )
+                    }
 
-                // Seção de Próximos Concursos (Card unificado)
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = spacing.lg),
-                        shape = MaterialTheme.shapes.large,
-                        colors =
-                            CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                            ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT))
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(vertical = spacing.md, horizontal = spacing.lg),
-                            verticalArrangement = Arrangement.spacedBy(spacing.md),
+                    // Seção de Próximos Concursos (Card unificado)
+                    item {
+                        Card(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = spacing.lg),
+                            shape = MaterialTheme.shapes.large,
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                            border =
+                                androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
+                                ),
                         ) {
-                            LotteryType.entries.forEachIndexed { index, type ->
-                                val contest = uiState.contests[type]
-                                val lotteryColor = LotteryColors.getColor(type)
+                            Column(
+                                modifier = Modifier.padding(vertical = spacing.md, horizontal = spacing.lg),
+                                verticalArrangement = Arrangement.spacedBy(spacing.md),
+                            ) {
+                                LotteryType.entries.forEachIndexed { index, type ->
+                                    val contest = uiState.contests[type]
+                                    val lotteryColor = LotteryColors.getColor(type)
 
-                                if (contest != null) {
-                                    NextContestRow(contest, lotteryColor, type)
-                                    
-                                    if (index < LotteryType.entries.lastIndex) {
-                                        HorizontalDivider(
-                                            modifier = Modifier.padding(vertical = spacing.xs),
-                                            thickness = 0.5.dp,
-                                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
-                                        )
+                                    if (contest != null) {
+                                        NextContestRow(contest, lotteryColor, type)
+
+                                        if (index < LotteryType.entries.lastIndex) {
+                                            HorizontalDivider(
+                                                modifier = Modifier.padding(vertical = spacing.xs),
+                                                thickness = 0.5.dp,
+                                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                
-                item {
-                    Text(
-                        text = "Últimos Resultados",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(horizontal = spacing.sm, vertical = spacing.sm)
-                    )
-                }
 
-                items(items = LotteryType.entries, key = { it.name }) { type ->
-                    val contest = uiState.contests[type]
-                    LotteryCard(
-                        contest = contest,
-                        lotteryType = type,
-                        onClick = onNavigateToChecker,
-                    )
-                }
-                item { Spacer(modifier = Modifier.height(spacing.xxl)) }
+                    item {
+                        Text(
+                            text = "Últimos Resultados",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(horizontal = spacing.sm, vertical = spacing.sm),
+                        )
+                    }
+
+                    items(items = LotteryType.entries, key = { it.name }) { type ->
+                        val contest = uiState.contests[type]
+                        LotteryCard(
+                            contest = contest,
+                            lotteryType = type,
+                            onClick = onNavigateToChecker,
+                        )
+                    }
+                    item { Spacer(modifier = Modifier.height(spacing.xxl)) }
                 }
             }
 
@@ -188,11 +192,11 @@ fun HomeScreen(
     }
 }
 
-    @Composable
-    fun NextContestRow(
+@Composable
+fun NextContestRow(
     contest: com.cebolao.domain.model.Contest,
     lotteryColor: androidx.compose.ui.graphics.Color,
-    type: LotteryType
+    type: LotteryType,
 ) {
     val estimatedPrize = contest.nextContestEstimatedPrize ?: 0.0
     val hasPrize = estimatedPrize > 0
@@ -211,7 +215,7 @@ fun HomeScreen(
             )
             val dateText = contest.nextContestDate?.let { " • $it" } ?: ""
             Text(
-                text = "Conc. ${contest.id + 1}${dateText}",
+                text = "Conc. ${contest.id + 1}$dateText",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW),
             )
@@ -221,12 +225,21 @@ fun HomeScreen(
             Column(
                 horizontalAlignment = Alignment.End,
             ) {
-                val formattedPrize = when {
-                    estimatedPrize >= 1_000_000_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.1f", estimatedPrize / 1_000_000_000.0)}B"
-                    estimatedPrize >= 1_000_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.1f", estimatedPrize / 1_000_000.0)}M"
-                    estimatedPrize >= 1_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.0f", estimatedPrize / 1_000.0)}K"
-                    else -> "R$ ${estimatedPrize.toLong()}"
-                }
+                val formattedPrize =
+                    when {
+                        estimatedPrize >= 1_000_000_000 -> "R$ ${String.format(
+                            java.util.Locale.getDefault(),
+                            "%.1f",
+                            estimatedPrize / 1_000_000_000.0,
+                        )}B"
+                        estimatedPrize >= 1_000_000 -> "R$ ${String.format(
+                            java.util.Locale.getDefault(),
+                            "%.1f",
+                            estimatedPrize / 1_000_000.0,
+                        )}M"
+                        estimatedPrize >= 1_000 -> "R$ ${String.format(java.util.Locale.getDefault(), "%.0f", estimatedPrize / 1_000.0)}K"
+                        else -> "R$ ${estimatedPrize.toLong()}"
+                    }
                 Text(
                     text = formattedPrize,
                     style = MaterialTheme.typography.titleSmall,
@@ -235,11 +248,11 @@ fun HomeScreen(
                 )
             }
         } else {
-             Text(
+            Text(
                 text = "Aguardando",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.outline,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
         }
     }

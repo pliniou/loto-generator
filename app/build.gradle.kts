@@ -41,6 +41,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -62,8 +63,6 @@ android {
     }
 
     composeCompiler {
-        enableStrongSkippingMode = true
-
         // Enable compose compiler metrics and reports for performance analysis
         // To generate: ./gradlew assembleDebug -Pcebolao.enableComposeReports=true
         if (project.findProperty("cebolao.enableComposeReports") == "true") {
@@ -84,15 +83,12 @@ android {
     }
 
     lint {
-        disable += "NullSafeMutableLiveData"
-        disable += "FrequentlyChangingValue"
-        disable += "RememberInComposition"
-        disable += "AutoboxingStateCreation"
+        checkReleaseBuilds = true
+        abortOnError = true
     }
 }
 
 dependencies {
-    implementation(libs.androidx.material3)
     // Compose BOM
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
@@ -164,8 +160,16 @@ dependencies {
 
     // Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    // Baseline Profiles (startup / runtime performance)
+    baselineProfile(project(":baselineprofile"))
 }
 
 ksp {
     arg("dagger.hilt.android.internal.disableAndroidSuperclassValidation", "true")
+}
+
+baselineProfile {
+    // Avoid generating profiles on every build; run explicitly when needed.
+    automaticGenerationDuringBuild = false
 }

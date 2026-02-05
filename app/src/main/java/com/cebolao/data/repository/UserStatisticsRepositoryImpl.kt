@@ -64,10 +64,10 @@ class UserStatisticsRepositoryImpl
             }
 
         override suspend fun getBestPreset(type: LotteryType): UserUsageStats? {
-             val statsList = observeStats().firstOrNull() ?: emptyList()
-             if (statsList.isEmpty()) return null
-             
-             return statsList.maxByOrNull { it.totalHits }
+            val statsList = observeStats().firstOrNull() ?: emptyList()
+            if (statsList.isEmpty()) return null
+
+            return statsList.maxByOrNull { it.totalHits }
         }
 
         private suspend fun updateStats(

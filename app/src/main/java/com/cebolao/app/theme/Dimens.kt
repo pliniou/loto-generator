@@ -77,18 +77,18 @@ object ComponentDimensions {
     val generatorButtonHeight = 64.dp
     val bottomBarHeight = 56.dp
     val bottomContentPadding = 120.dp
-    
+
     // Cards
     val cardPaddingSmall = 12.dp
     val cardPaddingMedium = 16.dp
     val cardPaddingLarge = 20.dp
-    
+
     // Ícones
     val iconSizeSmall = 20.dp
     val iconSizeMedium = 24.dp
     val iconSizeLarge = 32.dp
     val iconSizeExtraLarge = 48.dp
-    
+
     // Bolinhas (Lottery Balls)
     val ballSizeLarge = 32.dp
     val ballSizeSmall = 24.dp
@@ -98,12 +98,12 @@ object ComponentDimensions {
     val avatarSizeSmall = 32.dp
     val avatarSizeMedium = 40.dp
     val avatarSizeLarge = 56.dp
-    
+
     // Dividers
     val dividerThicknessThin = 0.5.dp
     val dividerThicknessMedium = 1.dp
     val dividerThicknessThick = 2.dp
-    
+
     // Stroke widths
     val strokeWidthThin = 0.5.dp
     val strokeWidthMedium = 1.dp

@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cebolao.app.core.UiEvent
+import com.cebolao.app.di.DefaultDispatcher
 import com.cebolao.app.util.toUserMessage
 import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.FilterConfig
@@ -14,19 +16,17 @@ import com.cebolao.domain.model.GenerationReport
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.model.LotteryType
 import com.cebolao.domain.model.UserFilterPreset
+import com.cebolao.domain.model.UserUsageStats
 import com.cebolao.domain.repository.LotteryRepository
 import com.cebolao.domain.repository.ProfileRepository
 import com.cebolao.domain.repository.UserPresetRepository
 import com.cebolao.domain.repository.UserStatisticsRepository
 import com.cebolao.domain.result.AppResult
-import com.cebolao.domain.model.UserUsageStats
 import com.cebolao.domain.rules.FilterPresets
 import com.cebolao.domain.usecase.GenerateGamesUseCase
-import com.cebolao.app.di.DefaultDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.cebolao.app.core.UiEvent
 import javax.inject.Inject
 
 @Immutable
@@ -45,7 +44,6 @@ data class GeneratorUiState(
     val profile: LotteryProfile? = null,
     val generatedGames: List<Game> = emptyList(),
     val isLoading: Boolean = false,
-
     val lastSavedCount: Int = 0,
     val selectedTeam: Int? = null,
     val activeFilters: List<GenerationFilter> = emptyList(),
@@ -120,14 +118,13 @@ class GeneratorViewModel
 
                     val result =
                         withContext(defaultDispatcher) {
-                            delay(800)
-
-                            val lastContest = _uiState.value.lastContest ?: run {
-                                when (val result = lotteryRepository.getLastContest(profile.type)) {
-                                    is AppResult.Success -> result.value
-                                    is AppResult.Failure -> null
+                            val lastContest =
+                                _uiState.value.lastContest ?: run {
+                                    when (val result = lotteryRepository.getLastContest(profile.type)) {
+                                        is AppResult.Success -> result.value
+                                        is AppResult.Failure -> null
+                                    }
                                 }
-                            }
                             generateGamesUseCase(profile, config, lastContest = lastContest)
                         }
 
@@ -170,13 +167,14 @@ class GeneratorViewModel
                 val recentContests = (lotteryRepository.getRecentContests(type, 10) as? AppResult.Success)?.value ?: emptyList()
                 val historyContests = (lotteryRepository.getRecentContests(type, 100) as? AppResult.Success)?.value ?: emptyList()
 
-                val gamesWithStats = currentState.generatedGames.map { game ->
-                    game.copy(
-                        recentHitRate = com.cebolao.domain.util.StatisticsUtil.calculateHitRate(game.numbers, recentContests),
-                        historicalHitRate = com.cebolao.domain.util.StatisticsUtil.calculateHitRate(game.numbers, historyContests),
-                        sourcePreset = currentState.activePresetName
-                    )
-                }
+                val gamesWithStats =
+                    currentState.generatedGames.map { game ->
+                        game.copy(
+                            recentHitRate = com.cebolao.domain.util.StatisticsUtil.calculateHitRate(game.numbers, recentContests),
+                            historicalHitRate = com.cebolao.domain.util.StatisticsUtil.calculateHitRate(game.numbers, historyContests),
+                            sourcePreset = currentState.activePresetName,
+                        )
+                    }
 
                 when (val result = lotteryRepository.saveGames(gamesWithStats)) {
                     is AppResult.Success -> {
@@ -237,16 +235,16 @@ class GeneratorViewModel
                 current.copy(
                     activeFilters = preset.filters,
                     filterConfigs = preset.configs,
-                    activePresetName = "Perfil padrão" // Identificador para o preset do perfil
+                    activePresetName = "Perfil padrão", // Identificador para o preset do perfil
                 )
         }
 
         fun onApplyUserPreset(preset: UserFilterPreset) {
-             _uiState.value =
+            _uiState.value =
                 _uiState.value.copy(
                     activeFilters = preset.filters,
                     filterConfigs = preset.filterConfigs,
-                    activePresetName = preset.name
+                    activePresetName = preset.name,
                 )
         }
 
@@ -281,10 +279,11 @@ class GeneratorViewModel
                 val profile = profileRepository.getProfile(type)
                 val filteredFilters = _uiState.value.activeFilters.filter { it.isApplicable(profile) }
                 val filteredConfigs = _uiState.value.filterConfigs.filterKeys { it.isApplicable(profile) }
-                val lastContest = when (val result = lotteryRepository.getLastContest(type)) {
-                    is AppResult.Success -> result.value
-                    is AppResult.Failure -> null
-                }
+                val lastContest =
+                    when (val result = lotteryRepository.getLastContest(type)) {
+                        is AppResult.Success -> result.value
+                        is AppResult.Failure -> null
+                    }
 
                 _uiState.value =
                     _uiState.value.copy(
@@ -296,14 +295,14 @@ class GeneratorViewModel
                         activeFilters = filteredFilters,
                         filterConfigs = filteredConfigs,
                         lastContest = lastContest,
-                        recommendation = null, 
-                        activePresetName = null
+                        recommendation = null,
+                        activePresetName = null,
                     )
-                
+
                 // Fetch recommendations
                 val recommendation = userStatisticsRepository.getBestPreset(type)
                 if (recommendation != null && recommendation.usageCount > 2) {
-                     _uiState.value = _uiState.value.copy(recommendation = recommendation)
+                    _uiState.value = _uiState.value.copy(recommendation = recommendation)
                 }
             }
 

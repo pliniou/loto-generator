@@ -87,7 +87,10 @@ class LotteryRepositoryImpl
                 }
             }
 
-        override suspend fun getRecentContests(type: LotteryType, limit: Int): AppResult<List<Contest>> =
+        override suspend fun getRecentContests(
+            type: LotteryType,
+            limit: Int,
+        ): AppResult<List<Contest>> =
             appResultSuspend {
                 withContext(ioDispatcher) {
                     lotteryDao.getRecentContests(type, limit).map { ContestMapper.toDomain(it) }
@@ -249,9 +252,9 @@ class LotteryRepositoryImpl
                 logE("Migration", "Falha ao migrar dados", error)
                 Failure(
                     com.cebolao.domain.error.AppError.DataCorruption(
-                        message = "Erro ao carregar dados salvos. Os dados podem estar corrompidos."
+                        message = "Erro ao carregar dados salvos. Os dados podem estar corrompidos.",
                     ),
-                    error
+                    error,
                 )
             }
         }

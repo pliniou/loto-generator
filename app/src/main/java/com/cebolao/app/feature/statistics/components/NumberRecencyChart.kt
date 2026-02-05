@@ -29,13 +29,14 @@ fun NumberRecencyChart(
     if (stats.isEmpty()) return
 
     val density = LocalDensity.current
-    val textPaint = remember(density) {
-        Paint().apply {
-            color = android.graphics.Color.GRAY
-            textSize = density.run { 10.sp.toPx() }
-            textAlign = Paint.Align.CENTER
+    val textPaint =
+        remember(density) {
+            Paint().apply {
+                color = android.graphics.Color.GRAY
+                textSize = density.run { 10.sp.toPx() }
+                textAlign = Paint.Align.CENTER
+            }
         }
-    }
 
     val maxDelay = remember(stats) { stats.maxOfOrNull { it.delay }?.toFloat() ?: 10f }
     val sortedStats = remember(stats) { stats.sortedBy { it.number } }
@@ -44,9 +45,9 @@ fun NumberRecencyChart(
         Canvas(modifier = Modifier.fillMaxWidth().height(200.dp)) {
             val stepX = size.width / (sortedStats.size - 1).coerceAtLeast(1)
             val maxY = size.height - 40.dp.toPx()
-            
+
             val path = Path()
-            
+
             sortedStats.forEachIndexed { index, stat ->
                 val delayRatio = stat.delay / maxDelay
                 // Higher delay = higher point visually? Or lower?
@@ -59,37 +60,37 @@ fun NumberRecencyChart(
                 } else {
                     path.lineTo(x, y)
                 }
-                
+
                 // Draw dot
                 if (stat.delay > maxDelay * 0.7) { // Highlight very late numbers
                     drawCircle(
                         color = dotColor,
                         radius = 4.dp.toPx(),
-                        center = Offset(x, y)
+                        center = Offset(x, y),
                     )
                 } else {
-                     drawCircle(
+                    drawCircle(
                         color = lineColor,
                         radius = 2.dp.toPx(),
-                        center = Offset(x, y)
+                        center = Offset(x, y),
                     )
                 }
-                
-                 // Draw number label every 5 numbers to avoid clutter
-                 if (index % 5 == 0 || index == sortedStats.lastIndex) {
+
+                // Draw number label every 5 numbers to avoid clutter
+                if (index % 5 == 0 || index == sortedStats.lastIndex) {
                     drawContext.canvas.nativeCanvas.drawText(
                         stat.number.toString(),
                         x,
                         size.height,
-                        textPaint
+                        textPaint,
                     )
-                 }
+                }
             }
 
             drawPath(
                 path = path,
                 color = lineColor,
-                style = Stroke(width = 2.dp.toPx())
+                style = Stroke(width = 2.dp.toPx()),
             )
         }
     }

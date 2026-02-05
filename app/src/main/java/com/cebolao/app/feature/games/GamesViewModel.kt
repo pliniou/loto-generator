@@ -2,6 +2,7 @@ package com.cebolao.app.feature.games
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cebolao.app.core.UiEvent
 import com.cebolao.app.util.toUserMessage
 import com.cebolao.domain.model.Game
 import com.cebolao.domain.model.LotteryType
@@ -18,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import com.cebolao.app.core.UiEvent
 import javax.inject.Inject
 
 data class GamesUiState(
@@ -34,7 +34,6 @@ class GamesViewModel
         private val repository: LotteryRepository,
     ) : ViewModel() {
         private val _filterType = MutableStateFlow<LotteryType?>(null)
-
 
         // Combina filtro com fluxo do repositório
         private val _uiState = MutableStateFlow(GamesUiState(isLoading = true))
@@ -58,19 +57,16 @@ class GamesViewModel
                             repository.observeGamesByType(type)
                         }
                     }
-                    .catch { 
-                         // Em caso de erro no flow, emite lista vazia para não quebrar a UI
-                         emit(emptyList()) 
+                    .catch {
+                        // Em caso de erro no flow, emite lista vazia para não quebrar a UI
+                        emit(emptyList())
                     }
                     .collect { games ->
-                        val sorted = games.sortedWith(
-                            compareByDescending<Game> { it.isPinned }
-                                .thenByDescending { it.createdAt }
-                        )
-                        _uiState.value = _uiState.value.copy(
-                            games = sorted,
-                            isLoading = false
-                        )
+                        _uiState.value =
+                            _uiState.value.copy(
+                                games = games,
+                                isLoading = false,
+                            )
                     }
             }
         }
@@ -96,7 +92,7 @@ class GamesViewModel
                 when (val result = repository.togglePinGame(game.id)) {
                     is AppResult.Success -> { /* Sucesso, fluxo reativo atualiza a lista */ }
                     is AppResult.Failure -> {
-                         _events.emit(UiEvent.ShowSnackbar(result.error.toUserMessage()))
+                        _events.emit(UiEvent.ShowSnackbar(result.error.toUserMessage()))
                     }
                 }
             }

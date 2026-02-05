@@ -44,7 +44,10 @@ interface LotteryRepository {
     /**
      * Retorna os últimos N concursos de uma modalidade para cálculos estatísticos.
      */
-    suspend fun getRecentContests(type: LotteryType, limit: Int): AppResult<List<Contest>>
+    suspend fun getRecentContests(
+        type: LotteryType,
+        limit: Int,
+    ): AppResult<List<Contest>>
 
     /**
      * Salva um novo jogo.

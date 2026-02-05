@@ -3,6 +3,7 @@ package com.cebolao.app.feature.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cebolao.app.core.UiEvent
 import com.cebolao.app.util.toUserMessage
 import com.cebolao.domain.error.AppError
 import com.cebolao.domain.model.Contest
@@ -18,7 +19,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.cebolao.app.core.UiEvent
 import javax.inject.Inject
 
 data class HomeUiState(
@@ -41,8 +41,8 @@ class HomeViewModel
         val events: SharedFlow<UiEvent> = _events.asSharedFlow()
 
         init {
-            refreshData()
             observeContests()
+            refreshData()
         }
 
         private fun observeContests() {
@@ -56,26 +56,35 @@ class HomeViewModel
 
         fun refreshData() {
             viewModelScope.launch {
-                val isInitial = _uiState.value.contests.isEmpty()
-                _uiState.value = _uiState.value.copy(
-                    isSyncing = true,
-                    isLoading = isInitial,
-                    error = null
-                )
+                val hasLocalData =
+                    when (val local = repository.getLastContest(LotteryType.LOTOFACIL)) {
+                        is AppResult.Success -> local.value != null
+                        is AppResult.Failure -> false
+                    }
+                val hasAnyContest = hasLocalData || _uiState.value.contests.values.any { it != null }
+                val isInitial = !hasAnyContest
+                _uiState.value =
+                    _uiState.value.copy(
+                        isSyncing = true,
+                        isLoading = isInitial,
+                        error = null,
+                    )
                 when (val result = repository.refresh()) {
                     is AppResult.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            isSyncing = false,
-                            isLoading = false
-                        )
+                        _uiState.value =
+                            _uiState.value.copy(
+                                isSyncing = false,
+                                isLoading = false,
+                            )
                     }
                     is AppResult.Failure -> {
                         Log.e("HomeVM", "Erro no refresh", result.cause)
-                        _uiState.value = _uiState.value.copy(
-                            isSyncing = false,
-                            isLoading = false,
-                            error = result.error
-                        )
+                        _uiState.value =
+                            _uiState.value.copy(
+                                isSyncing = false,
+                                isLoading = false,
+                                error = result.error,
+                            )
                         // Show snackbar only if we have content (otherwise ErrorState is shown)
                         if (!isInitial) {
                             _events.emit(UiEvent.ShowSnackbar(result.error.toUserMessage()))
@@ -84,6 +93,4 @@ class HomeViewModel
                 }
             }
         }
-
-
     }

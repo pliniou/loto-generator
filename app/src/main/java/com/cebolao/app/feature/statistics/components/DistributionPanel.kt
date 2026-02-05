@@ -38,21 +38,21 @@ fun DistributionPanel(
         Text(
             text = "Distribuição por Dezenas",
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         Spacer(modifier = Modifier.height(spacing.sm))
-        
+
         val maxDecadeCount = stats.decadeDistribution.values.maxOrNull() ?: 1
-        
+
         stats.decadeDistribution.forEach { (range, count) ->
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = range,
                     modifier = Modifier.width(60.dp),
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelMedium,
                 )
                 LinearProgressIndicator(
                     progress = { count / maxDecadeCount.toFloat() },
@@ -63,7 +63,7 @@ fun DistributionPanel(
                 Spacer(modifier = Modifier.width(spacing.xs))
                 Text(
                     text = count.toString(),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
                 )
             }
         }
@@ -73,42 +73,42 @@ fun DistributionPanel(
         Text(
             text = "Quadrantes",
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         Spacer(modifier = Modifier.height(spacing.sm))
-        
+
         if (stats.quadrantDistribution.size >= 4) {
             val q = stats.quadrantDistribution
             val total = q.sum().toFloat().coerceAtLeast(1f)
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.md)
+                horizontalArrangement = Arrangement.spacedBy(spacing.md),
             ) {
-                 // Visual 2x2 Grid Representation
-                 Card(
-                     modifier = Modifier.weight(1f).aspectRatio(1f),
-                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                 ) {
-                     Column(modifier = Modifier.fillMaxHeight()) {
-                         Row(modifier = Modifier.weight(1f)) {
-                             QuadrantCell(count = q[0], total = total, modifier = Modifier.weight(1f)) // TopLeft
-                             QuadrantCell(count = q[1], total = total, modifier = Modifier.weight(1f)) // TopRight
-                         }
-                         Row(modifier = Modifier.weight(1f)) {
-                             QuadrantCell(count = q[2], total = total, modifier = Modifier.weight(1f)) // BottomLeft
-                             QuadrantCell(count = q[3], total = total, modifier = Modifier.weight(1f)) // BottomRight
-                         }
-                     }
-                 }
-                 
-                 // Legend
-                 Column(modifier = Modifier.weight(1f)) {
-                     Text("1º: ${q[0]} (${(q[0]/total*100).toInt()}%)", style = MaterialTheme.typography.bodySmall)
-                     Text("2º: ${q[1]} (${(q[1]/total*100).toInt()}%)", style = MaterialTheme.typography.bodySmall)
-                     Text("3º: ${q[2]} (${(q[2]/total*100).toInt()}%)", style = MaterialTheme.typography.bodySmall)
-                     Text("4º: ${q[3]} (${(q[3]/total*100).toInt()}%)", style = MaterialTheme.typography.bodySmall)
-                 }
+                // Visual 2x2 Grid Representation
+                Card(
+                    modifier = Modifier.weight(1f).aspectRatio(1f),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                ) {
+                    Column(modifier = Modifier.fillMaxHeight()) {
+                        Row(modifier = Modifier.weight(1f)) {
+                            QuadrantCell(count = q[0], total = total, modifier = Modifier.weight(1f)) // TopLeft
+                            QuadrantCell(count = q[1], total = total, modifier = Modifier.weight(1f)) // TopRight
+                        }
+                        Row(modifier = Modifier.weight(1f)) {
+                            QuadrantCell(count = q[2], total = total, modifier = Modifier.weight(1f)) // BottomLeft
+                            QuadrantCell(count = q[3], total = total, modifier = Modifier.weight(1f)) // BottomRight
+                        }
+                    }
+                }
+
+                // Legend
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("1º: ${q[0]} (${(q[0] / total * 100).toInt()}%)", style = MaterialTheme.typography.bodySmall)
+                    Text("2º: ${q[1]} (${(q[1] / total * 100).toInt()}%)", style = MaterialTheme.typography.bodySmall)
+                    Text("3º: ${q[2]} (${(q[2] / total * 100).toInt()}%)", style = MaterialTheme.typography.bodySmall)
+                    Text("4º: ${q[3]} (${(q[3] / total * 100).toInt()}%)", style = MaterialTheme.typography.bodySmall)
+                }
             }
         }
     }
@@ -118,19 +118,20 @@ fun DistributionPanel(
 fun QuadrantCell(
     count: Int,
     total: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val alpha = (count / total).coerceIn(0.1f, 1f)
     Box(
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
-            .padding(4.dp),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
+                .padding(4.dp),
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = count.toString(),
             color = if (alpha > 0.5f) Color.White else Color.Black,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelSmall,
         )
     }
 }

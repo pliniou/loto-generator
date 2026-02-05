@@ -1,6 +1,5 @@
 package com.cebolao.app.component
 
-
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,9 +38,9 @@ fun LotteryCard(
 ) {
     val spacing = LocalSpacing.current
     val lotteryColor = LotteryColors.getColor(lotteryType)
-    
+
     // Animações de elevação e cor
-    
+
     // Sem animação para valores constantes
     val elevation = CebolaoElevation.level2
     val borderColor = lotteryColor.copy(alpha = AlphaLevels.BORDER_MEDIUM)
@@ -178,7 +177,7 @@ fun LotteryCard(
                             prize = prize,
                             lotteryColor = lotteryColor,
                             isMainPrize = index == 0,
-                            isAccumulated = contest.accumulated
+                            isAccumulated = contest.accumulated,
                         )
                     }
                 }
@@ -247,9 +246,10 @@ private fun PrizeTierRow(
     val formattedPrize = com.cebolao.app.util.FormatUtils.formatCurrency(prize.prizeValue)
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = spacing.xs),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = spacing.xs),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -282,7 +282,7 @@ private fun PrizeTierRow(
                 )
             } else {
                 // Only show "Acumulou" if it's the main prize AND the contest is actually accumulated.
-                // For other tiers with 0 winners, just show "0" or "Sem ganhadores" if preferred, 
+                // For other tiers with 0 winners, just show "0" or "Sem ganhadores" if preferred,
                 // but usually "0" is clearer for secondary tiers.
                 if (isMainPrize && isAccumulated) {
                     Text(

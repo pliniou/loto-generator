@@ -55,4 +55,3 @@ class SyncWorker
             private const val TAG = "SyncWorker"
         }
     }
-

@@ -1,6 +1,5 @@
 package com.cebolao.app.component
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -34,7 +33,7 @@ fun LotteryBall(
 ) {
     val backgroundColor = LotteryColors.getColor(lotteryType)
     val contentColor = LotteryColors.getOnColor(lotteryType)
-    
+
     // Sem animação para valores constantes
     val elevation = CebolaoElevation.level2
     val animatedBackgroundColor = backgroundColor

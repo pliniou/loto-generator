@@ -81,7 +81,7 @@ fun GeneratorConfigSection(
     Row(
         modifier = Modifier.fillMaxWidth().padding(bottom = spacing.sm),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = stringResource(R.string.generator_select_lottery),
@@ -90,12 +90,12 @@ fun GeneratorConfigSection(
         )
         IconButton(
             onClick = onInfoClick,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(24.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.Info,
                 contentDescription = "Informações da Loteria",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
     }
@@ -108,7 +108,7 @@ fun GeneratorConfigSection(
             val chipColor by animateColorAsState(
                 targetValue = LotteryColors.getColor(type),
                 animationSpec = tween(durationMillis = AnimationDurations.medium),
-                label = "chip-color-$type"
+                label = "chip-color-$type",
             )
             FilterChip(
                 selected = isSelected,
@@ -216,7 +216,7 @@ fun GeneratorConfigSection(
             Spacer(modifier = Modifier.height(spacing.lg))
             HorizontalDivider(
                 thickness = 0.5.dp,
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT)
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
             )
             Spacer(modifier = Modifier.height(spacing.md))
 
@@ -259,16 +259,18 @@ fun GeneratorConfigSection(
                 }
             }
 
-            val options = remember(profile) {
-                val base = listOf(
-                    GenerationFilter.PARITY_BALANCE,
-                    GenerationFilter.MULTIPLES_OF_3,
-                    GenerationFilter.REPEATED_FROM_PREVIOUS,
-                    GenerationFilter.MOLDURA_MIOLO,
-                    GenerationFilter.PRIME_NUMBERS,
-                )
-                profile?.let { p -> base.filter { it.isApplicable(p) } } ?: base
-            }
+            val options =
+                remember(profile) {
+                    val base =
+                        listOf(
+                            GenerationFilter.PARITY_BALANCE,
+                            GenerationFilter.MULTIPLES_OF_3,
+                            GenerationFilter.REPEATED_FROM_PREVIOUS,
+                            GenerationFilter.MOLDURA_MIOLO,
+                            GenerationFilter.PRIME_NUMBERS,
+                        )
+                    profile?.let { p -> base.filter { it.isApplicable(p) } } ?: base
+                }
 
             LazyRow(horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
                 items(items = options, key = { it.name }) { filter ->
@@ -378,7 +380,6 @@ fun GeneratorResultsSection(
         }
     }
 
-
     // Banner de geração parcial
     if (report != null && report.partial) {
         Card(
@@ -466,7 +467,7 @@ fun GeneratedGameItem(
             Spacer(modifier = Modifier.height(spacing.md))
             HorizontalDivider(
                 thickness = 0.5.dp,
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT)
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
             )
             Spacer(modifier = Modifier.height(spacing.md))
 

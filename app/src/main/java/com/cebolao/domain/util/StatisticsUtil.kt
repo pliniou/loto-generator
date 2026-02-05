@@ -103,7 +103,10 @@ object StatisticsUtil {
     /**
      * Calcula distribuição por quadrantes para matriz visual
      */
-    fun calculateQuadrantDistribution(numbers: List<Int>, maxNumber: Int): IntArray {
+    fun calculateQuadrantDistribution(
+        numbers: List<Int>,
+        maxNumber: Int,
+    ): IntArray {
         val half = maxNumber / 2
         var topLeft = 0
         var topRight = 0
@@ -139,8 +142,8 @@ object StatisticsUtil {
         val numbersSet = numbers.toSet()
 
         contests.forEach { contest ->
-             val hits = contest.getAllNumbers().count { it in numbersSet }
-             totalHits += hits
+            val hits = contest.getAllNumbers().count { it in numbersSet }
+            totalHits += hits
         }
 
         val averageHits = totalHits.toFloat() / contests.size

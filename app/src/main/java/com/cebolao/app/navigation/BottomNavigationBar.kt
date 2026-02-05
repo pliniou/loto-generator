@@ -72,7 +72,7 @@ fun CebolaoBottomBar(
                     is Route.About -> currentDestination?.hasRoute<Route.About>() == true
                     else -> false
                 }
-            
+
             // Animação de cor para ícone selecionado
             val iconColor by animateColorAsState(
                 targetValue =
@@ -82,9 +82,9 @@ fun CebolaoBottomBar(
                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_MEDIUM)
                     },
                 animationSpec = tween(durationMillis = 300),
-                label = "icon-color"
+                label = "icon-color",
             )
-            
+
             // Animação de cor para texto
             val textColor by animateColorAsState(
                 targetValue =
@@ -94,7 +94,7 @@ fun CebolaoBottomBar(
                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = AlphaLevels.TEXT_LOW)
                     },
                 animationSpec = tween(durationMillis = 300),
-                label = "text-color"
+                label = "text-color",
             )
 
             NavigationBarItem(

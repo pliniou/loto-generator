@@ -18,4 +18,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Cebolao"
 include(":app")
-// include(":baselineprofile")
+include(":baselineprofile")

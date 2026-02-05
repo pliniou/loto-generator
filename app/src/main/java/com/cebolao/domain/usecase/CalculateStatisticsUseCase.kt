@@ -1,8 +1,8 @@
 package com.cebolao.domain.usecase
 
 import com.cebolao.domain.model.Contest
-import com.cebolao.domain.model.Game
 import com.cebolao.domain.model.DistributionStats
+import com.cebolao.domain.model.Game
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.model.NumberStat
 import com.cebolao.domain.model.PrizeStat

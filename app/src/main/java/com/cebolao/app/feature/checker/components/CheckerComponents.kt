@@ -23,8 +23,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -75,7 +75,7 @@ fun CheckerTypeSelector(
             val chipColor by animateColorAsState(
                 targetValue = LotteryColors.getColor(type),
                 animationSpec = tween(durationMillis = 300),
-                label = "checker-chip-$type"
+                label = "checker-chip-$type",
             )
             FilterChip(
                 selected = isSelected,
@@ -117,21 +117,22 @@ fun CheckerDuplaModeSelector(
             val modeColor by animateColorAsState(
                 targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                 animationSpec = tween(durationMillis = 300),
-                label = "dupla-mode-$mode"
+                label = "dupla-mode-$mode",
             )
             val textColor by animateColorAsState(
                 targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                 animationSpec = tween(durationMillis = 300),
-                label = "dupla-mode-text-$mode"
+                label = "dupla-mode-text-$mode",
             )
             Surface(
                 modifier = Modifier.weight(1f),
                 color = modeColor,
                 shape = MaterialTheme.shapes.medium,
-                border = androidx.compose.foundation.BorderStroke(
-                    1.dp,
-                    if (isSelected) modeColor else MaterialTheme.colorScheme.outline.copy(alpha = AlphaLevels.BORDER_FAINT)
-                ),
+                border =
+                    androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        if (isSelected) modeColor else MaterialTheme.colorScheme.outline.copy(alpha = AlphaLevels.BORDER_FAINT),
+                    ),
             ) {
                 Box(
                     modifier =
@@ -141,13 +142,14 @@ fun CheckerDuplaModeSelector(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = stringResource(
-                            when (mode) {
-                                DuplaMode.FIRST -> R.string.checker_dupla_mode_first
-                                DuplaMode.SECOND -> R.string.checker_dupla_mode_second
-                                DuplaMode.BEST -> R.string.checker_dupla_mode_best
-                            }
-                        ),
+                        text =
+                            stringResource(
+                                when (mode) {
+                                    DuplaMode.FIRST -> R.string.checker_dupla_mode_first
+                                    DuplaMode.SECOND -> R.string.checker_dupla_mode_second
+                                    DuplaMode.BEST -> R.string.checker_dupla_mode_best
+                                },
+                            ),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                         color = textColor,
@@ -864,9 +866,10 @@ fun AnalysisStatsSection(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = color.copy(alpha = 0.08f),
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = color.copy(alpha = 0.08f),
+            ),
         border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.2f)),
     ) {
         Column(
@@ -902,19 +905,21 @@ fun AnalysisStatsSection(
                 val barFraction = stat.count.toFloat() / maxCount
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = spacing.xs),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = spacing.xs),
                     horizontalArrangement = Arrangement.spacedBy(spacing.md),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     // Hits badge
                     Box(
-                        modifier = Modifier
-                            .width(72.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(color.copy(alpha = 0.15f))
-                            .padding(horizontal = spacing.sm, vertical = spacing.xs),
+                        modifier =
+                            Modifier
+                                .width(72.dp)
+                                .clip(MaterialTheme.shapes.small)
+                                .background(color.copy(alpha = 0.15f))
+                                .padding(horizontal = spacing.sm, vertical = spacing.xs),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
@@ -927,25 +932,27 @@ fun AnalysisStatsSection(
 
                     // Progress bar
                     Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(12.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .height(12.dp)
+                                .clip(MaterialTheme.shapes.small)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
                     ) {
                         Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(barFraction.coerceIn(0.05f, 1f))
-                                .clip(MaterialTheme.shapes.small)
-                                .background(
-                                    Brush.horizontalGradient(
-                                        listOf(
-                                            color.copy(alpha = 0.6f),
-                                            color.copy(alpha = 0.9f),
-                                        )
-                                    )
-                                ),
+                            modifier =
+                                Modifier
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(barFraction.coerceIn(0.05f, 1f))
+                                    .clip(MaterialTheme.shapes.small)
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            listOf(
+                                                color.copy(alpha = 0.6f),
+                                                color.copy(alpha = 0.9f),
+                                            ),
+                                        ),
+                                    ),
                         )
                     }
 
@@ -972,9 +979,10 @@ fun AnalysisStatsSection(
             val bestHits = results.maxOfOrNull { it.hits } ?: 0
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = spacing.sm),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = spacing.sm),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

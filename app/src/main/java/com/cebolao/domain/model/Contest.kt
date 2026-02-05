@@ -54,4 +54,3 @@ data class Prize(
     val prizeValue: Double,
     val description: String? = null,
 )
-

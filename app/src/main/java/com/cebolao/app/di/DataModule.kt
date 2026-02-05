@@ -8,12 +8,12 @@ import com.cebolao.data.local.room.dao.LotteryDao
 import com.cebolao.data.repository.LotteryRepositoryImpl
 import com.cebolao.data.repository.ProfileRepositoryImpl
 import com.cebolao.data.repository.SettingsRepositoryImpl
+import com.cebolao.data.repository.UserStatisticsRepositoryImpl
 import com.cebolao.domain.repository.LotteryRepository
 import com.cebolao.domain.repository.ProfileRepository
 import com.cebolao.domain.repository.SettingsRepository
 import com.cebolao.domain.repository.UserPresetRepository
 import com.cebolao.domain.repository.UserStatisticsRepository
-import com.cebolao.data.repository.UserStatisticsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

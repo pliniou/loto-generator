@@ -1,9 +1,9 @@
 package com.cebolao.domain.usecase
 
+import com.cebolao.domain.Constants
 import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.Game
 import com.cebolao.domain.model.GenerationConfig
-import com.cebolao.domain.Constants
 import com.cebolao.domain.model.GenerationFilter
 import com.cebolao.domain.model.GenerationReport
 import com.cebolao.domain.model.GenerationResult

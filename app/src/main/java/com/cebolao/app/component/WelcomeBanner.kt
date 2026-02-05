@@ -52,132 +52,136 @@ import com.cebolao.domain.util.LotteryScheduleUtil
 @Composable
 fun WelcomeBanner(modifier: Modifier = Modifier) {
     val spacing = LocalSpacing.current
-    val context = androidx.compose.ui.platform.LocalContext.current
     val today = remember { java.time.LocalDate.now() }
-    
-    // Day of week integer compatible with our logic (1=Sun, ... 7=Sat) if needed, 
+
+    // Day of week integer compatible with our logic (1=Sun, ... 7=Sat) if needed,
     // or just rely on what LotteryScheduleUtil returns.
     // java.time.DayOfWeek: MONDAY=1 ... SUNDAY=7
     // Calendar: SUNDAY=1 ... SATURDAY=7
     // Let's assume LotteryScheduleUtil uses Calendar logic or we match by simple name/enum if possible.
     // For now, let's just get the schedule.
     val schedule = remember { LotteryScheduleUtil.getWeeklySchedule() }
-    
+
     // Find today's schedule
-    val dateString = remember {
-        com.cebolao.app.util.FormatUtils.formatFriendlyDate(today)
-    }
+    val dateString =
+        remember {
+            com.cebolao.app.util.FormatUtils.formatFriendlyDate(today)
+        }
 
     // Gradient background
-    val brush = Brush.linearGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.tertiary, // A bit of variation
-        )
-    )
+    val primary = MaterialTheme.colorScheme.primary
+    val tertiary = MaterialTheme.colorScheme.tertiary
+    val brush =
+        remember(primary, tertiary) {
+            Brush.linearGradient(
+                colors = listOf(primary, tertiary),
+            )
+        }
 
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Flat on background usually better or low elevation
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(brush)
-                .padding(spacing.lg)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(brush)
+                    .padding(spacing.lg),
         ) {
             Column {
                 // Top Row: Greeting & Date
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column {
                         Text(
                             text = stringResource(R.string.home_greeting), // "Olá, Apostador!"
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = Color.White,
                         )
                         Text(
                             text = dateString,
                             style = MaterialTheme.typography.labelLarge,
-                            color = Color.White.copy(alpha = AlphaLevels.TEXT_MEDIUM)
+                            color = Color.White.copy(alpha = AlphaLevels.TEXT_MEDIUM),
                         )
                     }
-                    
+
                     // Optional: Maybe an icon or logo here
                 }
-                
+
                 Spacer(modifier = Modifier.height(spacing.xl))
-                
+
                 // "Hoje" Section - Highlight what is happening today
                 val todaysSchedule = schedule.find { it.dayOfWeek == today.dayOfWeek }
-                
+
                 if (todaysSchedule != null && todaysSchedule.lotteries.isNotEmpty()) {
                     Text(
                         text = "Sorteios de Hoje",
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White.copy(alpha = AlphaLevels.TEXT_HIGH),
-                        modifier = Modifier.padding(bottom = spacing.sm)
+                        modifier = Modifier.padding(bottom = spacing.sm),
                     )
-                    
+
                     // Horizontal list of today's lotteries pills
                     LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(spacing.sm)
+                        horizontalArrangement = Arrangement.spacedBy(spacing.sm),
                     ) {
                         items(todaysSchedule.lotteries) { type ->
                             Surface(
                                 color = Color.White.copy(alpha = 0.2f),
                                 shape = CircleShape,
-                                onClick = { /* Maybe scroll to that lottery? */ }
+                                onClick = { /* Maybe scroll to that lottery? */ },
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.xs)
+                                    modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.xs),
                                 ) {
                                     Box(
-                                        modifier = Modifier
-                                            .size(8.dp)
-                                            .background(LotteryColors.getColor(type), CircleShape)
+                                        modifier =
+                                            Modifier
+                                                .size(8.dp)
+                                                .background(LotteryColors.getColor(type), CircleShape),
                                     )
                                     Spacer(modifier = Modifier.width(spacing.xs))
                                     Text(
                                         text = stringResource(LotteryUiMapper.getNameRes(type)),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = Color.White,
-                                        fontWeight = FontWeight.SemiBold
+                                        fontWeight = FontWeight.SemiBold,
                                     )
                                 }
                             }
                         }
                     }
                 } else {
-                     Text(
+                    Text(
                         text = "Sem sorteios hoje", // Ou descanso
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = AlphaLevels.TEXT_MEDIUM)
+                        color = Color.White.copy(alpha = AlphaLevels.TEXT_MEDIUM),
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(spacing.lg))
-                
+
                 // Calendar Strip (Simplified)
                 Text(
-                     text = "Próximos dias",
-                     style = MaterialTheme.typography.labelMedium,
-                     fontWeight = FontWeight.Bold,
-                     color = Color.White.copy(alpha = AlphaLevels.TEXT_HIGH),
-                     modifier = Modifier.padding(bottom = spacing.sm)
+                    text = "Próximos dias",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White.copy(alpha = AlphaLevels.TEXT_HIGH),
+                    modifier = Modifier.padding(bottom = spacing.sm),
                 )
-                
+
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(spacing.xs),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     items(items = schedule, key = { it.dayOfWeek }) { day ->
                         val isToday = day.dayOfWeek == today.dayOfWeek
@@ -192,42 +196,45 @@ fun WelcomeBanner(modifier: Modifier = Modifier) {
 @Composable
 private fun DayCompactCard(
     day: DaySchedule,
-    isToday: Boolean
+    isToday: Boolean,
 ) {
     val backgroundColor = if (isToday) Color.White else Color.White.copy(alpha = 0.1f)
     val textColor = if (isToday) MaterialTheme.colorScheme.primary else Color.White
-    
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(backgroundColor)
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(backgroundColor)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         Text(
             text = day.name.take(3), // Seg, Ter...
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
-            color = textColor
+            color = textColor,
         )
         if (day.lotteries.isNotEmpty()) {
-             Spacer(modifier = Modifier.height(4.dp))
-             Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                 day.lotteries.take(3).forEach { type ->
-                     Box(
-                         modifier = Modifier
-                             .size(4.dp)
-                             .background(LotteryColors.getColor(type), CircleShape)
-                     )
-                 }
-                 if (day.lotteries.size > 3) {
-                     Box(
-                         modifier = Modifier
-                             .size(4.dp)
-                             .background(textColor.copy(alpha = 0.5f), CircleShape)
-                     )
-                 }
-             }
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                day.lotteries.take(3).forEach { type ->
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(4.dp)
+                                .background(LotteryColors.getColor(type), CircleShape),
+                    )
+                }
+                if (day.lotteries.size > 3) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(4.dp)
+                                .background(textColor.copy(alpha = 0.5f), CircleShape),
+                    )
+                }
+            }
         }
     }
 }
