@@ -113,4 +113,3 @@ class GameValidator
             return game.numbers.any(StatisticsUtil::isPrime)
         }
     }
-}

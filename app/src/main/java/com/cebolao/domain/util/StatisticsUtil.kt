@@ -82,7 +82,7 @@ object StatisticsUtil {
     /**
      * Verifica se um número é primo
      */
-    private fun isPrime(n: Int): Boolean {
+    fun isPrime(n: Int): Boolean {
         if (n < 2) return false
         if (n == 2) return true
         if (n % 2 == 0) return false

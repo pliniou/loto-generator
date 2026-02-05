@@ -64,13 +64,6 @@ fun WelcomeBanner(modifier: Modifier = Modifier) {
     val schedule = remember { LotteryScheduleUtil.getWeeklySchedule() }
     
     // Find today's schedule
-    // We can match by java.time DayOfWeek to the util's constant.
-    // Util uses Calendar constants? Let's check visually or assume standard match.
-    // A simple way is to find the schedule item that corresponds to today.
-    // If DaySchedule has a 'isToday' flag or we calculate it.
-    // Let's rely on the previous logic: (today.dayOfWeek.value % 7) + 1 for Calendar style.
-    val dayOfWeekCalendarStyle = (today.dayOfWeek.value % 7) + 1
-    
     val dateString = remember {
         com.cebolao.app.util.FormatUtils.formatFriendlyDate(today)
     }
@@ -122,7 +115,7 @@ fun WelcomeBanner(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.height(spacing.xl))
                 
                 // "Hoje" Section - Highlight what is happening today
-                val todaysSchedule = schedule.find { it.dayOfWeekConstant == dayOfWeekCalendarStyle }
+                val todaysSchedule = schedule.find { it.dayOfWeek == today.dayOfWeek }
                 
                 if (todaysSchedule != null && todaysSchedule.lotteries.isNotEmpty()) {
                     Text(
@@ -186,8 +179,8 @@ fun WelcomeBanner(modifier: Modifier = Modifier) {
                     horizontalArrangement = Arrangement.spacedBy(spacing.xs),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    items(items = schedule, key = { it.dayOfWeekConstant }) { day ->
-                        val isToday = day.dayOfWeekConstant == dayOfWeekCalendarStyle
+                    items(items = schedule, key = { it.dayOfWeek }) { day ->
+                        val isToday = day.dayOfWeek == today.dayOfWeek
                         DayCompactCard(day = day, isToday = isToday)
                     }
                 }
