@@ -17,8 +17,8 @@ import com.cebolao.app.feature.home.HomeScreen
 @Composable
 fun CebolaoNavHost(
     navController: NavHostController,
-    startDestination: Route = Route.Home,
     modifier: Modifier = Modifier,
+    startDestination: Route = Route.Home,
 ) {
     NavHost(
         navController = navController,

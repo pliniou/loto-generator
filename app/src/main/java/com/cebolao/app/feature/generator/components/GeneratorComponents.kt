@@ -392,7 +392,12 @@ fun GeneratorResultsSection(
                     Icon(imageVector = Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onErrorContainer)
                     Spacer(modifier = Modifier.width(spacing.sm))
                     Text(
-                        text = stringResource(R.string.generation_partial_warning, report.generated, quantity),
+                        text = pluralStringResource(
+                            R.plurals.generation_partial_warning,
+                            quantity,
+                            report.generated,
+                            quantity,
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onErrorContainer,
@@ -412,9 +417,9 @@ fun GeneratorResultsSection(
 @Composable
 fun GeneratedGameItem(
     game: Game,
-    lastContest: com.cebolao.domain.model.Contest? = null,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    lastContest: com.cebolao.domain.model.Contest? = null,
 ) {
     val spacing = LocalSpacing.current
     val lotteryColor = LotteryColors.getColor(game.lotteryType)
@@ -527,7 +532,11 @@ fun GeneratedGameItem(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         InsightBadge(
-                            label = stringResource(R.string.insight_repeats, insight.repeatsFromLast),
+                            label = pluralStringResource(
+                                R.plurals.insight_repeats,
+                                insight.repeatsFromLast,
+                                insight.repeatsFromLast,
+                            ),
                             containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                             contentColor = MaterialTheme.colorScheme.onErrorContainer,
                         )

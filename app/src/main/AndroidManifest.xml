@@ -15,7 +15,8 @@
         android:label="@string/app_name"
         android:enableOnBackInvokedCallback="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Cebolao">
+        android:theme="@style/Theme.Cebolao"
+        tools:ignore="DataExtractionRules,UnusedAttribute">
 
         <!-- WorkManager is initialized on-demand via Configuration.Provider (CebolaoApplication). -->
         <provider

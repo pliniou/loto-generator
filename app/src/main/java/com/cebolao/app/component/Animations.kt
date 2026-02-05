@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.cebolao.app.theme.AlphaLevels
@@ -124,7 +125,7 @@ fun ScannerAnimation(color: Color) {
                     Modifier
                         .fillMaxWidth(0.9f)
                         .height(2.dp)
-                        .offset(y = offsetY.dp)
+                        .offset { IntOffset(x = 0, y = offsetY.dp.roundToPx()) }
                         .background(
                             Brush.horizontalGradient(
                                 listOf(Color.Transparent, color, Color.Transparent),

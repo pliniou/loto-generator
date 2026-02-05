@@ -49,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -82,9 +81,18 @@ import kotlinx.coroutines.flow.collectLatest
 fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
     val spacing = LocalSpacing.current
     val haptic = LocalHapticFeedback.current
+    val savedGamesMessage =
+        if (uiState.lastSavedCount > 0) {
+            pluralStringResource(
+                R.plurals.snackbar_games_saved,
+                uiState.lastSavedCount,
+                uiState.lastSavedCount,
+            )
+        } else {
+            ""
+        }
 
     var showTeamDialog by remember { mutableStateOf(false) }
     var showClearConfirmation by remember { mutableStateOf(false) }
@@ -183,13 +191,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
     LaunchedEffect(uiState.lastSavedCount) {
         if (uiState.lastSavedCount > 0) {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-            val message =
-                context.resources.getQuantityString(
-                    R.plurals.snackbar_games_saved,
-                    uiState.lastSavedCount,
-                    uiState.lastSavedCount,
-                )
-            snackbarHostState.showSnackbar(message)
+            snackbarHostState.showSnackbar(savedGamesMessage)
         }
     }
 

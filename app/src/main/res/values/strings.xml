@@ -12,15 +12,10 @@
     <string name="nav_statistics">Estatísticas</string>
 
     <!-- States -->
-    <string name="state_loading">Carregando…</string>
     <string name="state_error">Não foi possível atualizar agora.</string>
-    <string name="state_offline">Sem conexão. Exibindo dados salvos.</string>
-    <string name="state_syncing">Atualizando resultados…</string>
     <string name="state_empty_games">Você ainda não salvou nenhum jogo.</string>
-    <string name="state_stale_data">Dados de %s</string>
     <string name="state_error_title">Ops, algo deu errado</string>
     <string name="state_error_retry">Tentar novamente</string>
-    <string name="state_loading_message">Carregando informações…</string>
     <string name="state_empty_title">Nada por aqui</string>
     <string name="state_empty_action">Criar agora</string>
 
@@ -33,29 +28,15 @@
     </plurals>
     <string name="action_save">Salvar</string>
     <string name="action_cancel">Cancelar</string>
-    <string name="action_apply">Aplicar</string>
     <string name="action_delete">Excluir</string>
-    <string name="action_retry">Tentar novamente</string>
     <string name="action_sync">Atualizar resultados</string>
     <string name="action_remove">Remover</string>
-    <string name="action_fix_team">Fixar time</string>
     <string name="action_redo">Refazer</string>
-    <string name="action_back">Voltar</string>
     <string name="action_increase">Aumentar</string>
     <string name="action_select">Selecionar</string>
-    <string name="action_generate_now">Gerar agora</string>
     <string name="action_pin">Fixar jogo</string>
     <string name="action_unpin">Desafixar jogo</string>
-    <string name="content_description_add_game">Adicionar novo jogo</string>
-    <string name="content_description_close">Fechar</string>
-    <string name="content_description_refresh">Atualizar dados</string>
-    <string name="content_description_filter">Filtrar por modalidade</string>
-    <string name="content_description_options">Mais opções</string>
     <string name="content_description_back">Voltar</string>
-    <string name="content_description_delete">Excluir</string>
-    <string name="content_description_check">Conferir</string>
-    <string name="content_description_copy">Copiar</string>
-    <string name="content_description_share">Compartilhar</string>
 
     <!-- Generator -->
     <string name="generator_title">Gerador de Jogos</string>
@@ -68,22 +49,18 @@
     <string name="generator_fine_tuning">Ajuste fino</string>
     <string name="filter_parity_range">Paridade: %1$d%% a %2$d%%</string>
     <string name="filter_repeats_limit">Máx. repetidas do anterior: %1$d</string>
-    <string name="preset_name_label">Nome do preset</string>
-    <string name="save_preset">Salvar preset</string>
-    <string name="user_presets">Presets do usuário</string>
     <string name="action_close">Fechar</string>
     <string name="report_details">Detalhes do relatório</string>
     <string name="report_attempts">Tentativas: %1$d</string>
     <string name="report_rejected_by_filter">Rejeições por filtro</string>
-    <string name="example_label">Exemplo:</string>
-    <string name="generation_partial_warning">Geração parcial: foram gerados %1$d de %2$d jogos</string>
+    <plurals name="generation_partial_warning">
+        <item quantity="one">Geração parcial: foi gerado %1$d de %2$d jogo</item>
+        <item quantity="other">Geração parcial: foram gerados %1$d de %2$d jogos</item>
+    </plurals>
     <string name="generator_total_cost">Custo total: %s</string>
     <string name="apply_preset">Aplicar preset: %1$s</string>
     <string name="timemania_team_optional">Time do Coração (opcional)</string>
     <string name="timemania_random_team_saved">Aleatório (sortear ao salvar)</string>
-    <string name="error_invalid_values">Valores inválidos</string>
-    <string name="error_invalid_parity_range">Paridade deve estar entre 0.0 e 1.0 e min &lt;= max</string>
-    <string name="error_invalid_repeats">Máx. repetições inválido</string>
     <string name="filter_all">Todos</string>
     <plurals name="snackbar_games_saved">
         <item quantity="one">%d jogo salvo com sucesso!</item>
@@ -93,11 +70,7 @@
 
     <!-- Checker -->
     <string name="checker_title">Conferidor</string>
-    <string name="checker_select_numbers">Selecione os números</string>
     <string name="checker_select_team">Selecionar time…</string>
-    <string name="checker_against">Conferir contra: Conc. %1$d (%2$s)</string>
-    <string name="checker_prize_details">Detalhes do prêmio</string>
-    <string name="checker_past_prizes">Premiações já ocorridas</string>
     <plurals name="checker_hits">
         <item quantity="one">%d acerto</item>
         <item quantity="other">%d acertos</item>
@@ -109,10 +82,6 @@
 
     <!-- Games -->
     <string name="games_title">Meus Jogos</string>
-    <string name="games_saved">Salvos</string>
-    <string name="games_generated">Gerados</string>
-    <string name="games_fixed">Fixado</string>
-    <string name="games_analyze">Analisar</string>
     <plurals name="games_count">
         <item quantity="one">%d jogo</item>
         <item quantity="other">%d jogos</item>
@@ -124,9 +93,6 @@
 
     <!-- Home -->
     <string name="home_title">Início</string>
-    <string name="home_last_contest">Último sorteio</string>
-    <string name="home_next_contest">Próximo concurso</string>
-    <string name="home_estimated_prize">Prêmio estimado</string>
     <string name="home_contest_number">Concurso %d</string>
     <string name="home_greeting">Olá, Apostador!</string>
     <string name="home_schedule_title">Calendário de sorteios</string>
@@ -158,27 +124,17 @@
 
     <!-- Timemania -->
     <string name="timemania_team_heart">Time do Coração</string>
-    <string name="timemania_random_team">Sortear time</string>
     <string name="timemania_team_hit">Time acertado!</string>
     <string name="timemania_team_miss">Errou o time</string>
-    <string name="team_display">Time: %s</string>
     <string name="team_select_title">Selecione o time</string>
     <string name="team_search_placeholder">Buscar time…</string>
-    <string name="team_code">UF %1$s - Cód. %2$d</string>
 
     <!-- Super Sete -->
-    <string name="super_sete_column">Coluna %d</string>
-    <string name="super_sete_select_number">Selecione um número por coluna</string>
 
     <!-- Common -->
-    <string name="contest">Concurso</string>
-    <string name="date">Data</string>
-    <string name="numbers">Números</string>
-    <string name="ok">OK</string>
     <string name="contest_short">Conc. %d</string>
     <string name="second_draw">2º sorteio</string>
     <string name="state_no_data">Sem dados</string>
-    <string name="content_app_logo">Logo do aplicativo</string>
     <!-- Onboarding -->
     <string name="onboard_title_1">Bem-vindo ao Cebolão</string>
     <string name="onboard_desc_1">Sua ferramenta completa para analisar, gerar e conferir loterias da CAIXA.</string>
@@ -214,9 +170,10 @@
     <string name="checker_analysis_empty">Nenhuma premiação encontrada em concursos anteriores.</string>
     <string name="checker_analysis_subtitle">Premiações em concursos passados:</string>
     <string name="insight_sum">Soma: %d</string>
-    <string name="insight_repeats">%d Repetidas</string>
+    <plurals name="insight_repeats">
+        <item quantity="one">%d Repetida</item>
+        <item quantity="other">%d Repetidas</item>
+    </plurals>
     <string name="action_analyze">Analisar</string>
-    <string name="statistics_coming_soon_title">Em breve!</string>
-    <string name="statistics_coming_soon_description">Estatísticas detalhadas sobre os números mais sorteados, padrões de frequência e análises avançadas.</string>
     <string name="statistics_title">Estatísticas</string>
 </resources>

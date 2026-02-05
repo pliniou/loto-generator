@@ -42,12 +42,12 @@ import com.cebolao.app.theme.LocalSpacing
 
 @Composable
 fun EmptyState(
-    title: String = stringResource(R.string.state_empty_title),
     message: String,
+    modifier: Modifier = Modifier,
+    title: String = stringResource(R.string.state_empty_title),
     illustration: ImageVector = Icons.Default.Info, // Use vector for now, can be replaced with resId logic if needed
     actionLabel: String? = null,
     onAction: (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     val spacing = LocalSpacing.current
     Column(
@@ -103,9 +103,9 @@ fun EmptyState(
 
 @Composable
 fun ErrorState(
-    message: String = stringResource(R.string.state_error),
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    message: String = stringResource(R.string.state_error),
 ) {
     val spacing = LocalSpacing.current
     Column(
