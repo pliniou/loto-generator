@@ -9,6 +9,7 @@ import com.cebolao.data.local.room.dao.LotteryDao
 import com.cebolao.data.remote.mapper.ContestMapper
 import com.cebolao.data.remote.mapper.GameMapper
 import com.cebolao.domain.model.LotteryType
+import com.cebolao.domain.rules.LotteryRulesRegistry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -44,8 +45,7 @@ class DataInitializer
                     migrateLegacyJsonIfPresent()
                     seedFromAssetsIfEmpty()
                 } catch (e: Exception) {
-                    Log.wtf(TAG, "Falha ao inicializar dados (seed/migração). Interrompendo para evitar estado inconsistente.", e)
-                    throw e
+                    Log.e(TAG, "Falha ao inicializar dados (seed/migração). O app seguirá sem seed inicial completa.", e)
                 }
             }
         }
@@ -98,7 +98,7 @@ class DataInitializer
 
             Log.d(TAG, "Banco vazio: aplicando seed a partir dos assets")
 
-            LotteryType.entries.forEach { type ->
+            LotteryRulesRegistry.supportedTypes().forEach { type ->
                 val entities = assetsReader.readContests(type).map { contest -> ContestMapper.toEntity(contest) }
                 entities.chunked(500).forEach { chunk ->
                     lotteryDao.insertContests(chunk)

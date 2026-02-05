@@ -14,6 +14,7 @@ import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.Game
 import com.cebolao.domain.model.LotteryType
 import com.cebolao.domain.repository.LotteryRepository
+import com.cebolao.domain.rules.LotteryRulesRegistry
 import com.cebolao.domain.result.AppResult
 import com.cebolao.domain.result.AppResult.Failure
 import com.cebolao.domain.result.AppResult.Success
@@ -149,7 +150,7 @@ class LotteryRepositoryImpl
                 var hadAnyNetworkSuccess = false
                 var lastNetworkFailure: Throwable? = null
 
-                LotteryType.entries.forEach { type ->
+                LotteryRulesRegistry.supportedTypes().forEach { type ->
                     val result = runCatching { syncLotteryType(type) }
                     if (result.isSuccess) {
                         hadAnyNetworkSuccess = true

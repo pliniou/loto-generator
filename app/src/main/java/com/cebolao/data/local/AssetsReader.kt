@@ -7,6 +7,7 @@ import com.cebolao.domain.Constants
 import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.LotteryProfile
 import com.cebolao.domain.model.LotteryType
+import com.cebolao.domain.rules.LotteryRulesRegistry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
@@ -274,7 +275,7 @@ class AssetsReader
         /**
          * Lê todos os profiles.
          */
-        fun readAllProfiles(): List<LotteryProfile> = LotteryType.entries.map { readProfile(it) }
+        fun readAllProfiles(): List<LotteryProfile> = LotteryRulesRegistry.supportedTypes().map { readProfile(it) }
 
         /**
          * Classe auxiliar para deserializar contests dos assets.

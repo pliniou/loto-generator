@@ -89,4 +89,7 @@ object LotteryRulesRegistry {
      * @throws IllegalArgumentException se o tipo não for suportado
      */
     fun getRules(type: LotteryType): LotteryRules = registry[type] ?: error("Tipo de loteria não suportado: $type")
+
+    fun supportedTypes(): List<LotteryType> =
+        LotteryType.entries.filter { type -> registry.containsKey(type) }
 }
