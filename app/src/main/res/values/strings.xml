@@ -28,19 +28,28 @@
     </plurals>
     <string name="action_save">Salvar</string>
     <string name="action_cancel">Cancelar</string>
+    <string name="action_discard">Descartar</string>
+    <string name="action_save_games">Salvar jogos</string>
     <string name="action_delete">Excluir</string>
     <string name="action_sync">Atualizar resultados</string>
     <string name="action_remove">Remover</string>
+    <string name="action_undo">Desfazer</string>
     <string name="action_redo">Refazer</string>
+    <string name="action_regenerate">Gerar novamente</string>
     <string name="action_increase">Aumentar</string>
     <string name="action_select">Selecionar</string>
+    <string name="action_previous">Anterior</string>
+    <string name="action_next">Próximo</string>
     <string name="action_pin">Fixar jogo</string>
     <string name="action_unpin">Desafixar jogo</string>
     <string name="content_description_back">Voltar</string>
 
     <!-- Generator -->
     <string name="generator_title">Gerador de Jogos</string>
+    <string name="generator_controls_heading">Controles de geração</string>
+    <string name="generator_controls_subtitle">Defina modalidade, quantidade e filtros antes de gerar.</string>
     <string name="generator_select_lottery">Selecione a modalidade</string>
+    <string name="generator_number_sequence">Sequência</string>
     <string name="generator_quantity">Quantidade de jogos</string>
     <string name="generator_filters">Filtros</string>
     <string name="config_filters">Configurar filtros</string>
@@ -48,7 +57,9 @@
     <string name="generator_filters_active">Filtros ativos</string>
     <string name="generator_fine_tuning">Ajuste fino</string>
     <string name="filter_parity_range">Paridade: %1$d%% a %2$d%%</string>
+    <string name="filter_parity_range_short">Paridade %1$d–%2$d%%</string>
     <string name="filter_repeats_limit">Máx. repetidas do anterior: %1$d</string>
+    <string name="filter_repeats_limit_short">Repetidas ≤ %1$d</string>
     <string name="action_close">Fechar</string>
     <string name="report_details">Detalhes do relatório</string>
     <string name="report_attempts">Tentativas: %1$d</string>
@@ -58,10 +69,20 @@
         <item quantity="other">Geração parcial: foram gerados %1$d de %2$d jogos</item>
     </plurals>
     <string name="generator_total_cost">Custo total: %s</string>
+    <string name="generator_saved_confirmation">Jogos salvos</string>
+    <string name="generator_results_placeholder">Gere jogos para ver os resultados aqui.</string>
+    <string name="generator_pagination_page">Página %1$d de %2$d</string>
+    <string name="generator_pagination_range">Mostrando %1$d–%2$d de %3$d</string>
     <string name="apply_preset">Aplicar preset: %1$s</string>
     <string name="timemania_team_optional">Time do Coração (opcional)</string>
     <string name="timemania_random_team_saved">Aleatório (sortear ao salvar)</string>
     <string name="filter_all">Todos</string>
+    <string name="filter_last_10">Últimos 10</string>
+    <string name="filter_last_20">Últimos 20</string>
+    <string name="filter_last_50">Últimos 50</string>
+    <string name="filter_last_100">Últimos 100</string>
+    <string name="checker_history_prize_label">Vezes premiado com essa aposta</string>
+    <string name="filter_label_with_count">%1$s (%2$d)</string>
     <plurals name="snackbar_games_saved">
         <item quantity="one">%d jogo salvo com sucesso!</item>
         <item quantity="other">%d jogos salvos com sucesso!</item>
@@ -82,6 +103,10 @@
 
     <!-- Games -->
     <string name="games_title">Meus Jogos</string>
+    <string name="games_hit_rate_label">Taxa de acertos (últimos %1$d concursos): %2$d%%</string>
+    <string name="games_hit_rate_info">Sobre taxa de acertos</string>
+    <string name="games_hit_rate_info_message">%2$d%% significa que, nos últimos %1$d concursos, este jogo acertou ao menos uma dezena em %2$d%% deles.</string>
+    <string name="games_remove_snackbar">Jogo removido</string>
     <plurals name="games_count">
         <item quantity="one">%d jogo</item>
         <item quantity="other">%d jogos</item>
@@ -101,6 +126,16 @@
     <string name="about_title">Sobre</string>
     <string name="about_disclaimer">Este aplicativo é uma ferramenta de apoio para jogadores de loterias. Os resultados exibidos são obtidos da CAIXA e podem apresentar atrasos. Não nos responsabilizamos por eventuais divergências. Jogue com responsabilidade.</string>
     <string name="about_version">Versão %s</string>
+    <string name="about_tagline">Sua bússola para planejar loterias com dados oficiais.</string>
+    <string name="about_contact_title">Contato e suporte</string>
+    <string name="about_contact_description">Tem dúvidas, sugestões ou encontrou alguma inconsistência? Envie um e-mail ou acesse nossa central de suporte.</string>
+    <string name="about_contact_email">contato@cebolao.app</string>
+    <string name="about_contact_email_uri">mailto:contato@cebolao.app</string>
+    <string name="about_contact_support_label">Central de suporte</string>
+    <string name="about_contact_support_url">https://cebolao.app/contato</string>
+    <string name="about_source_label">Mais detalhes no site oficial da CAIXA</string>
+    <string name="about_source_url">https://loterias.caixa.gov.br</string>
+    <string name="about_header_status">Dados oficiais da CAIXA</string>
     <string name="about_lottery_info_title">Informações das loterias</string>
     <string name="about_min_bet">Aposta mínima</string>
     <string name="about_win_chance">Chance de ganhar</string>
@@ -161,7 +196,7 @@
     <string name="filter_primes_desc">Assegura presença de ao menos um primo</string>
     <!-- Dialogs -->
     <string name="dialog_delete_title">Excluir jogo?</string>
-    <string name="dialog_delete_message">Tem certeza que deseja excluir este jogo? Esta ação não pode ser desfeita.</string>
+    <string name="dialog_delete_message">Tem certeza que deseja excluir este jogo?</string>
     <string name="dialog_clear_title">Limpar gerados?</string>
     <string name="dialog_clear_message">Deseja descartar todos os jogos gerados não salvos?</string>
 
@@ -170,6 +205,13 @@
     <string name="checker_analysis_empty">Nenhuma premiação encontrada em concursos anteriores.</string>
     <string name="checker_analysis_subtitle">Premiações em concursos passados:</string>
     <string name="insight_sum">Soma: %d</string>
+    <string name="insight_label_sum">Soma</string>
+    <string name="insight_label_even_odd">Par/Ímpar</string>
+    <string name="insight_label_average">Média</string>
+    <string name="insight_label_longest_sequence">Sequência</string>
+    <string name="insight_label_multiples_of_3">Múltiplos de 3</string>
+    <string name="insight_label_primes">Primos</string>
+    <string name="insight_repeats_from_last">Repetidas do último: %1$d</string>
     <plurals name="insight_repeats">
         <item quantity="one">%d Repetida</item>
         <item quantity="other">%d Repetidas</item>

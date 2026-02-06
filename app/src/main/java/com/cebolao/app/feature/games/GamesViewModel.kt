@@ -9,7 +9,6 @@ import com.cebolao.domain.model.LotteryType
 import com.cebolao.domain.repository.LotteryRepository
 import com.cebolao.domain.result.AppResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,13 +16,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class GamesUiState(
     val filterType: LotteryType? = null,
-    val games: List<Game> = emptyList(),
+    val savedGames: List<SavedGameCardUiState> = emptyList(),
+    val countsByType: Map<LotteryType, Int> = emptyMap(),
+    val totalCount: Int = 0,
     val isLoading: Boolean = false,
 )
 
@@ -46,34 +47,45 @@ class GamesViewModel
             observeGames()
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         private fun observeGames() {
             viewModelScope.launch {
-                _filterType
-                    .flatMapLatest { type ->
-                        if (type == null) {
-                            repository.observeGames()
+                combine(repository.observeGames(), _filterType) { games, filter ->
+                    val filtered =
+                        if (filter == null) {
+                            games
                         } else {
-                            repository.observeGamesByType(type)
+                            games.filter { it.lotteryType == filter }
                         }
-                    }
+
+                    val counts = games.groupingBy { it.lotteryType }.eachCount()
+
+                    GamesUiState(
+                        filterType = filter,
+                        savedGames = filtered.map { it.toSavedGameCardUiState() },
+                        countsByType = counts,
+                        totalCount = games.size,
+                        isLoading = false,
+                    )
+                }
                     .catch {
-                        // Em caso de erro no flow, emite lista vazia para não quebrar a UI
-                        emit(emptyList())
-                    }
-                    .collect { games ->
-                        _uiState.value =
-                            _uiState.value.copy(
-                                games = games,
+                        emit(
+                            GamesUiState(
+                                filterType = _filterType.value,
+                                savedGames = emptyList(),
+                                countsByType = emptyMap(),
+                                totalCount = 0,
                                 isLoading = false,
-                            )
+                            ),
+                        )
+                    }
+                    .collect { state ->
+                        _uiState.value = state
                     }
             }
         }
 
         fun onFilterChanged(type: LotteryType?) {
             _filterType.value = type
-            _uiState.value = _uiState.value.copy(filterType = type)
         }
 
         fun onDeleteGame(game: Game) {

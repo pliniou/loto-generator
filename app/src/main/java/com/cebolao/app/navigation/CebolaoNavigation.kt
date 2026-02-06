@@ -5,8 +5,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.cebolao.app.feature.about.AboutScreen
 import com.cebolao.app.feature.checker.CheckerScreen
+import com.cebolao.app.feature.checker.CheckerPrefillArgs
 import com.cebolao.app.feature.games.GamesScreen
 import com.cebolao.app.feature.generator.GeneratorScreen
 import com.cebolao.app.feature.home.HomeScreen
@@ -19,6 +21,7 @@ fun CebolaoNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     startDestination: Route = Route.Home,
+    isLargeScreen: Boolean = false,
 ) {
     NavHost(
         navController = navController,
@@ -36,22 +39,45 @@ fun CebolaoNavHost(
         }
         composable<Route.Home> {
             HomeScreen(
+                isLargeScreen = isLargeScreen,
                 onNavigateToChecker = {
                     navController.navigate(Route.Checker)
                 },
             )
         }
         composable<Route.Generator> {
-            GeneratorScreen()
+            GeneratorScreen(isLargeScreen = isLargeScreen)
         }
         composable<Route.Games> {
-            GamesScreen()
+            GamesScreen(
+                onNavigateToGenerator = { navController.navigate(Route.Generator) },
+                onNavigateToChecker = { game ->
+                    navController.navigate(
+                        Route.CheckerPrefill(
+                            type = game.lotteryType,
+                            numbers = game.numbers,
+                            teamNumber = game.teamNumber,
+                        ),
+                    )
+                },
+            )
         }
         composable<Route.Checker> {
             CheckerScreen()
         }
+        composable<Route.CheckerPrefill> { backStackEntry ->
+            val args = backStackEntry.toRoute<Route.CheckerPrefill>()
+            CheckerScreen(
+                prefillArgs =
+                    CheckerPrefillArgs(
+                        type = args.type,
+                        numbers = args.numbers,
+                        teamNumber = args.teamNumber,
+                    ),
+            )
+        }
         composable<Route.About> {
-            AboutScreen()
+            AboutScreen(isLargeScreen = isLargeScreen)
         }
         composable<Route.Statistics> {
             com.cebolao.app.feature.statistics.StatisticsScreen()

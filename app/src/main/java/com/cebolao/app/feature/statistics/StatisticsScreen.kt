@@ -1,10 +1,13 @@
 package com.cebolao.app.feature.statistics
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -27,26 +28,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cebolao.R
+import com.cebolao.app.component.LotteryFilterBar
 import com.cebolao.app.feature.statistics.components.DistributionPanel
 import com.cebolao.app.feature.statistics.components.NumberFrequencyChart
 import com.cebolao.app.feature.statistics.components.NumberRecencyChart
+import com.cebolao.app.feature.statistics.components.QuadrantsPanel
 import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
 import com.cebolao.app.util.LotteryUiMapper
-import com.cebolao.domain.model.LotteryType
+
+private const val WIDE_WIDTH_BREAKPOINT_DP = 720
 
 @Composable
 fun StatisticsScreen(viewModel: StatisticsViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val spacing = LocalSpacing.current
     val lotteryColor = LotteryColors.getColor(state.selectedType)
+    val lotteryName = stringResource(LotteryUiMapper.getNameRes(state.selectedType))
+    val rangeLabel =
+        if (state.totalContestsAnalyzed > 0) {
+            "nos últimos ${state.totalContestsAnalyzed} concursos"
+        } else {
+            "nos últimos ${state.contestRange} concursos"
+        }
 
     CebolaoContent {
         Column(
@@ -64,41 +76,47 @@ fun StatisticsScreen(viewModel: StatisticsViewModel = hiltViewModel()) {
             )
             Spacer(modifier = Modifier.height(spacing.md))
 
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+            LotteryFilterBar(
+                selectedType = state.selectedType,
+                onSelectionChanged = { type -> type?.let(viewModel::onTypeSelected) },
+                showSelectedCheck = true,
                 modifier = Modifier.padding(bottom = spacing.lg),
-            ) {
-                items(items = LotteryType.entries, key = { it.name }) { type ->
-                    val isSelected = type == state.selectedType
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = { viewModel.onTypeSelected(type) },
-                        label = { Text(stringResource(LotteryUiMapper.getNameRes(type))) },
-                        colors =
-                            FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = LotteryColors.getColor(type),
-                                selectedLabelColor = LotteryColors.getOnColor(type),
-                            ),
-                    )
-                }
-            }
+            )
 
-            // Range Selector
-            Row(
+            Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = spacing.lg),
-                horizontalArrangement = Arrangement.spacedBy(spacing.sm),
-                verticalAlignment = Alignment.CenterVertically,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                elevation = CardDefaults.cardElevation(0.dp),
             ) {
-                Text(text = "Analisar:", style = MaterialTheme.typography.labelLarge)
-                listOf(50, 100, 200).forEach { range ->
-                    FilterChip(
-                        selected = state.contestRange == range,
-                        onClick = { viewModel.onRangeSelected(range) },
-                        label = { Text("Últimos $range") },
-                        colors =
-                            FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            ),
+                Column(modifier = Modifier.padding(horizontal = spacing.lg, vertical = spacing.md)) {
+                    Text(
+                        text = "Período analisado",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Spacer(modifier = Modifier.height(spacing.xs))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(spacing.sm, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        listOf(50, 100, 200).forEach { range ->
+                            FilterChip(
+                                selected = state.contestRange == range,
+                                onClick = { viewModel.onRangeSelected(range) },
+                                label = { Text("Últimos $range") },
+                                colors =
+                                    FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    ),
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(spacing.xs))
+                    Text(
+                        text = "$lotteryName • $rangeLabel",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -112,67 +130,63 @@ fun StatisticsScreen(viewModel: StatisticsViewModel = hiltViewModel()) {
                     visible = !state.isLoading,
                     enter = fadeIn() + expandVertically(),
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(spacing.xl)) {
-                        // Frequency Chart
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            elevation = CardDefaults.cardElevation(2.dp),
-                        ) {
-                            Column(modifier = Modifier.padding(spacing.lg)) {
-                                Text(
-                                    text = "Frequência dos Números",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = lotteryColor,
-                                )
-                                Text(
-                                    text = "Quantas vezes cada número saiu nos últimos ${state.totalContestsAnalyzed} concursos.",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                Spacer(modifier = Modifier.height(spacing.md))
-                                NumberFrequencyChart(
-                                    stats = state.numberStats,
-                                    barColor = lotteryColor,
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                            }
-                        }
+                    Crossfade(
+                        targetState = Pair(state.selectedType, state.contestRange),
+                        animationSpec = tween(durationMillis = 250),
+                        label = "statistics_crossfade",
+                    ) {
+                        BoxWithConstraints {
+                            val isWide = maxWidth >= WIDE_WIDTH_BREAKPOINT_DP.dp
+                            Column(verticalArrangement = Arrangement.spacedBy(spacing.xl)) {
+                                if (isWide) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(spacing.md),
+                                        modifier = Modifier.fillMaxWidth(),
+                                    ) {
+                                        FrequencyCard(
+                                            state = state,
+                                            lotteryColor = lotteryColor,
+                                            lotteryName = lotteryName,
+                                            rangeLabel = rangeLabel,
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                        RecencyCard(
+                                            state = state,
+                                            lotteryColor = lotteryColor,
+                                            rangeLabel = rangeLabel,
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                    }
+                                } else {
+                                    FrequencyCard(
+                                        state = state,
+                                        lotteryColor = lotteryColor,
+                                        lotteryName = lotteryName,
+                                        rangeLabel = rangeLabel,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    RecencyCard(
+                                        state = state,
+                                        lotteryColor = lotteryColor,
+                                        rangeLabel = rangeLabel,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
 
-                        // Recency Chart
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            elevation = CardDefaults.cardElevation(2.dp),
-                        ) {
-                            Column(modifier = Modifier.padding(spacing.lg)) {
-                                Text(
-                                    text = "Dezenas Atrasadas (Recência)",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = lotteryColor,
-                                )
-                                Text(
-                                    text = "Concursos sem sair. Barras altas = números frios.",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                Spacer(modifier = Modifier.height(spacing.md))
-                                NumberRecencyChart(
-                                    stats = state.numberStats,
-                                    lineColor = lotteryColor,
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                            }
-                        }
-
-                        // Distribution
-                        state.distributionStats?.let { dist ->
-                            Card(
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                elevation = CardDefaults.cardElevation(2.dp),
-                            ) {
-                                Column(modifier = Modifier.padding(spacing.lg)) {
-                                    DistributionPanel(stats = dist)
+                                // Distribution
+                                state.distributionStats?.let { dist ->
+                                    if (isWide) {
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(spacing.md),
+                                            modifier = Modifier.fillMaxWidth(),
+                                        ) {
+                                            DistributionCard(dist = dist, modifier = Modifier.weight(1f))
+                                            QuadrantsCard(dist = dist, modifier = Modifier.weight(1f))
+                                        }
+                                    } else {
+                                        DistributionCard(dist = dist, modifier = Modifier.fillMaxWidth())
+                                        QuadrantsCard(dist = dist, modifier = Modifier.fillMaxWidth())
+                                    }
                                 }
                             }
                         }
@@ -181,4 +195,169 @@ fun StatisticsScreen(viewModel: StatisticsViewModel = hiltViewModel()) {
             }
         }
     }
+}
+
+@Composable
+private fun DistributionCard(
+    dist: com.cebolao.domain.model.DistributionStats,
+    modifier: Modifier,
+) {
+    val spacing = LocalSpacing.current
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp),
+    ) {
+        Column(modifier = Modifier.padding(spacing.lg)) {
+            DistributionPanel(stats = dist)
+        }
+    }
+}
+
+@Composable
+private fun QuadrantsCard(
+    dist: com.cebolao.domain.model.DistributionStats,
+    modifier: Modifier,
+) {
+    val spacing = LocalSpacing.current
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp),
+    ) {
+        Column(modifier = Modifier.padding(spacing.lg)) {
+            QuadrantsPanel(quadrants = dist.quadrantDistribution)
+        }
+    }
+}
+
+@Composable
+private fun FrequencyCard(
+    state: StatisticsUiState,
+    lotteryColor: Color,
+    lotteryName: String,
+    rangeLabel: String,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = LocalSpacing.current
+
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp),
+    ) {
+        Column(modifier = Modifier.padding(spacing.lg)) {
+            Text(
+                text = "Frequência das dezenas — $rangeLabel",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = lotteryColor,
+            )
+            Text(
+                text = "Dados de $lotteryName. Destaques mostram as mais quentes e frias no período.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (state.numberStats.isNotEmpty()) {
+                val hottest = state.highlights.maxFrequencyNumbers.firstOrNull()
+                Spacer(modifier = Modifier.height(spacing.xs))
+                hottest?.let {
+                    Text(
+                        text = "Número que mais saiu: $it (${state.highlights.maxFrequencyValue} vezes)",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+                Text(
+                    text =
+                        "Mais frequentes (${state.highlights.maxFrequencyValue}x): ${formatNumberList(state.highlights.maxFrequencyNumbers)}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text =
+                        "Menos frequentes (${state.highlights.minFrequencyValue}x): ${formatNumberList(state.highlights.minFrequencyNumbers)}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(modifier = Modifier.height(spacing.md))
+            NumberFrequencyChart(
+                stats = state.numberStats,
+                barColor = lotteryColor,
+                highlightMaxNumbers = state.highlights.maxFrequencyNumbers.toSet(),
+                highlightMinNumbers = state.highlights.minFrequencyNumbers.toSet(),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun RecencyCard(
+    state: StatisticsUiState,
+    lotteryColor: Color,
+    rangeLabel: String,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = LocalSpacing.current
+
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp),
+    ) {
+        Column(modifier = Modifier.padding(spacing.lg)) {
+            Text(
+                text = "Dezenas atrasadas — $rangeLabel",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = lotteryColor,
+            )
+            Text(
+                text = "Barras discretas por número. Toque em uma barra para ver há quantos concursos ela não aparece.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (state.numberStats.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(spacing.xs))
+                val delayLabel =
+                    if (state.highlights.maxDelayValue < 0) {
+                        "nunca saiu neste recorte"
+                    } else {
+                        "há ${state.highlights.maxDelayValue} concursos"
+                    }
+                val mostDelayed = state.highlights.maxDelayNumbers.firstOrNull()
+                mostDelayed?.let {
+                    Text(
+                        text = "Número mais atrasado: $it ($delayLabel)",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+                Text(
+                    text =
+                        "Mais atrasadas: ${formatNumberList(state.highlights.maxDelayNumbers)} ($delayLabel)",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(modifier = Modifier.height(spacing.md))
+            NumberRecencyChart(
+                stats = state.numberStats,
+                barColor = lotteryColor,
+                highlightColor = MaterialTheme.colorScheme.error,
+                highlightedNumbers = state.highlights.topDelayNumbers.toSet(),
+                topLabeledNumbers = state.highlights.topDelayNumbers.toSet(),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+private fun formatNumberList(numbers: List<Int>, limit: Int = 6): String {
+    if (numbers.isEmpty()) return "-"
+    val trimmed = numbers.take(limit)
+    val suffix = if (numbers.size > limit) "..." else ""
+    return trimmed.joinToString(", ") + suffix
 }

@@ -1,5 +1,6 @@
 package com.cebolao.app.navigation
 
+import com.cebolao.domain.model.LotteryType
 import kotlinx.serialization.Serializable
 
 /**
@@ -23,6 +24,13 @@ sealed interface Route {
 
     @Serializable
     data object Checker : Route
+
+    @Serializable
+    data class CheckerPrefill(
+        val type: LotteryType,
+        val numbers: List<Int>,
+        val teamNumber: Int? = null,
+    ) : Route
 
     @Serializable
     data object About : Route

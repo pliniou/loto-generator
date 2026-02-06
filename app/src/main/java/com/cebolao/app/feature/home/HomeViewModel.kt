@@ -26,6 +26,8 @@ data class HomeUiState(
     val isSyncing: Boolean = false,
     val isLoading: Boolean = false, // Initial load or empty state load
     val error: AppError? = null,
+    val upcomingDrawsExpanded: Boolean = false,
+    val latestResultsExpanded: Boolean = false,
 )
 
 @HiltViewModel
@@ -54,7 +56,18 @@ class HomeViewModel
             }
         }
 
-        fun refreshData() {
+        fun toggleUpcomingDrawsExpanded() {
+            _uiState.value = _uiState.value.copy(
+                upcomingDrawsExpanded = !_uiState.value.upcomingDrawsExpanded
+            )
+        }
+
+        fun toggleLatestResultsExpanded() {
+            _uiState.value = _uiState.value.copy(
+                latestResultsExpanded = !_uiState.value.latestResultsExpanded
+            )
+        }
+            fun refreshData() {
             viewModelScope.launch {
                 val hasLocalData =
                     when (val local = repository.getLastContest(LotteryType.LOTOFACIL)) {

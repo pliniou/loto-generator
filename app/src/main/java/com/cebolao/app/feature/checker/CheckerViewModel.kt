@@ -38,7 +38,20 @@ data class CheckerUiState(
     val numberStats: List<NumberStat> = emptyList(),
     val isAnalyzing: Boolean = false,
     val showAnalysisDialog: Boolean = false,
+    val matchedNumbers: Set<Int> = emptySet(),
+    val statsFilter: StatsFilter = StatsFilter.ALL,
+    val isContestSelectorExpanded: Boolean = false,
+    val contestSearchQuery: String = "",
+    val availableContests: List<Contest> = emptyList(),
 )
+
+enum class StatsFilter(val labelRes: Int) {
+    ALL(com.cebolao.R.string.filter_all),
+    LAST_10(com.cebolao.R.string.filter_last_10),
+    LAST_20(com.cebolao.R.string.filter_last_20),
+    LAST_50(com.cebolao.R.string.filter_last_50),
+    LAST_100(com.cebolao.R.string.filter_last_100),
+}
 
 data class CheckerResult(
     val hits: Int,
@@ -72,6 +85,7 @@ class CheckerViewModel
 
         // Cache for analysis to avoid re-collecting massive flows
         private var cachedContests: List<Contest> = emptyList()
+        private var hasAppliedPrefill = false
 
         init {
             loadData(LotteryType.LOTOFACIL)
@@ -95,8 +109,14 @@ class CheckerViewModel
                     bestHit = 0,
                     prizeCount = 0,
                     totalContestsChecked = 0,
+
                     numberStats = emptyList(),
                     showAnalysisDialog = false,
+                    matchedNumbers = emptySet(),
+                    statsFilter = StatsFilter.ALL,
+                    isContestSelectorExpanded = false,
+                    contestSearchQuery = "",
+                    availableContests = emptyList(),
                 )
             loadData(type)
         }
@@ -141,6 +161,16 @@ class CheckerViewModel
             _uiState.value = _uiState.value.copy(selectedTeam = teamId, checkResult = null)
         }
 
+        fun applyPrefillOnce(
+            type: LotteryType,
+            numbers: List<Int>,
+            teamNumber: Int?,
+        ) {
+            if (hasAppliedPrefill) return
+            hasAppliedPrefill = true
+            prefillGame(type, numbers, teamNumber)
+        }
+
         fun onCheck() {
             val state = _uiState.value
             val contest = state.lastContest ?: return
@@ -173,10 +203,16 @@ class CheckerViewModel
                     )
                 }
 
-            val bestHit = history.maxOfOrNull { it.hits } ?: 0
-            val prizeCount = history.count { it.isPrize }
+            val filteredHistory = applyFilter(history, state.statsFilter)
+            val filteredContests = applyContestFilter(cachedContests, state.statsFilter)
 
-            val numberStats = calculateStatisticsUseCase.calculateNumberStats(cachedContests, profile)
+            val bestHit = filteredHistory.maxOfOrNull { it.hits } ?: 0
+            val prizeCount = filteredHistory.count { it.isPrize }
+
+            val numberStats = calculateStatisticsUseCase.calculateNumberStats(filteredContests, profile)
+
+            val resultNumbers = contest.getAllNumbers().toSet()
+            val matched = gameNumbers.filter { it in resultNumbers }.toSet()
 
             _uiState.value =
                 state.copy(
@@ -189,12 +225,66 @@ class CheckerViewModel
                             prizeTier = latestResult.prizeTier,
                             isPrize = latestResult.isPrize,
                         ),
-                    historyResults = history.sortedByDescending { it.contestNumber },
+                    matchedNumbers = matched,
+                    historyResults = filteredHistory.sortedByDescending { it.contestNumber },
                     bestHit = bestHit,
                     prizeCount = prizeCount,
-                    totalContestsChecked = history.size,
+                    totalContestsChecked = filteredHistory.size,
                     numberStats = numberStats,
                 )
+        }
+
+        fun onStatsFilterSelected(filter: StatsFilter) {
+            _uiState.value = _uiState.value.copy(statsFilter = filter)
+            // Re-run check if we already have a result, to update stats based on new filter
+            if (_uiState.value.checkResult != null) {
+                onCheck()
+            }
+        }
+
+        fun onContestSearchQueryChanged(query: String) {
+            _uiState.value = _uiState.value.copy(contestSearchQuery = query)
+        }
+
+        fun onContestSelected(contest: Contest) {
+            _uiState.value =
+                _uiState.value.copy(
+                    lastContest = contest,
+                    isContestSelectorExpanded = false,
+                    contestSearchQuery = "",
+                    checkResult = null, // Reset result when changing contest
+                    matchedNumbers = emptySet(),
+                )
+        }
+
+        fun onContestSelectorToggle(expanded: Boolean) {
+            _uiState.value = _uiState.value.copy(isContestSelectorExpanded = expanded)
+        }
+
+        private fun applyFilter(history: List<HistoryHit>, filter: StatsFilter): List<HistoryHit> {
+            // History is usually generated for ALL cached contests. We just take the last N.
+            // Note: History generation in onCheck iterates over cachedContests.
+            // cachedContests are usually ordered descending or ascending? Repository default is usually desc (latest first).
+            // Let's assume we sort by ID descending before filtering to get "Latest N".
+            val sorted = history.sortedByDescending { it.contestNumber }
+            return when (filter) {
+                StatsFilter.ALL -> sorted
+                StatsFilter.LAST_10 -> sorted.take(10)
+                StatsFilter.LAST_20 -> sorted.take(20)
+                StatsFilter.LAST_50 -> sorted.take(50)
+                StatsFilter.LAST_100 -> sorted.take(100)
+            }
+        }
+
+        private fun applyContestFilter(contests: List<Contest>, filter: StatsFilter): List<Contest> {
+             val sorted = contests.sortedByDescending { it.id }
+             return when (filter) {
+                StatsFilter.ALL -> sorted
+                StatsFilter.LAST_10 -> sorted.take(10)
+                StatsFilter.LAST_20 -> sorted.take(20)
+                StatsFilter.LAST_50 -> sorted.take(50)
+                StatsFilter.LAST_100 -> sorted.take(100)
+            }
         }
 
         fun onAnalyzeHistory() {
@@ -223,6 +313,47 @@ class CheckerViewModel
             _uiState.value = _uiState.value.copy(showAnalysisDialog = false)
         }
 
+        private fun prefillGame(
+            type: LotteryType,
+            numbers: List<Int>,
+            teamNumber: Int?,
+        ) {
+            val normalizedNumbers =
+                if (type == LotteryType.SUPER_SETE) {
+                    val padded = numbers.take(7).toMutableList()
+                    while (padded.size < 7) padded.add(-1)
+                    padded.toList()
+                } else {
+                    numbers.sorted()
+                }
+
+            _uiState.value =
+                _uiState.value.copy(
+                    selectedType = type,
+                    selectedNumbers = normalizedNumbers,
+                    checkResult = null,
+                    lastContest = null,
+                    selectedTeam = if (type == LotteryType.TIMEMANIA) teamNumber else null,
+                    teamHit = null,
+                    profile = null,
+                    selectedDuplaMode = DuplaMode.BEST,
+                    analysisResults = emptyList(),
+                    historyResults = emptyList(),
+                    bestHit = 0,
+                    prizeCount = 0,
+                    totalContestsChecked = 0,
+                    numberStats = emptyList(),
+
+                    isAnalyzing = false,
+                    showAnalysisDialog = false,
+                    matchedNumbers = emptySet(),
+                    isContestSelectorExpanded = false,
+                    contestSearchQuery = "",
+                    statsFilter = StatsFilter.ALL,
+                )
+            loadData(type)
+        }
+
         private fun loadData(type: LotteryType) {
             contestsJob?.cancel()
             cachedContests = emptyList()
@@ -236,7 +367,14 @@ class CheckerViewModel
                     repository.observeContests(type).collect { contests ->
                         cachedContests = contests
                         val latest = contests.firstOrNull()
-                        _uiState.value = _uiState.value.copy(lastContest = latest)
+                        val currentLast = _uiState.value.lastContest
+                        // Keep current selected contest if it exists, otherwise use latest
+                        val activeContest = if (currentLast != null && contests.any { it.id == currentLast.id }) currentLast else latest
+
+                        _uiState.value = _uiState.value.copy(
+                            lastContest = activeContest,
+                            availableContests = contests
+                        )
                     }
                 }
         }

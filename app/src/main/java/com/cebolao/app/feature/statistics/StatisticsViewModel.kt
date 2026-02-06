@@ -28,6 +28,17 @@ data class StatisticsUiState(
     val isLoading: Boolean = false,
     val totalContestsAnalyzed: Int = 0,
     val contestRange: Int = 100, // Default to last 100 contests
+    val highlights: HighlightStats = HighlightStats(),
+)
+
+data class HighlightStats(
+    val maxFrequencyNumbers: List<Int> = emptyList(),
+    val minFrequencyNumbers: List<Int> = emptyList(),
+    val maxDelayNumbers: List<Int> = emptyList(),
+    val topDelayNumbers: List<Int> = emptyList(),
+    val maxFrequencyValue: Int = 0,
+    val minFrequencyValue: Int = 0,
+    val maxDelayValue: Int = 0,
 )
 
 @HiltViewModel
@@ -99,9 +110,33 @@ class StatisticsViewModel
                                 numberStats = numberStats.sortedByDescending { it.frequency },
                                 distributionStats = distribution,
                                 totalContestsAnalyzed = contestsToAnalyze.size,
+                                highlights = buildHighlights(numberStats),
                                 isLoading = false,
                             )
                     }
                 }
+        }
+
+        private fun buildHighlights(numberStats: List<NumberStat>): HighlightStats {
+            if (numberStats.isEmpty()) return HighlightStats()
+
+            val maxFreq = numberStats.maxOf { it.frequency }
+            val minFreq = numberStats.minOf { it.frequency }
+            val maxDelay = numberStats.maxOf { it.delay }
+            val topDelay =
+                numberStats
+                    .sortedByDescending { it.delay }
+                    .take(3)
+                    .map { it.number }
+
+            return HighlightStats(
+                maxFrequencyNumbers = numberStats.filter { it.frequency == maxFreq }.map { it.number }.sorted(),
+                minFrequencyNumbers = numberStats.filter { it.frequency == minFreq }.map { it.number }.sorted(),
+                maxDelayNumbers = numberStats.filter { it.delay == maxDelay }.map { it.number }.sorted(),
+                topDelayNumbers = topDelay.sorted(),
+                maxFrequencyValue = maxFreq,
+                minFrequencyValue = minFreq,
+                maxDelayValue = maxDelay,
+            )
         }
     }

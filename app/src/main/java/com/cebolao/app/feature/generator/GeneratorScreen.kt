@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -74,11 +76,15 @@ import com.cebolao.app.theme.LocalSpacing
 import com.cebolao.app.theme.LotteryColors
 import com.cebolao.app.ui.layout.CebolaoContent
 import com.cebolao.domain.util.LotteryInfoProvider
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
+fun GeneratorScreen(
+    isLargeScreen: Boolean = false,
+    viewModel: GeneratorViewModel = hiltViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val spacing = LocalSpacing.current
@@ -97,6 +103,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
     var showTeamDialog by remember { mutableStateOf(false) }
     var showClearConfirmation by remember { mutableStateOf(false) }
     var showInfoSheet by remember { mutableStateOf(false) }
+    var showSavedConfirmation by remember { mutableStateOf(false) }
     var selectedGameForDetails by remember { mutableStateOf<com.cebolao.domain.model.Game?>(null) }
 
     // Derived states to avoid recomposition when list changes but derived state doesn't
@@ -108,7 +115,7 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
         ConfirmationDialog(
             title = stringResource(R.string.dialog_clear_title),
             text = stringResource(R.string.dialog_clear_message),
-            confirmText = stringResource(R.string.action_clear),
+            confirmText = stringResource(R.string.action_discard),
             onConfirm = {
                 viewModel.onClearGenerated()
                 showClearConfirmation = false
@@ -191,7 +198,10 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
     LaunchedEffect(uiState.lastSavedCount) {
         if (uiState.lastSavedCount > 0) {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            showSavedConfirmation = true
             snackbarHostState.showSnackbar(savedGamesMessage)
+            delay(1200)
+            showSavedConfirmation = false
         }
     }
 
@@ -213,107 +223,253 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
 
     CebolaoContent {
         Box(modifier = Modifier.fillMaxSize()) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding =
-                    PaddingValues(
-                        top = spacing.lg,
-                        bottom = ComponentDimensions.bottomContentPadding,
-                    ),
-                // Espaço para a barra inferior
-                verticalArrangement = Arrangement.spacedBy(spacing.lg),
-            ) {
-                // 0. Recomendação (se houver)
-                if (recommendedPreset != null && uiState.recommendation != null) {
-                    item {
-                        RecommendationCard(
-                            stats = uiState.recommendation!!,
-                            onApply = { viewModel.onApplyUserPreset(recommendedPreset) },
-                            onDismiss = { /* Optional: add dismiss logic to VM */ },
-                        )
-                    }
-                }
+            if (isLargeScreen) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(spacing.lg),
+                ) {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        contentPadding =
+                            PaddingValues(
+                                top = spacing.lg,
+                                bottom = ComponentDimensions.bottomContentPadding,
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(spacing.lg),
+                    ) {
+                        if (recommendedPreset != null && uiState.recommendation != null) {
+                            item {
+                                RecommendationCard(
+                                    stats = uiState.recommendation!!,
+                                    onApply = { viewModel.onApplyUserPreset(recommendedPreset) },
+                                    onDismiss = { /* Optional: add dismiss logic to VM */ },
+                                )
+                            }
+                        }
 
-                // 1. Config Section
-                item {
-                    GeneratorConfigSection(
-                        selectedType = uiState.selectedType,
-                        quantity = uiState.quantity,
-                        activeFilters = uiState.activeFilters,
-                        profile = uiState.profile,
-                        onTypeSelected = { viewModel.onTypeSelected(it) },
-                        onQuantityChanged = { viewModel.onQuantityChanged(it) },
-                        onFilterToggled = { viewModel.onFilterToggled(it) },
-                        onOpenFilterConfig = { viewModel.onOpenFilterConfig() },
-                        onInfoClick = { showInfoSheet = true },
-                    )
-                }
-
-                // 2. Timemania
-                item {
-                    TimemaniaTeamCard(
-                        selectedType = uiState.selectedType,
-                        selectedTeam = uiState.selectedTeam,
-                        onShowTeamDialog = { showTeamDialog = true },
-                    )
-                }
-
-                // 3. Ação Gerar
-                if (!hasGeneratedGames) {
-                    item {
-                        Spacer(modifier = Modifier.height(spacing.md))
-                        Button(
-                            onClick = { viewModel.onGenerate() },
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .height(ComponentDimensions.generatorButtonHeight),
-                            shape = MaterialTheme.shapes.large,
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                            colors =
-                                ButtonDefaults.buttonColors(
-                                    containerColor = LotteryColors.getColor(uiState.selectedType),
-                                    contentColor = LotteryColors.getOnColor(uiState.selectedType),
-                                ),
-                        ) {
-                            Text(
-                                text =
-                                    pluralStringResource(
-                                        R.plurals.action_generate,
-                                        uiState.quantity,
-                                        uiState.quantity,
-                                    ),
-                                fontWeight = FontWeight.ExtraBold,
-                                style = MaterialTheme.typography.titleMedium,
+                        item {
+                            GeneratorConfigSection(
+                                selectedType = uiState.selectedType,
+                                quantity = uiState.quantity,
+                                activeFilters = uiState.activeFilters,
+                                filterConfigs = uiState.filterConfigs,
+                                profile = uiState.profile,
+                                onTypeSelected = { viewModel.onTypeSelected(it) },
+                                onQuantityChanged = { viewModel.onQuantityChanged(it) },
+                                onFilterToggled = { viewModel.onFilterToggled(it) },
+                                onOpenFilterConfig = { viewModel.onOpenFilterConfig() },
+                                onInfoClick = { showInfoSheet = true },
                             )
+                        }
+
+                        item {
+                            TimemaniaTeamCard(
+                                selectedType = uiState.selectedType,
+                                selectedTeam = uiState.selectedTeam,
+                                onShowTeamDialog = { showTeamDialog = true },
+                            )
+                        }
+
+                        if (!hasGeneratedGames) {
+                            item {
+                                Spacer(modifier = Modifier.height(spacing.md))
+                                Button(
+                                    onClick = { viewModel.onGenerate() },
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .height(ComponentDimensions.generatorButtonHeight),
+                                    shape = MaterialTheme.shapes.large,
+                                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                                    colors =
+                                        ButtonDefaults.buttonColors(
+                                            containerColor = LotteryColors.getColor(uiState.selectedType),
+                                            contentColor = LotteryColors.getOnColor(uiState.selectedType),
+                                        ),
+                                ) {
+                                    Text(
+                                        text =
+                                            pluralStringResource(
+                                                R.plurals.action_generate,
+                                                uiState.quantity,
+                                                uiState.quantity,
+                                            ),
+                                        fontWeight = FontWeight.ExtraBold,
+                                        style = MaterialTheme.typography.titleMedium,
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    LazyColumn(
+                        modifier = Modifier.weight(1.35f).fillMaxHeight(),
+                        contentPadding =
+                            PaddingValues(
+                                top = spacing.lg,
+                                bottom = ComponentDimensions.bottomContentPadding,
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(spacing.sm),
+                    ) {
+                        if (hasGeneratedGames) {
+                            item {
+                                GeneratorResultsSection(
+                                    generatedCount = uiState.generatedGames.size,
+                                    quantity = uiState.quantity,
+                                    report = uiState.generationReport,
+                                    onOpenReportDetails = { viewModel.onOpenReportDetails() },
+                                    onRetry = { viewModel.onGenerate() },
+                                )
+                            }
+
+                            if (uiState.generatedGames.size > uiState.generatedGamesPageSize) {
+                                item {
+                                    com.cebolao.app.feature.generator.components.GeneratorPaginationControls(
+                                        total = uiState.generatedGames.size,
+                                        page = uiState.generatedGamesPage,
+                                        pageSize = uiState.generatedGamesPageSize,
+                                        onPrevious = { viewModel.onPreviousGeneratedGamesPage() },
+                                        onNext = { viewModel.onNextGeneratedGamesPage() },
+                                    )
+                                }
+                            }
+
+                            items(items = uiState.visibleGeneratedGames, key = { it.id }) { game ->
+                                GeneratedGameItem(
+                                    game = game,
+                                    lastContest = uiState.lastContest,
+                                    onClick = { selectedGameForDetails = game },
+                                    modifier = Modifier,
+                                )
+                            }
+                        } else {
+                            item {
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_LOW),
+                                    shape = MaterialTheme.shapes.large,
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.generator_results_placeholder),
+                                        modifier = Modifier.padding(spacing.lg),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding =
+                        PaddingValues(
+                            top = spacing.lg,
+                            bottom = ComponentDimensions.bottomContentPadding,
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(spacing.sm),
+                ) {
+                    if (recommendedPreset != null && uiState.recommendation != null) {
+                        item {
+                            RecommendationCard(
+                                stats = uiState.recommendation!!,
+                                onApply = { viewModel.onApplyUserPreset(recommendedPreset) },
+                                onDismiss = { /* Optional: add dismiss logic to VM */ },
+                            )
+                        }
+                    }
 
-                // 4. Resultados
-                if (hasGeneratedGames) {
                     item {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(vertical = spacing.sm),
-                            thickness = 0.5.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
-                        )
-                        GeneratorResultsSection(
-                            generatedCount = uiState.generatedGames.size,
+                        GeneratorConfigSection(
+                            selectedType = uiState.selectedType,
                             quantity = uiState.quantity,
-                            report = uiState.generationReport,
-                            onOpenReportDetails = { viewModel.onOpenReportDetails() },
-                            onRetry = { viewModel.onGenerate() },
+                            activeFilters = uiState.activeFilters,
+                            filterConfigs = uiState.filterConfigs,
+                            profile = uiState.profile,
+                            onTypeSelected = { viewModel.onTypeSelected(it) },
+                            onQuantityChanged = { viewModel.onQuantityChanged(it) },
+                            onFilterToggled = { viewModel.onFilterToggled(it) },
+                            onOpenFilterConfig = { viewModel.onOpenFilterConfig() },
+                            onInfoClick = { showInfoSheet = true },
                         )
                     }
 
-                    items(items = uiState.generatedGames, key = { it.id }) { game ->
-                        GeneratedGameItem(
-                            game = game,
-                            lastContest = uiState.lastContest,
-                            onClick = { selectedGameForDetails = game },
-                            modifier = Modifier,
+                    item {
+                        TimemaniaTeamCard(
+                            selectedType = uiState.selectedType,
+                            selectedTeam = uiState.selectedTeam,
+                            onShowTeamDialog = { showTeamDialog = true },
                         )
+                    }
+
+                    if (!hasGeneratedGames) {
+                        item {
+                            Spacer(modifier = Modifier.height(spacing.md))
+                            Button(
+                                onClick = { viewModel.onGenerate() },
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(ComponentDimensions.generatorButtonHeight),
+                                shape = MaterialTheme.shapes.large,
+                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                                colors =
+                                    ButtonDefaults.buttonColors(
+                                        containerColor = LotteryColors.getColor(uiState.selectedType),
+                                        contentColor = LotteryColors.getOnColor(uiState.selectedType),
+                                    ),
+                            ) {
+                                Text(
+                                    text =
+                                        pluralStringResource(
+                                            R.plurals.action_generate,
+                                            uiState.quantity,
+                                            uiState.quantity,
+                                        ),
+                                    fontWeight = FontWeight.ExtraBold,
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                            }
+                        }
+                    }
+
+                    if (hasGeneratedGames) {
+                        item {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = spacing.sm),
+                                thickness = 0.5.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = AlphaLevels.BORDER_FAINT),
+                            )
+                            GeneratorResultsSection(
+                                generatedCount = uiState.generatedGames.size,
+                                quantity = uiState.quantity,
+                                report = uiState.generationReport,
+                                onOpenReportDetails = { viewModel.onOpenReportDetails() },
+                                onRetry = { viewModel.onGenerate() },
+                            )
+                        }
+
+                        if (uiState.generatedGames.size > uiState.generatedGamesPageSize) {
+                            item {
+                                com.cebolao.app.feature.generator.components.GeneratorPaginationControls(
+                                    total = uiState.generatedGames.size,
+                                    page = uiState.generatedGamesPage,
+                                    pageSize = uiState.generatedGamesPageSize,
+                                    onPrevious = { viewModel.onPreviousGeneratedGamesPage() },
+                                    onNext = { viewModel.onNextGeneratedGamesPage() },
+                                )
+                            }
+                        }
+
+                        items(items = uiState.visibleGeneratedGames, key = { it.id }) { game ->
+                            GeneratedGameItem(
+                                game = game,
+                                lastContest = uiState.lastContest,
+                                onClick = { selectedGameForDetails = game },
+                                modifier = Modifier,
+                            )
+                        }
                     }
                 }
             }
@@ -329,7 +485,17 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                 visible = showActionBar,
                 onClear = { showClearConfirmation = true },
                 onSave = { viewModel.onSaveAll() },
-                modifier = Modifier.align(Alignment.BottomCenter),
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter),
+            )
+
+            GeneratorSaveFeedback(
+                visible = showSavedConfirmation,
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = spacing.xxxl + spacing.md),
             )
 
             SnackbarHost(
@@ -337,8 +503,54 @@ fun GeneratorScreen(viewModel: GeneratorViewModel = hiltViewModel()) {
                 modifier =
                     Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(bottom = if (uiState.generatedGames.isNotEmpty()) 100.dp else spacing.lg),
+                        .padding(
+                            bottom =
+                                if (uiState.generatedGames.isNotEmpty()) {
+                                    ComponentDimensions.bottomBarHeight + spacing.xl
+                                } else {
+                                    spacing.lg
+                                },
+                        ),
             )
+        }
+    }
+}
+
+@Composable
+private fun GeneratorSaveFeedback(
+    visible: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val spacing = LocalSpacing.current
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+        exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 }),
+        modifier = modifier,
+    ) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.primaryContainer,
+            tonalElevation = 4.dp,
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = spacing.md, vertical = spacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(spacing.xs),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(18.dp),
+                )
+                Text(
+                    text = stringResource(R.string.generator_saved_confirmation),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
         }
     }
 }
@@ -405,7 +617,7 @@ private fun GeneratorBottomBar(
                 ) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = null)
                     Spacer(modifier = Modifier.width(spacing.sm))
-                    Text(stringResource(R.string.action_cancel), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.action_discard), fontWeight = FontWeight.Bold)
                 }
 
                 Button(
@@ -416,7 +628,7 @@ private fun GeneratorBottomBar(
                 ) {
                     Icon(imageVector = Icons.Default.Check, contentDescription = null)
                     Spacer(modifier = Modifier.width(spacing.sm))
-                    Text(stringResource(R.string.action_save), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.action_save_games), fontWeight = FontWeight.Bold)
                 }
             }
         }

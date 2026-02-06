@@ -43,6 +43,9 @@ data class GeneratorUiState(
     val quantity: Int = 1,
     val profile: LotteryProfile? = null,
     val generatedGames: List<Game> = emptyList(),
+    val visibleGeneratedGames: List<Game> = emptyList(),
+    val generatedGamesPage: Int = 0,
+    val generatedGamesPageSize: Int = 20,
     val isLoading: Boolean = false,
     val lastSavedCount: Int = 0,
     val selectedTeam: Int? = null,
@@ -68,6 +71,10 @@ class GeneratorViewModel
         private val generateGamesUseCase: GenerateGamesUseCase,
         @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     ) : ViewModel() {
+        private companion object {
+            const val DEFAULT_GENERATED_GAMES_PAGE_SIZE = 20
+        }
+
         private val _uiState = MutableStateFlow(GeneratorUiState())
         val uiState: StateFlow<GeneratorUiState> = _uiState.asStateFlow()
 
@@ -138,11 +145,17 @@ class GeneratorViewModel
                     }
 
                     _uiState.value =
-                        currentState.copy(
-                            generatedGames = games,
-                            isLoading = false,
-                            lastSavedCount = 0,
-                            generationReport = result.report,
+                        applyGeneratedGamesPage(
+                            state =
+                                currentState.copy(
+                                    generatedGames = games,
+                                    isLoading = false,
+                                    lastSavedCount = 0,
+                                    generationReport = result.report,
+                                    generatedGamesPage = 0,
+                                    generatedGamesPageSize = DEFAULT_GENERATED_GAMES_PAGE_SIZE,
+                                ),
+                            page = 0,
                         )
                     currentState.activePresetName?.let { presetName ->
                         userStatisticsRepository.recordUsage(presetName)
@@ -181,6 +194,8 @@ class GeneratorViewModel
                         _uiState.value =
                             currentState.copy(
                                 generatedGames = emptyList(),
+                                visibleGeneratedGames = emptyList(),
+                                generatedGamesPage = 0,
                                 lastSavedCount = currentState.generatedGames.size,
                                 isLoading = false,
                             )
@@ -200,7 +215,57 @@ class GeneratorViewModel
         }
 
         fun onClearGenerated() {
-            _uiState.value = _uiState.value.copy(generatedGames = emptyList(), lastSavedCount = 0, generationReport = null)
+            _uiState.value =
+                _uiState.value.copy(
+                    generatedGames = emptyList(),
+                    visibleGeneratedGames = emptyList(),
+                    generatedGamesPage = 0,
+                    lastSavedCount = 0,
+                    generationReport = null,
+                )
+        }
+
+        fun onNextGeneratedGamesPage() {
+            val current = _uiState.value
+            val maxPage = maxPageFor(current.generatedGames.size, current.generatedGamesPageSize)
+            val next = (current.generatedGamesPage + 1).coerceAtMost(maxPage)
+            if (next == current.generatedGamesPage) return
+            _uiState.value = applyGeneratedGamesPage(current, page = next)
+        }
+
+        fun onPreviousGeneratedGamesPage() {
+            val current = _uiState.value
+            val prev = (current.generatedGamesPage - 1).coerceAtLeast(0)
+            if (prev == current.generatedGamesPage) return
+            _uiState.value = applyGeneratedGamesPage(current, page = prev)
+        }
+
+        private fun applyGeneratedGamesPage(
+            state: GeneratorUiState,
+            page: Int,
+        ): GeneratorUiState {
+            if (state.generatedGames.isEmpty()) {
+                return state.copy(visibleGeneratedGames = emptyList(), generatedGamesPage = 0)
+            }
+
+            val safePageSize = state.generatedGamesPageSize.coerceAtLeast(1)
+            val safePage = page.coerceIn(0, maxPageFor(state.generatedGames.size, safePageSize))
+            val from = safePage * safePageSize
+            val visible = state.generatedGames.drop(from).take(safePageSize)
+            return state.copy(
+                visibleGeneratedGames = visible,
+                generatedGamesPage = safePage,
+                generatedGamesPageSize = safePageSize,
+            )
+        }
+
+        private fun maxPageFor(
+            total: Int,
+            pageSize: Int,
+        ): Int {
+            if (total <= 0) return 0
+            val safePageSize = pageSize.coerceAtLeast(1)
+            return (total - 1) / safePageSize
         }
 
         fun onFilterToggled(filter: GenerationFilter) {
@@ -290,6 +355,9 @@ class GeneratorViewModel
                         selectedType = type,
                         profile = profile,
                         generatedGames = emptyList(),
+                        visibleGeneratedGames = emptyList(),
+                        generatedGamesPage = 0,
+                        generatedGamesPageSize = DEFAULT_GENERATED_GAMES_PAGE_SIZE,
                         lastSavedCount = 0,
                         selectedTeam = null,
                         activeFilters = filteredFilters,

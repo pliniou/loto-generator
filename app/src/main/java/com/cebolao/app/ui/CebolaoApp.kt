@@ -1,10 +1,11 @@
 package com.cebolao.app.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -24,9 +25,9 @@ import com.cebolao.app.theme.CebolaoTheme
  * Configura tema, navegação e bottom bar.
  */
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun CebolaoApp(startDestination: Route = Route.Home) {
+fun CebolaoApp(modifier: Modifier = Modifier, startDestination: Route = Route.Home, isLargeScreen: Boolean = false) {
     CebolaoTheme {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -35,7 +36,7 @@ fun CebolaoApp(startDestination: Route = Route.Home) {
         val isOnboarding = currentDestination?.hasRoute<Route.Onboarding>() == true
 
         Scaffold(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 if (!isOnboarding) {
@@ -44,7 +45,8 @@ fun CebolaoApp(startDestination: Route = Route.Home) {
                             currentDestination?.hasRoute<Route.Home>() == true -> R.string.home_title
                             currentDestination?.hasRoute<Route.Generator>() == true -> R.string.generator_title
                             currentDestination?.hasRoute<Route.Games>() == true -> R.string.games_title
-                            currentDestination?.hasRoute<Route.Checker>() == true -> R.string.checker_title
+                            currentDestination?.hasRoute<Route.Checker>() == true ||
+                                currentDestination?.hasRoute<Route.CheckerPrefill>() == true -> R.string.checker_title
                             currentDestination?.hasRoute<Route.About>() == true -> R.string.about_title
                             else -> R.string.app_name
                         }
@@ -62,6 +64,7 @@ fun CebolaoApp(startDestination: Route = Route.Home) {
             CebolaoNavHost(
                 navController = navController,
                 startDestination = startDestination,
+                isLargeScreen = isLargeScreen,
                 modifier = Modifier.padding(innerPadding),
             )
         }

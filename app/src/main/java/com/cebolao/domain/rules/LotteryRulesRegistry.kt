@@ -7,7 +7,7 @@ import com.cebolao.domain.model.LotteryType
 
 internal object MegaSenaRules : LotteryRules {
     override val type = LotteryType.MEGA_SENA
-    override val apiSlug = "megasena"
+    override val apiSlug = "mega-sena"
     override val assetFilename = "mega_sena.json"
     override val defaultPreset =
         com.cebolao.domain.model.FilterPreset(

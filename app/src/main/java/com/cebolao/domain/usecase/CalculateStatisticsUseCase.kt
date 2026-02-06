@@ -106,24 +106,32 @@ class CalculateStatisticsUseCase
             val allNumbers = contests.flatMap { it.getAllNumbers() }
 
             // Calculate decades
-            // This needs to be smarter to handle different lotteries ranges
-            // For now, simple 0-9, 10-19 grouping
-            val decades =
-                allNumbers
-                    .groupingBy { (it / 10) * 10 }
-                    .eachCount()
-                    .mapKeys { (start, _) ->
-                        val end = start + 9
-                        "$start-$end"
+            // Ensure labels respect the lottery max number (e.g., "20-25" for Lotofácil)
+            val decadeBuckets =
+                buildMap<String, Int> {
+                    val start = (profile.minNumber / 10) * 10
+                    var current = start
+                    while (current <= profile.maxNumber) {
+                        val end = minOf(current + 9, profile.maxNumber)
+                        val label = "%02d-%02d".format(current, end)
+                        put(label, 0)
+                        current += 10
                     }
-                    .toSortedMap()
+                }.toMutableMap()
+
+            allNumbers.forEach { number ->
+                val start = (number / 10) * 10
+                val end = minOf(start + 9, profile.maxNumber)
+                val label = "%02d-%02d".format(start, end)
+                decadeBuckets[label] = (decadeBuckets[label] ?: 0) + 1
+            }
 
             // Calculate quadrants
             // Need max number from profile to know where the center is
             val quartrants = StatisticsUtil.calculateQuadrantDistribution(allNumbers, profile.maxNumber)
 
             return DistributionStats(
-                decadeDistribution = decades.toMap(),
+                decadeDistribution = decadeBuckets.toSortedMap(),
                 quadrantDistribution = quartrants.toList(),
             )
         }

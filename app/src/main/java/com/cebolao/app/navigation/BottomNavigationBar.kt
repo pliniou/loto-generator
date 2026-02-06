@@ -68,7 +68,9 @@ fun CebolaoBottomBar(
                     is Route.Home -> currentDestination?.hasRoute<Route.Home>() == true
                     is Route.Generator -> currentDestination?.hasRoute<Route.Generator>() == true
                     is Route.Games -> currentDestination?.hasRoute<Route.Games>() == true
-                    is Route.Checker -> currentDestination?.hasRoute<Route.Checker>() == true
+                    is Route.Checker ->
+                        currentDestination?.hasRoute<Route.Checker>() == true ||
+                            currentDestination?.hasRoute<Route.CheckerPrefill>() == true
                     is Route.About -> currentDestination?.hasRoute<Route.About>() == true
                     else -> false
                 }
