@@ -1,0 +1,159 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "9c7c252a0b4a4d4c2f0c70832927ddff",
+    "entities": [
+      {
+        "tableName": "games",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `lotteryType` TEXT NOT NULL, `numbers` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `isPinned` INTEGER NOT NULL, `secondDrawNumbers` TEXT, `teamName` TEXT, `recentHitRate` REAL NOT NULL, `historicalHitRate` REAL NOT NULL, `sourcePreset` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lotteryType",
+            "columnName": "lotteryType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numbers",
+            "columnName": "numbers",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isPinned",
+            "columnName": "isPinned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "secondDrawNumbers",
+            "columnName": "secondDrawNumbers",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "teamName",
+            "columnName": "teamName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "recentHitRate",
+            "columnName": "recentHitRate",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "historicalHitRate",
+            "columnName": "historicalHitRate",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourcePreset",
+            "columnName": "sourcePreset",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "contests",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `lotteryType` TEXT NOT NULL, `contestNumber` INTEGER NOT NULL, `date` TEXT NOT NULL, `numbers` TEXT NOT NULL, `secondDrawNumbers` TEXT, `teamName` TEXT, `nextContest` INTEGER, `nextContestDate` TEXT, `nextContestEstimatedPrize` REAL, `accumulated` INTEGER, `prizeList` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lotteryType",
+            "columnName": "lotteryType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contestNumber",
+            "columnName": "contestNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numbers",
+            "columnName": "numbers",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "secondDrawNumbers",
+            "columnName": "secondDrawNumbers",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "teamName",
+            "columnName": "teamName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nextContest",
+            "columnName": "nextContest",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "nextContestDate",
+            "columnName": "nextContestDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nextContestEstimatedPrize",
+            "columnName": "nextContestEstimatedPrize",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "accumulated",
+            "columnName": "accumulated",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "prizeList",
+            "columnName": "prizeList",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9c7c252a0b4a4d4c2f0c70832927ddff')"
+    ]
+  }
+}
