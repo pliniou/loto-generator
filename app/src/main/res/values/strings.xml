@@ -20,7 +20,6 @@
     <string name="state_empty_action">Criar agora</string>
 
     <!-- Actions -->
-    <string name="action_check">Conferir jogo</string>
     <plurals name="action_generate">
         <item quantity="one">Gerar %d jogo</item>
         <item quantity="other">Gerar %d jogos</item>
@@ -41,7 +40,7 @@
     <string name="action_pin">Fixar jogo</string>
     <string name="action_unpin">Desafixar jogo</string>
     <string name="action_check_and_analyze">Conferir &amp; Analisar</string>
-    <string name="action_analyzing">Analisando...</string>
+    <string name="action_analyzing">Analisando…</string>
     <string name="content_description_back">Voltar</string>
 
     <!-- Generator -->
@@ -57,8 +56,16 @@
     <string name="generator_filters_active">Filtros ativos</string>
     <string name="generator_fine_tuning">Ajuste fino</string>
     <string name="generator_recommendation_title">Sugestão para você</string>
-    <string name="generator_recommendation_body">O preset "%1$s" tem bons resultados: %2$d jogos salvos e %3$d usos. Que tal usá-lo?</string>
+    <string name="generator_recommendation_body">O preset "%1$s" tem bons resultados: %2$s e %3$s. Que tal usá-lo?</string>
     <string name="generator_use_preset">Usar preset</string>
+    <plurals name="generator_recommendation_games">
+        <item quantity="one">%d jogo salvo</item>
+        <item quantity="other">%d jogos salvos</item>
+    </plurals>
+    <plurals name="generator_recommendation_usages">
+        <item quantity="one">%d uso</item>
+        <item quantity="other">%d usos</item>
+    </plurals>
     <string name="filter_parity_range">Paridade: %1$d%% a %2$d%%</string>
     <string name="filter_parity_range_short">Paridade %1$d–%2$d%%</string>
     <string name="filter_repeats_limit">Máx. repetidas do anterior: %1$d</string>

@@ -667,14 +667,15 @@ private fun RecommendationCard(
                     fontWeight = FontWeight.Bold,
                 )
             }
+            val gamesText = pluralStringResource(R.plurals.generator_recommendation_games, stats.savedGamesCount, stats.savedGamesCount)
+            val usagesText = pluralStringResource(R.plurals.generator_recommendation_usages, stats.usageCount, stats.usageCount)
             Text(
-                text =
-                    stringResource(
-                        R.string.generator_recommendation_body,
-                        stats.presetName,
-                        stats.savedGamesCount,
-                        stats.usageCount,
-                    ),
+                text = stringResource(
+                    R.string.generator_recommendation_body,
+                    stats.presetName,
+                    gamesText,
+                    usagesText,
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
