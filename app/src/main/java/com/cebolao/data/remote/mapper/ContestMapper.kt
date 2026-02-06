@@ -55,8 +55,20 @@ object ContestMapper {
 
     // --- Entity -> Domain ---
     fun toDomain(entity: ContestEntity): Contest {
-        val numbers = entity.numbers.map { it.toInt() }.sorted()
-        val secondDraw = entity.secondDrawNumbers?.map { it.toInt() }?.sorted()
+        val rawNumbers = entity.numbers.map { it.toInt() }
+        val numbers =
+            if (entity.lotteryType == LotteryType.SUPER_SETE) {
+                rawNumbers
+            } else {
+                rawNumbers.sorted()
+            }
+        val rawSecondDraw = entity.secondDrawNumbers?.map { it.toInt() }
+        val secondDraw =
+            if (entity.lotteryType == LotteryType.SUPER_SETE) {
+                rawSecondDraw
+            } else {
+                rawSecondDraw?.sorted()
+            }
         val teamNumber = entity.teamName?.let { com.cebolao.domain.util.TimemaniaUtil.getTeamId(it) }
 
         return Contest(

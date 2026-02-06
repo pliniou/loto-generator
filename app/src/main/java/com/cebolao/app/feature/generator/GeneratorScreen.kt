@@ -661,14 +661,20 @@ private fun RecommendationCard(
                 )
                 Spacer(modifier = Modifier.width(spacing.sm))
                 Text(
-                    text = "Sugestão para você",
+                    text = stringResource(R.string.generator_recommendation_title),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.Bold,
                 )
             }
             Text(
-                text = "O preset '${stats.presetName}' tem bons resultados: ${stats.savedGamesCount} jogos salvos e ${stats.usageCount} usos. Que tal usá-lo?",
+                text =
+                    stringResource(
+                        R.string.generator_recommendation_body,
+                        stats.presetName,
+                        stats.savedGamesCount,
+                        stats.usageCount,
+                    ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
@@ -677,7 +683,7 @@ private fun RecommendationCard(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
                 modifier = Modifier.align(Alignment.End),
             ) {
-                Text("Usar Preset")
+                Text(stringResource(R.string.generator_use_preset))
             }
         }
     }

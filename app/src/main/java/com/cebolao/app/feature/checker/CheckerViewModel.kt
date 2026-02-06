@@ -2,6 +2,7 @@ package com.cebolao.app.feature.checker
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cebolao.app.di.DefaultDispatcher
 import com.cebolao.domain.model.Contest
 import com.cebolao.domain.model.DuplaMode
 import com.cebolao.domain.model.Game
@@ -14,11 +15,13 @@ import com.cebolao.domain.repository.ProfileRepository
 import com.cebolao.domain.usecase.CalculateStatisticsUseCase
 import com.cebolao.domain.usecase.CheckGameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class CheckerUiState(
@@ -78,6 +81,7 @@ class CheckerViewModel
         private val profileRepository: ProfileRepository,
         private val checkGameUseCase: CheckGameUseCase,
         private val calculateStatisticsUseCase: CalculateStatisticsUseCase,
+        @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(CheckerUiState())
         val uiState: StateFlow<CheckerUiState> = _uiState.asStateFlow()
@@ -162,50 +166,66 @@ class CheckerViewModel
             if (!profile.isValidGame(gameNumbers)) return
 
             val gameToCheck = buildTransientGame(state)
+            val contestsSnapshot = cachedContests
+            val statsFilter = state.statsFilter
 
-            val latestResult = checkGameUseCase(gameToCheck, contest, profile, state.selectedDuplaMode)
+            viewModelScope.launch {
+                val computation =
+                    withContext(defaultDispatcher) {
+                        val latestResult = checkGameUseCase(gameToCheck, contest, profile, state.selectedDuplaMode)
 
-            val history =
-                cachedContests.map { c ->
-                    val r = checkGameUseCase(gameToCheck, c, profile, state.selectedDuplaMode)
-                    HistoryHit(
-                        contestNumber = c.id,
-                        contestDate = c.drawDate,
-                        hits = r.hits,
-                        prizeTier = r.prizeTier,
-                        isPrize = r.isPrize,
+                        val history =
+                            contestsSnapshot.map { c ->
+                                val r = checkGameUseCase(gameToCheck, c, profile, state.selectedDuplaMode)
+                                HistoryHit(
+                                    contestNumber = c.id,
+                                    contestDate = c.drawDate,
+                                    hits = r.hits,
+                                    prizeTier = r.prizeTier,
+                                    isPrize = r.isPrize,
+                                )
+                            }
+
+                        val filteredHistory = applyFilter(history, statsFilter)
+                        val filteredContests = applyContestFilter(contestsSnapshot, statsFilter)
+
+                        val bestHit = filteredHistory.maxOfOrNull { it.hits } ?: 0
+                        val prizeCount = filteredHistory.count { it.isPrize }
+
+                        val numberStats = calculateStatisticsUseCase.calculateNumberStats(filteredContests, profile)
+
+                        val resultNumbers = contest.getAllNumbers().toSet()
+                        val matched = gameNumbers.filter { it in resultNumbers }.toSet()
+
+                        CheckComputation(
+                            latestResult = latestResult,
+                            filteredHistory = filteredHistory,
+                            bestHit = bestHit,
+                            prizeCount = prizeCount,
+                            numberStats = numberStats,
+                            matchedNumbers = matched,
+                        )
+                    }
+
+                _uiState.value =
+                    state.copy(
+                        checkResult =
+                            CheckerResult(
+                                hits = computation.latestResult.hits,
+                                teamHit = if (profile.hasTeam) computation.latestResult.teamHit else null,
+                                contestNumber = contest.id,
+                                contestDate = contest.drawDate,
+                                prizeTier = computation.latestResult.prizeTier,
+                                isPrize = computation.latestResult.isPrize,
+                            ),
+                        matchedNumbers = computation.matchedNumbers,
+                        historyResults = computation.filteredHistory.sortedByDescending { it.contestNumber },
+                        bestHit = computation.bestHit,
+                        prizeCount = computation.prizeCount,
+                        totalContestsChecked = computation.filteredHistory.size,
+                        numberStats = computation.numberStats,
                     )
-                }
-
-            val filteredHistory = applyFilter(history, state.statsFilter)
-            val filteredContests = applyContestFilter(cachedContests, state.statsFilter)
-
-            val bestHit = filteredHistory.maxOfOrNull { it.hits } ?: 0
-            val prizeCount = filteredHistory.count { it.isPrize }
-
-            val numberStats = calculateStatisticsUseCase.calculateNumberStats(filteredContests, profile)
-
-            val resultNumbers = contest.getAllNumbers().toSet()
-            val matched = gameNumbers.filter { it in resultNumbers }.toSet()
-
-            _uiState.value =
-                state.copy(
-                    checkResult =
-                        CheckerResult(
-                            hits = latestResult.hits,
-                            teamHit = if (profile.hasTeam) latestResult.teamHit else null,
-                            contestNumber = contest.id,
-                            contestDate = contest.drawDate,
-                            prizeTier = latestResult.prizeTier,
-                            isPrize = latestResult.isPrize,
-                        ),
-                    matchedNumbers = matched,
-                    historyResults = filteredHistory.sortedByDescending { it.contestNumber },
-                    bestHit = bestHit,
-                    prizeCount = prizeCount,
-                    totalContestsChecked = filteredHistory.size,
-                    numberStats = numberStats,
-                )
+            }
         }
 
         fun onStatsFilterSelected(filter: StatsFilter) {
@@ -254,9 +274,13 @@ class CheckerViewModel
                 if (gameNumbers.isEmpty()) return
             }
 
+            val contestsSnapshot = cachedContests
             viewModelScope.launch {
                 _uiState.value = state.copy(isAnalyzing = true)
-                val stats = calculateStatisticsUseCase.checkHistory(gameNumbers, cachedContests, profile)
+                val stats =
+                    withContext(defaultDispatcher) {
+                        calculateStatisticsUseCase.checkHistory(gameNumbers, contestsSnapshot, profile)
+                    }
                 _uiState.value =
                     _uiState.value.copy(
                         analysisResults = stats,
@@ -372,10 +396,11 @@ class CheckerViewModel
                         // Keep current selected contest if it exists, otherwise use latest
                         val activeContest = if (currentLast != null && contests.any { it.id == currentLast.id }) currentLast else latest
 
-                        _uiState.value = _uiState.value.copy(
-                            lastContest = activeContest,
-                            availableContests = contests
-                        )
+                        _uiState.value =
+                            _uiState.value.copy(
+                                lastContest = activeContest,
+                                availableContests = contests,
+                            )
                     }
                 }
         }
@@ -383,4 +408,13 @@ class CheckerViewModel
         companion object {
             private const val TEMP_GAME_ID = "temp"
         }
-    }
+
+        private data class CheckComputation(
+            val latestResult: com.cebolao.domain.model.CheckResult,
+            val filteredHistory: List<HistoryHit>,
+            val bestHit: Int,
+            val prizeCount: Int,
+            val numberStats: List<NumberStat>,
+            val matchedNumbers: Set<Int>,
+        )
+}

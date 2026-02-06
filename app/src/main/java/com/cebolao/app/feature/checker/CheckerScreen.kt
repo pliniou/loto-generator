@@ -469,7 +469,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.checkerStatsSection(
             ) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Estatísticas",
+                    text = stringResource(R.string.statistics_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
                     color = lotteryColor,
@@ -513,7 +513,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.checkerStatsSection(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
-                    CheckerSectionSubheading(text = "Resumo Histórico")
+                    CheckerSectionSubheading(text = stringResource(R.string.checker_history_summary_title))
                     HistorySummaryRow(
                         total = uiState.totalContestsChecked,
                         best = uiState.bestHit,
@@ -541,7 +541,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.checkerStatsSection(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
-                    CheckerSectionSubheading(text = "Distribuição de Acertos")
+                    CheckerSectionSubheading(text = stringResource(R.string.checker_hits_distribution_title))
                     AnalysisStatsSection(
                         results = uiState.analysisResults,
                         color = lotteryColor,
@@ -568,7 +568,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.checkerStatsSection(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
-                    CheckerSectionSubheading(text = "Distribuição de Acertos por Concurso")
+                    CheckerSectionSubheading(text = stringResource(R.string.checker_hits_per_contest_title))
                     HistoryHitsList(
                         history = uiState.historyResults,
                         color = lotteryColor,
@@ -595,7 +595,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.checkerStatsSection(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
-                    CheckerSectionSubheading(text = "Frequência das Dezenas")
+                    CheckerSectionSubheading(text = stringResource(R.string.checker_numbers_frequency_title))
                     NumberStatsSection(
                         stats = uiState.numberStats,
                         color = lotteryColor,
@@ -634,7 +634,7 @@ private fun CheckActionButton(
             ),
     ) {
         Text(
-            text = if (isAnalyzing) "Analisando..." else stringResource(R.string.action_check) + " & " + stringResource(R.string.action_analyze),
+            text = if (isAnalyzing) stringResource(R.string.action_analyzing) else stringResource(R.string.action_check_and_analyze),
             fontWeight = FontWeight.ExtraBold,
         )
     }

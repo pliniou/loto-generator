@@ -2,12 +2,25 @@ package com.cebolao.data.remote.mapper
 
 import com.cebolao.data.local.room.entity.GameEntity
 import com.cebolao.domain.model.Game
+import com.cebolao.domain.model.LotteryType
 import com.cebolao.domain.util.TimemaniaUtil
 
 object GameMapper {
     fun toDomain(entity: GameEntity): Game {
-        val numbers = entity.numbers.map { it.toInt() }.sorted()
-        val secondDraw = entity.secondDrawNumbers?.map { it.toInt() }?.sorted()
+        val rawNumbers = entity.numbers.map { it.toInt() }
+        val numbers =
+            if (entity.lotteryType == LotteryType.SUPER_SETE) {
+                rawNumbers
+            } else {
+                rawNumbers.sorted()
+            }
+        val rawSecondDraw = entity.secondDrawNumbers?.map { it.toInt() }
+        val secondDraw =
+            if (entity.lotteryType == LotteryType.SUPER_SETE) {
+                rawSecondDraw
+            } else {
+                rawSecondDraw?.sorted()
+            }
         val teamNumber = entity.teamName?.let { TimemaniaUtil.getTeamId(it) }
 
         return Game(

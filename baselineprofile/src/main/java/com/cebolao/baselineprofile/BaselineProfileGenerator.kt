@@ -41,12 +41,12 @@ class BaselineProfileGenerator {
         device.waitForIdle()
 
         device.findObject(
-            androidx.test.uiautomator.By.desc("Meus Jogos")
+            androidx.test.uiautomator.By.desc("Jogos")
         )?.click()
         device.waitForIdle()
 
         device.findObject(
-            androidx.test.uiautomator.By.desc("Conferir")
+            androidx.test.uiautomator.By.desc("Conferidor")
         )?.click()
         device.waitForIdle()
 

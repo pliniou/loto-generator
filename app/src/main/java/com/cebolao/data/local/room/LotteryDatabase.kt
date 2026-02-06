@@ -10,7 +10,7 @@ import com.cebolao.data.local.room.entity.GameEntity
 @Database(
     entities = [GameEntity::class, ContestEntity::class],
     version = 1,
-    exportSchema = false,
+    exportSchema = true,
 )
 @TypeConverters(Converters::class)
 abstract class LotteryDatabase : RoomDatabase() {

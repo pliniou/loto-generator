@@ -96,6 +96,11 @@ No fluxo normal, o lint ignora esse ruído para focar em problemas de código e 
 - O leitor de fixtures aceita tanto o array simples quanto um wrapper com `schemaVersion` e `contests` (recomendado). Veja `docs/ASSETS_SCHEMA.md` para detalhes de versão, validação e fallback.
 - Em versões legadas, os dados locais eram persistidos em `lottery_data.json`. O app migra automaticamente esse arquivo para o Room no startup quando encontrado.
 
+**Room & Migrations**
+- Schemas do Room são exportados para `app/schemas` via KSP para rastrear mudanças de banco.
+- Ao alterar entidades/DAO, incremente a versão do banco e forneça migração explícita (ou auto-migração) antes de publicar.
+- Evite `fallbackToDestructiveMigration` em produção; use apenas em ambientes de desenvolvimento se necessário.
+
 > **Nota:** O projeto utiliza configurações estritas de versão do Kotlin para garantir estabilidade. Se encontrar problemas de build, verifique se está usando as versões definidas no `gradle/libs.versions.toml` ou `build.gradle.kts`. Também assegure que o JDK esteja instalado e `JAVA_HOME` configurado para rodar os testes localmente.
 
 ## 🎨 Design System

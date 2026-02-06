@@ -40,6 +40,8 @@
     <string name="action_next">Próximo</string>
     <string name="action_pin">Fixar jogo</string>
     <string name="action_unpin">Desafixar jogo</string>
+    <string name="action_check_and_analyze">Conferir &amp; Analisar</string>
+    <string name="action_analyzing">Analisando...</string>
     <string name="content_description_back">Voltar</string>
 
     <!-- Generator -->
@@ -54,6 +56,9 @@
     <string name="generator_presets_title">Presets</string>
     <string name="generator_filters_active">Filtros ativos</string>
     <string name="generator_fine_tuning">Ajuste fino</string>
+    <string name="generator_recommendation_title">Sugestão para você</string>
+    <string name="generator_recommendation_body">O preset "%1$s" tem bons resultados: %2$d jogos salvos e %3$d usos. Que tal usá-lo?</string>
+    <string name="generator_use_preset">Usar preset</string>
     <string name="filter_parity_range">Paridade: %1$d%% a %2$d%%</string>
     <string name="filter_parity_range_short">Paridade %1$d–%2$d%%</string>
     <string name="filter_repeats_limit">Máx. repetidas do anterior: %1$d</string>
@@ -98,6 +103,10 @@
     <string name="checker_dupla_mode_second">2º Sorteio</string>
     <string name="checker_dupla_mode_best">Melhor dos dois</string>
     <string name="checker_prize_badge">PREMIADO!</string>
+    <string name="checker_history_summary_title">Resumo Histórico</string>
+    <string name="checker_hits_distribution_title">Distribuição de Acertos</string>
+    <string name="checker_hits_per_contest_title">Distribuição de Acertos por Concurso</string>
+    <string name="checker_numbers_frequency_title">Frequência das Dezenas</string>
 
     <!-- Games -->
     <string name="games_title">Meus Jogos</string>
@@ -215,6 +224,11 @@
     <string name="insight_label_longest_sequence">Sequência</string>
     <string name="insight_label_multiples_of_3">Múltiplos de 3</string>
     <string name="insight_label_primes">Primos</string>
+    <string name="insight_even_odd_short">%1$dP / %2$dI</string>
+    <string name="insight_average_short">Média: %1$s</string>
+    <string name="insight_sequence_short">Seq: %1$d</string>
+    <string name="insight_multiples_of_3_short">Múlt3: %1$d</string>
+    <string name="insight_primes_short">Primos: %1$d</string>
     <string name="insight_repeats_from_last">Repetidas do último: %1$d</string>
     <plurals name="insight_repeats">
         <item quantity="one">%d Repetida</item>

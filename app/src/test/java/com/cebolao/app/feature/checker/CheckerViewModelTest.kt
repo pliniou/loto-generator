@@ -31,6 +31,7 @@ class CheckerViewModelTest {
                     FakeProfileRepo(),
                     checkUseCase,
                     statsUseCase,
+                    mainDispatcherRule.testDispatcher,
                 )
 
             advanceUntilIdle()
@@ -58,6 +59,7 @@ class CheckerViewModelTest {
                     FakeProfileRepo(),
                     checkUseCase,
                     statsUseCase,
+                    mainDispatcherRule.testDispatcher,
                 )
             advanceUntilIdle() // Load initial profile (Lotofacil)
 

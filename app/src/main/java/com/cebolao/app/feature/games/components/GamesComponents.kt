@@ -353,23 +353,23 @@ fun SavedGameCard(
                         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                     )
                     SavedInsightBadge(
-                        label = "${insight.evenCount}P / ${insight.oddCount}I",
+                        label = stringResource(R.string.insight_even_odd_short, insight.evenCount, insight.oddCount),
                         color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                     )
                     SavedInsightBadge(
-                        label = "Média: ${insight.average}",
+                        label = stringResource(R.string.insight_average_short, insight.average.toString()),
                         color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = AlphaLevels.CARD_MEDIUM),
                     )
                     SavedInsightBadge(
-                        label = "Seq: ${insight.longestSequence}",
+                        label = stringResource(R.string.insight_sequence_short, insight.longestSequence),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_HIGH),
                     )
                     SavedInsightBadge(
-                        label = "Múlt3: ${insight.multiplesOf3}",
+                        label = stringResource(R.string.insight_multiples_of_3_short, insight.multiplesOf3),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_HIGH),
                     )
                     SavedInsightBadge(
-                        label = "Primos: ${insight.primeCount}",
+                        label = stringResource(R.string.insight_primes_short, insight.primeCount),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = AlphaLevels.CARD_HIGH),
                     )
                 }
