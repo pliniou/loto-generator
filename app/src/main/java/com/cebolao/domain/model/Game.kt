@@ -15,7 +15,6 @@ import kotlinx.serialization.Serializable
  * @property secondDrawNumbers Segundo sorteio (apenas Dupla Sena)
  * @property teamNumber Número do time (apenas Timemania, 1..80)
  * @property isPinned Se está fixado no topo
- * @property isPinned Se está fixado no topo
  * @property createdAt Timestamp de criação (Unix epoch millis)
  * @property recentHitRate Taxa de acertos nos últimos concursos (0.0 a 1.0)
  * @property historicalHitRate Taxa de acertos histórica (0.0 a 1.0)

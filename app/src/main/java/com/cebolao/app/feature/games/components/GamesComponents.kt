@@ -63,6 +63,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -381,8 +382,9 @@ fun SavedGameCard(
                         ) {
                             Text(
                                 text =
-                                    stringResource(
-                                        R.string.games_hit_rate_label,
+                                    pluralStringResource(
+                                        R.plurals.games_hit_rate_label,
+                                        RECENT_HIT_RATE_WINDOW,
                                         RECENT_HIT_RATE_WINDOW,
                                         savedGame.recentHitRatePercent,
                                     ),

@@ -16,11 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -109,7 +109,7 @@ fun AboutScreen(
 
             Spacer(modifier = Modifier.height(spacing.xl))
 
-            Divider(
+            HorizontalDivider(
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -367,7 +367,7 @@ private fun AboutContactSection(
                 horizontalArrangement = Arrangement.spacedBy(spacing.sm),
             ) {
                 Icon(
-                    imageVector = Icons.Default.OpenInNew,
+                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp),

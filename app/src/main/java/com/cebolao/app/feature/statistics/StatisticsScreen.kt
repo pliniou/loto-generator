@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -134,58 +135,60 @@ fun StatisticsScreen(viewModel: StatisticsViewModel = hiltViewModel()) {
                         targetState = Pair(state.selectedType, state.contestRange),
                         animationSpec = tween(durationMillis = 250),
                         label = "statistics_crossfade",
-                    ) {
-                        BoxWithConstraints {
-                            val isWide = maxWidth >= WIDE_WIDTH_BREAKPOINT_DP.dp
-                            Column(verticalArrangement = Arrangement.spacedBy(spacing.xl)) {
-                                if (isWide) {
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(spacing.md),
-                                        modifier = Modifier.fillMaxWidth(),
-                                    ) {
-                                        FrequencyCard(
-                                            state = state,
-                                            lotteryColor = lotteryColor,
-                                            lotteryName = lotteryName,
-                                            rangeLabel = rangeLabel,
-                                            modifier = Modifier.weight(1f),
-                                        )
-                                        RecencyCard(
-                                            state = state,
-                                            lotteryColor = lotteryColor,
-                                            rangeLabel = rangeLabel,
-                                            modifier = Modifier.weight(1f),
-                                        )
-                                    }
-                                } else {
-                                    FrequencyCard(
-                                        state = state,
-                                        lotteryColor = lotteryColor,
-                                        lotteryName = lotteryName,
-                                        rangeLabel = rangeLabel,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                    RecencyCard(
-                                        state = state,
-                                        lotteryColor = lotteryColor,
-                                        rangeLabel = rangeLabel,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                }
-
-                                // Distribution
-                                state.distributionStats?.let { dist ->
+                    ) { statisticsState ->
+                        key(statisticsState) {
+                            BoxWithConstraints {
+                                val isWide = maxWidth >= WIDE_WIDTH_BREAKPOINT_DP.dp
+                                Column(verticalArrangement = Arrangement.spacedBy(spacing.xl)) {
                                     if (isWide) {
                                         Row(
                                             horizontalArrangement = Arrangement.spacedBy(spacing.md),
                                             modifier = Modifier.fillMaxWidth(),
                                         ) {
-                                            DistributionCard(dist = dist, modifier = Modifier.weight(1f))
-                                            QuadrantsCard(dist = dist, modifier = Modifier.weight(1f))
+                                            FrequencyCard(
+                                                state = state,
+                                                lotteryColor = lotteryColor,
+                                                lotteryName = lotteryName,
+                                                rangeLabel = rangeLabel,
+                                                modifier = Modifier.weight(1f),
+                                            )
+                                            RecencyCard(
+                                                state = state,
+                                                lotteryColor = lotteryColor,
+                                                rangeLabel = rangeLabel,
+                                                modifier = Modifier.weight(1f),
+                                            )
                                         }
                                     } else {
-                                        DistributionCard(dist = dist, modifier = Modifier.fillMaxWidth())
-                                        QuadrantsCard(dist = dist, modifier = Modifier.fillMaxWidth())
+                                        FrequencyCard(
+                                            state = state,
+                                            lotteryColor = lotteryColor,
+                                            lotteryName = lotteryName,
+                                            rangeLabel = rangeLabel,
+                                            modifier = Modifier.fillMaxWidth(),
+                                        )
+                                        RecencyCard(
+                                            state = state,
+                                            lotteryColor = lotteryColor,
+                                            rangeLabel = rangeLabel,
+                                            modifier = Modifier.fillMaxWidth(),
+                                        )
+                                    }
+
+                                    // Distribution
+                                    state.distributionStats?.let { dist ->
+                                        if (isWide) {
+                                            Row(
+                                                horizontalArrangement = Arrangement.spacedBy(spacing.md),
+                                                modifier = Modifier.fillMaxWidth(),
+                                            ) {
+                                                DistributionCard(dist = dist, modifier = Modifier.weight(1f))
+                                                QuadrantsCard(dist = dist, modifier = Modifier.weight(1f))
+                                            }
+                                        } else {
+                                            DistributionCard(dist = dist, modifier = Modifier.fillMaxWidth())
+                                            QuadrantsCard(dist = dist, modifier = Modifier.fillMaxWidth())
+                                        }
                                     }
                                 }
                             }

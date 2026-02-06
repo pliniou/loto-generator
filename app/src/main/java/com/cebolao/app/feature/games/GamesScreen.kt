@@ -28,7 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -55,7 +55,7 @@ fun GamesScreen(
     onNavigateToGenerator: () -> Unit = {},
     onNavigateToChecker: (Game) -> Unit = {},
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val spacing = LocalSpacing.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -162,8 +162,9 @@ fun GamesScreen(
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     message =
-                                        context.getString(
-                                            R.string.games_hit_rate_info_message,
+                                        resources.getQuantityString(
+                                            R.plurals.games_hit_rate_info_message,
+                                            RECENT_HIT_RATE_WINDOW,
                                             RECENT_HIT_RATE_WINDOW,
                                             percent,
                                         ),

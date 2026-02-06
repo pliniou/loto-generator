@@ -1211,8 +1211,8 @@ fun AnalysisStatsSection(
 fun HitDistributionChart(
     results: List<PrizeStat>,
     color: Color,
-    prizeRanges: Set<Int> = emptySet(),
     modifier: Modifier = Modifier,
+    prizeRanges: Set<Int> = emptySet(),
 ) {
     if (results.isEmpty()) return
     val spacing = LocalSpacing.current

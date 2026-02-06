@@ -63,6 +63,13 @@ O projeto possui **cobertura de testes** abrangente para engines de domínio e l
 ./gradlew :app:testDebugUnitTest
 ```
 
+**Auditoria de dependências (sem atualizar versões):**
+```bash
+./gradlew :app:lintDebug -P"cebolao.enableVersionAudit=true"
+```
+Use este comando apenas quando quiser revisar disponibilidade de versões novas.
+No fluxo normal, o lint ignora esse ruído para focar em problemas de código e recursos.
+
 **Cobertura atual:**
 - ✅ `GeneratorEngine` — geração, validação e relatórios
 - ✅ `CheckerEngine` — conferência para todas as modalidades

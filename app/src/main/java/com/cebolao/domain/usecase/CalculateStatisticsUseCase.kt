@@ -14,9 +14,6 @@ class CalculateStatisticsUseCase
     constructor(
         private val checkGameUseCase: CheckGameUseCase,
     ) {
-        private val tempGameId = "temp"
-        private val tempCreatedAt = 1L
-
         /**
          * Calcula frequência e atraso de cada número em um range de concursos.
          * @param contests Lista de concursos, idealmente ordenada pro mais recente no final, mas vamos ordenar aqui.
@@ -30,17 +27,15 @@ class CalculateStatisticsUseCase
 
             val sortedContests = contests.sortedBy { it.id }
             val lastContestId = sortedContests.last().id
-            val counts = mutableMapOf<Int, Int>()
-            val lastSeen = mutableMapOf<Int, Int>()
 
             // Intervalo de números da loteria
             val allNumbers = (profile.minNumber..profile.maxNumber).toList()
 
-            // Inicializa maps
-            allNumbers.forEach {
-                counts[it] = 0
-                lastSeen[it] = 0 // 0 significa nunca visto ou muito antigo
-            }
+            val counts = allNumbers.associateWith { 0 }.toMutableMap()
+            val lastSeen =
+                allNumbers
+                    .associateWith { 0 } // 0 significa nunca visto ou muito antigo
+                    .toMutableMap()
 
             sortedContests.forEach { contest ->
                 contest.getAllNumbers().forEach { num ->
@@ -67,18 +62,12 @@ class CalculateStatisticsUseCase
             profile: LotteryProfile,
         ): List<PrizeStat> {
             val hitCounts = mutableMapOf<Int, Int>()
+            val game = buildHistoryGame(selectedNumbers, profile)
 
             contests.forEach { contest ->
                 val result =
                     checkGameUseCase(
-                        game =
-                            Game(
-                                id = tempGameId,
-                                lotteryType = profile.type,
-                                numbers = selectedNumbers,
-                                teamNumber = null,
-                                createdAt = tempCreatedAt,
-                            ),
+                        game = game,
                         contest = contest,
                         profile = profile,
                     )
@@ -128,11 +117,28 @@ class CalculateStatisticsUseCase
 
             // Calculate quadrants
             // Need max number from profile to know where the center is
-            val quartrants = StatisticsUtil.calculateQuadrantDistribution(allNumbers, profile.maxNumber)
+            val quadrants = StatisticsUtil.calculateQuadrantDistribution(allNumbers, profile.maxNumber)
 
             return DistributionStats(
                 decadeDistribution = decadeBuckets.toSortedMap(),
-                quadrantDistribution = quartrants.toList(),
+                quadrantDistribution = quadrants.toList(),
             )
+        }
+
+        private fun buildHistoryGame(
+            selectedNumbers: List<Int>,
+            profile: LotteryProfile,
+        ): Game =
+            Game(
+                id = TEMP_GAME_ID,
+                lotteryType = profile.type,
+                numbers = selectedNumbers,
+                teamNumber = null,
+                createdAt = TEMP_CREATED_AT,
+            )
+
+        companion object {
+            private const val TEMP_GAME_ID = "temp"
+            private const val TEMP_CREATED_AT = 1L
         }
     }

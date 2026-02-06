@@ -92,31 +92,12 @@ class CheckerViewModel
         }
 
         fun onTypeSelected(type: LotteryType) {
-            val initialSelection = if (type == LotteryType.SUPER_SETE) List(7) { -1 } else emptyList()
-
             _uiState.value =
-                _uiState.value.copy(
-                    selectedType = type,
-                    selectedNumbers = initialSelection,
-                    checkResult = null,
-                    lastContest = null,
+                _uiState.value.resetForType(
+                    type = type,
+                    selectedNumbers = initialSelectionFor(type),
                     selectedTeam = null,
-                    teamHit = null,
-                    profile = null,
-                    selectedDuplaMode = DuplaMode.BEST,
-                    analysisResults = emptyList(),
-                    historyResults = emptyList(),
-                    bestHit = 0,
-                    prizeCount = 0,
-                    totalContestsChecked = 0,
-
-                    numberStats = emptyList(),
-                    showAnalysisDialog = false,
-                    matchedNumbers = emptySet(),
-                    statsFilter = StatsFilter.ALL,
-                    isContestSelectorExpanded = false,
-                    contestSearchQuery = "",
-                    availableContests = emptyList(),
+                    isAnalyzing = _uiState.value.isAnalyzing,
                 )
             loadData(type)
         }
@@ -180,20 +161,13 @@ class CheckerViewModel
             if (gameNumbers.isEmpty()) return
             if (!profile.isValidGame(gameNumbers)) return
 
-            val tempGame =
-                Game(
-                    id = "temp",
-                    lotteryType = state.selectedType,
-                    numbers = gameNumbers,
-                    teamNumber = state.selectedTeam,
-                    createdAt = System.currentTimeMillis(),
-                )
+            val gameToCheck = buildTransientGame(state)
 
-            val latestResult = checkGameUseCase(tempGame, contest, profile, state.selectedDuplaMode)
+            val latestResult = checkGameUseCase(gameToCheck, contest, profile, state.selectedDuplaMode)
 
             val history =
                 cachedContests.map { c ->
-                    val r = checkGameUseCase(tempGame, c, profile, state.selectedDuplaMode)
+                    val r = checkGameUseCase(gameToCheck, c, profile, state.selectedDuplaMode)
                     HistoryHit(
                         contestNumber = c.id,
                         contestDate = c.drawDate,
@@ -262,29 +236,11 @@ class CheckerViewModel
         }
 
         private fun applyFilter(history: List<HistoryHit>, filter: StatsFilter): List<HistoryHit> {
-            // History is usually generated for ALL cached contests. We just take the last N.
-            // Note: History generation in onCheck iterates over cachedContests.
-            // cachedContests are usually ordered descending or ascending? Repository default is usually desc (latest first).
-            // Let's assume we sort by ID descending before filtering to get "Latest N".
-            val sorted = history.sortedByDescending { it.contestNumber }
-            return when (filter) {
-                StatsFilter.ALL -> sorted
-                StatsFilter.LAST_10 -> sorted.take(10)
-                StatsFilter.LAST_20 -> sorted.take(20)
-                StatsFilter.LAST_50 -> sorted.take(50)
-                StatsFilter.LAST_100 -> sorted.take(100)
-            }
+            return applyLatestFilter(history, filter) { it.contestNumber }
         }
 
         private fun applyContestFilter(contests: List<Contest>, filter: StatsFilter): List<Contest> {
-             val sorted = contests.sortedByDescending { it.id }
-             return when (filter) {
-                StatsFilter.ALL -> sorted
-                StatsFilter.LAST_10 -> sorted.take(10)
-                StatsFilter.LAST_20 -> sorted.take(20)
-                StatsFilter.LAST_50 -> sorted.take(50)
-                StatsFilter.LAST_100 -> sorted.take(100)
-            }
+            return applyLatestFilter(contests, filter) { it.id }
         }
 
         fun onAnalyzeHistory() {
@@ -328,31 +284,76 @@ class CheckerViewModel
                 }
 
             _uiState.value =
-                _uiState.value.copy(
-                    selectedType = type,
+                _uiState.value.resetForType(
+                    type = type,
                     selectedNumbers = normalizedNumbers,
-                    checkResult = null,
-                    lastContest = null,
-                    selectedTeam = if (type == LotteryType.TIMEMANIA) teamNumber else null,
-                    teamHit = null,
-                    profile = null,
-                    selectedDuplaMode = DuplaMode.BEST,
-                    analysisResults = emptyList(),
-                    historyResults = emptyList(),
-                    bestHit = 0,
-                    prizeCount = 0,
-                    totalContestsChecked = 0,
-                    numberStats = emptyList(),
-
+                    selectedTeam = teamNumber,
                     isAnalyzing = false,
-                    showAnalysisDialog = false,
-                    matchedNumbers = emptySet(),
-                    isContestSelectorExpanded = false,
-                    contestSearchQuery = "",
-                    statsFilter = StatsFilter.ALL,
                 )
             loadData(type)
         }
+
+        private fun initialSelectionFor(type: LotteryType): List<Int> =
+            if (type == LotteryType.SUPER_SETE) List(7) { -1 } else emptyList()
+
+        private fun buildTransientGame(state: CheckerUiState): Game =
+            Game(
+                id = TEMP_GAME_ID,
+                lotteryType = state.selectedType,
+                numbers = state.selectedNumbers,
+                teamNumber = state.selectedTeam,
+                createdAt = System.currentTimeMillis(),
+            )
+
+        private fun CheckerUiState.resetForType(
+            type: LotteryType,
+            selectedNumbers: List<Int>,
+            selectedTeam: Int?,
+            isAnalyzing: Boolean,
+        ): CheckerUiState =
+            copy(
+                selectedType = type,
+                selectedNumbers = selectedNumbers,
+                checkResult = null,
+                lastContest = null,
+                selectedTeam = if (type == LotteryType.TIMEMANIA) selectedTeam else null,
+                teamHit = null,
+                profile = null,
+                selectedDuplaMode = DuplaMode.BEST,
+                analysisResults = emptyList(),
+                historyResults = emptyList(),
+                bestHit = 0,
+                prizeCount = 0,
+                totalContestsChecked = 0,
+                numberStats = emptyList(),
+                isAnalyzing = isAnalyzing,
+                showAnalysisDialog = false,
+                matchedNumbers = emptySet(),
+                statsFilter = StatsFilter.ALL,
+                isContestSelectorExpanded = false,
+                contestSearchQuery = "",
+                availableContests = emptyList(),
+            )
+
+        private fun <T> applyLatestFilter(
+            items: List<T>,
+            filter: StatsFilter,
+            contestNumberSelector: (T) -> Int,
+        ): List<T> {
+            val sorted = items.sortedByDescending(contestNumberSelector)
+            val limit = filter.itemLimit ?: return sorted
+            return sorted.take(limit)
+        }
+
+        private val StatsFilter.itemLimit: Int?
+            get() =
+                when (this) {
+                    StatsFilter.ALL -> null
+                    StatsFilter.LAST_10 -> 10
+                    StatsFilter.LAST_20 -> 20
+                    StatsFilter.LAST_50 -> 50
+                    StatsFilter.LAST_100 -> 100
+                }
 
         private fun loadData(type: LotteryType) {
             contestsJob?.cancel()
@@ -377,5 +378,9 @@ class CheckerViewModel
                         )
                     }
                 }
+        }
+
+        companion object {
+            private const val TEMP_GAME_ID = "temp"
         }
     }

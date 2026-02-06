@@ -20,7 +20,6 @@
     <string name="state_empty_action">Criar agora</string>
 
     <!-- Actions -->
-    <string name="action_clear">Limpar seleção</string>
     <string name="action_check">Conferir jogo</string>
     <plurals name="action_generate">
         <item quantity="one">Gerar %d jogo</item>
@@ -34,7 +33,6 @@
     <string name="action_sync">Atualizar resultados</string>
     <string name="action_remove">Remover</string>
     <string name="action_undo">Desfazer</string>
-    <string name="action_redo">Refazer</string>
     <string name="action_regenerate">Gerar novamente</string>
     <string name="action_increase">Aumentar</string>
     <string name="action_select">Selecionar</string>
@@ -103,9 +101,15 @@
 
     <!-- Games -->
     <string name="games_title">Meus Jogos</string>
-    <string name="games_hit_rate_label">Taxa de acertos (últimos %1$d concursos): %2$d%%</string>
+    <plurals name="games_hit_rate_label">
+        <item quantity="one">Taxa de acertos (último %1$d concurso): %2$d%%</item>
+        <item quantity="other">Taxa de acertos (últimos %1$d concursos): %2$d%%</item>
+    </plurals>
     <string name="games_hit_rate_info">Sobre taxa de acertos</string>
-    <string name="games_hit_rate_info_message">%2$d%% significa que, nos últimos %1$d concursos, este jogo acertou ao menos uma dezena em %2$d%% deles.</string>
+    <plurals name="games_hit_rate_info_message">
+        <item quantity="one">%2$d%% significa que, no último %1$d concurso, este jogo acertou ao menos uma dezena em %2$d%% deles.</item>
+        <item quantity="other">%2$d%% significa que, nos últimos %1$d concursos, este jogo acertou ao menos uma dezena em %2$d%% deles.</item>
+    </plurals>
     <string name="games_remove_snackbar">Jogo removido</string>
     <plurals name="games_count">
         <item quantity="one">%d jogo</item>

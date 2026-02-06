@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -370,13 +371,15 @@ private fun androidx.compose.foundation.lazy.LazyListScope.checkerInputSection(
                 targetState = Triple(uiState.selectedNumbers, uiState.matchedNumbers, uiState.checkResult?.contestNumber),
                 animationSpec = tween(animationDurationMs),
                 label = "checker-grid-crossfade",
-            ) {
-                Box(modifier = Modifier.height(gridHeight)) {
-                    CheckerNumberGrid(
-                        uiState = uiState,
-                        onNumberToggle = onNumberToggle,
-                        modifier = Modifier.fillMaxSize(),
-                    )
+            ) { gridState ->
+                key(gridState) {
+                    Box(modifier = Modifier.height(gridHeight)) {
+                        CheckerNumberGrid(
+                            uiState = uiState,
+                            onNumberToggle = onNumberToggle,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
                 }
             }
         }
@@ -402,7 +405,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.checkerInputSection(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(16.dp), // Hardcoded pending LocalSpacing access in extension, could pass it
+                            .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {

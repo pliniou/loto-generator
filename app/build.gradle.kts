@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.baselineprofile)
 }
 
+val enableVersionAudit = providers.gradleProperty("cebolao.enableVersionAudit").orNull == "true"
+
 ktlint {
     // Formatting is enforced - codebase follows ktlint standards
     android.set(true)
@@ -81,6 +83,13 @@ android {
     lint {
         checkReleaseBuilds = true
         abortOnError = true
+        // Keep normal lint focused on actionable app issues; run with
+        // -Pcebolao.enableVersionAudit=true when explicitly auditing dependency updates.
+        checkDependencies = enableVersionAudit
+        if (!enableVersionAudit) {
+            disable += "NewerVersionAvailable"
+            disable += "GradleDependency"
+        }
     }
 }
 

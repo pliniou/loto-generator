@@ -37,21 +37,21 @@ class SyncWorker
                         }
                         is AppResult.Failure -> {
                             Log.e(TAG, "Erro na sincronização em background", result.cause)
-                            if (runAttemptCount < 3) Result.retry() else Result.failure()
+                            retryOrFail()
                         }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Erro na sincronização em background", e)
-                    if (runAttemptCount < 3) {
-                        Result.retry()
-                    } else {
-                        Result.failure()
-                    }
+                    retryOrFail()
                 }
             }
+
+        private fun retryOrFail(): Result =
+            if (runAttemptCount < MAX_RETRY_ATTEMPTS) Result.retry() else Result.failure()
 
         companion object {
             const val WORK_NAME = "lottery_sync_work"
             private const val TAG = "SyncWorker"
+            private const val MAX_RETRY_ATTEMPTS = 3
         }
     }
